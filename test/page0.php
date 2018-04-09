@@ -25,6 +25,19 @@
     <div class="container-fluid">
           <h1>Page 0</h1>
           <p>This is some text.</p>
+          <p>
+              <?php
+              echo "Now (UTC): " . date("Y/m/d h:i:s a") . "<br>";
+              date_default_timezone_set("America/Mexico_City");
+              echo "Now (America/Mexico_City): " . date("Y/m/d h:i:s a") . "<br>";
+              $time = 0;
+              echo "Unix Epoch: " . date("Y/m/d h:i:s a", $time) . "<br>";
+              echo "Unix Epoch: " . date("Y/m/d H:i:s a", $time) . "<br>";
+              $time = mktime(18, 30, 0, 1, 21, 1977);
+              echo "My birthday: " . date("Y/m/d h:i:s a", $time) . "<br>";
+              echo "My birthday: " . date("Y/m/d H:i:s a", $time) . "<br>";
+              ?>
+          </p>
     </div>
 </body>
 </html>

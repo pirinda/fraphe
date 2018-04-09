@@ -1,5 +1,6 @@
 <?php
 require_once "../app/session/FUser.php";
+require_once "../app/session/FSession.php";
 session_start();
 ?>
 <!DOCTYPE html>
@@ -27,6 +28,7 @@ session_start();
               ?>
           </p>
           <p>
+              <h2>User from $_SESSION Global Variable</h2>
               <?php
               echo "Retrieving \$user from \$_SESSION:<br>";
               if (!isset($_SESSION['user'])) {
@@ -34,6 +36,7 @@ session_start();
               } else {
                   $user = $_SESSION['user'];
                   echo "<p>User name: [", $user->getName(), "]</p>";
+
                   echo "<p>Dumping \$user: ", var_dump($_SESSION['user']), "</p>";
               }
 
@@ -42,6 +45,23 @@ session_start();
                   echo "\$undefined not set!<br>";
               } else {
                   echo "<p>Dumping \$undefined: ", var_dump($_SESSION['undefined']), "</p>";
+              }
+              ?>
+              <h2>Session from $_SESSION Global Variable</h2>
+              <?php
+              echo "Retrieving \$session from \$_SESSION:<br>";
+              if (!isset($_SESSION['session'])) {
+                  echo "\$session not set!<br>";
+              } else {
+                  $session = $_SESSION['session'];
+                  echo "<p>Local language: [", $session->getLocLang(), "]</p>";
+                  echo "<p>Local country: [", $session->getLocCountry(), "]</p>";
+                  echo "<p>Local currency: [", $session->getLocCurrency(), "]</p>";
+                  echo "<p>Local time zone: [", $session->getLocTimeZone(), "]</p>";
+
+                  echo "<p>Current user name: [", $session->getCurUser()->getName(), "]</p>";
+                  
+                  echo "<p>Dumping \$session: ", var_dump($_SESSION['session']), "</p>";
               }
               ?>
           </p>

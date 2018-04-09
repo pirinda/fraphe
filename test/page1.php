@@ -1,5 +1,6 @@
 <?php
 require_once "../app/session/FUser.php";
+require_once "../app/session/FSession.php";
 session_start();
 ?>
 <!DOCTYPE html>
@@ -23,10 +24,21 @@ session_start();
           <p>This is some text.</p>
           <?php
           use Fraphe\Session\FUser;
-          $user = new FUser("John Travolta");
+          use Fraphe\Session\FSession;
+          $user = new FUser(1, "John Travolta");
           echo "<p>User name: [", $user->getName(), "]</p>";
           $_SESSION['user'] = $user;
+
+          $session = new FSession();
+          $date = mktime(0, 0, 0, date("m"), date("d"), date("Y"));
+          $session->setCurSettings($date, $user);
+          $_SESSION['session'] = $session;
           ?>
+          <p>
+          <?php
+          echo "Now: " . date("Y/m/d h:i:s a") . "<br>";
+          ?>
+          </p>
           <a href="page2.php">Go to page 2</a>
     </div>
 </body>
