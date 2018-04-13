@@ -26,12 +26,15 @@ session_start();
           use Fraphe\Session\FUser;
           use Fraphe\Session\FSession;
           $user = new FUser(1, "John Travolta");
+          echo "<p>User ID: [", $user->getId(), "]</p>";
           echo "<p>User name: [", $user->getName(), "]</p>";
           $_SESSION['user'] = $user;
 
           $session = new FSession();
           $date = mktime(0, 0, 0, date("m"), date("d"), date("Y"));
           $session->setCurSettings($date, $user);
+          echo "<p>Session current-date as timestamp: [", $session->getCurDate(), "]</p>";
+          echo "<p>Session current-date formatted: [", date("Y/m/d h:i:s a", $session->getCurDate()), "]</p>";
           $_SESSION['session'] = $session;
           ?>
           <p>

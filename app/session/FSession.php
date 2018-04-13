@@ -1,6 +1,8 @@
 <?php
 namespace Fraphe\Session;
 
+require_once "FUser.php";
+
 class FSession
 {
     private $locLang;       // ISO 639-1
@@ -10,7 +12,7 @@ class FSession
     private $curDate;
     private $curUser;
 
-    function __construct()
+    public function __construct()
     {
         $this->locLang = "es";
         $this->locCountry = "MEX";
@@ -18,43 +20,43 @@ class FSession
         $this->locTimeZone = "America/Mexico_City";
     }
 
-    public function getLocLang()
+    public function getLocLang(): string
     {
         return $this->locLang;
     }
 
-    public function getLocCountry()
+    public function getLocCountry(): string
     {
         return $this->locCountry;
     }
 
-    public function getLocCurrency()
+    public function getLocCurrency(): string
     {
         return $this->locCurrency;
     }
 
-    public function getLocTimeZone()
+    public function getLocTimeZone(): string
     {
         return $this->locTimeZone;
     }
 
-    public function setCurSettings($curDate, $curUser)
+    public function setCurSettings(int $curDate, FUser $curUser)
     {
         $this->curDate = $curDate;
         $this->curUser = $curUser;
     }
 
-    public function getCurDate()
+    public function getCurDate(): int
     {
         return $this->curDate;
     }
 
-    public function getCurUser()
+    public function getCurUser(): FUser
     {
         return $this->curUser;
     }
 
-    public function getConnection()
+    public function getConnection(): PDO
     {
         $connection = null;
 
@@ -62,10 +64,9 @@ class FSession
             $connection = new PDO("mysql:host=localhost;port=3306;dbname=fraphe", "root", "msroot");
             $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
-            
+
         }
 
         return $connection;
     }
-
 }

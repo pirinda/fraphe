@@ -6,18 +6,18 @@ class FUser
     private $userId;
     private $userName;
 
-    function __construct($userId, $userName)
+    public function __construct(int $userId, string $userName)
     {
         $this->userId = $userId;
         $this->userName = $userName;
     }
 
-    public function getId()
+    public function getId(): int
     {
         return $this->userId;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->userName;
     }

@@ -28,14 +28,16 @@
           <p>
               <?php
               echo "Now (UTC): " . date("Y/m/d h:i:s a") . "<br>";
-              date_default_timezone_set("America/Mexico_City");
-              echo "Now (America/Mexico_City): " . date("Y/m/d h:i:s a") . "<br>";
+              $timezone = "America/Mexico_City";
+              date_default_timezone_set($timezone);
+              echo "Now ($timezone): " . date("Y/m/d h:i:s a") . "<br>";
               $time = 0;
-              echo "Unix Epoch: " . date("Y/m/d h:i:s a", $time) . "<br>";
-              echo "Unix Epoch: " . date("Y/m/d H:i:s a", $time) . "<br>";
+              echo "Unix Epoch (12h): " . date("Y/m/d h:i:s a", $time) . "<br>";
+              echo "Unix Epoch (24h): " . date("Y/m/d H:i:s", $time) . "<br>";
               $time = mktime(18, 30, 0, 1, 21, 1977);
-              echo "My birthday: " . date("Y/m/d h:i:s a", $time) . "<br>";
-              echo "My birthday: " . date("Y/m/d H:i:s a", $time) . "<br>";
+              echo "My birthday (12h): " . date("Y/m/d h:i:s a", $time) . "<br>";
+              echo "My birthday (24h): " . date("Y/m/d H:i:s", $time) . "<br>";
+              echo "Password Hash: " . password_hash("admin", PASSWORD_DEFAULT) . "<br>";
               ?>
           </p>
     </div>
