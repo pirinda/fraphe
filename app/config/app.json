@@ -1,0 +1,7 @@
+{
+  "appTitle":"LIMS AA 1.0",
+  "appVendor":"CEDIMI Laboratorios",
+  "dbHost":"localhost",
+  "dbPort":"3306",
+  "dbName":"appdev"
+}

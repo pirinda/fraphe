@@ -1,0 +1,25 @@
+<?php
+echo '<nav class="navbar navbar-inverse navbar-fixed-top">';
+echo '<div class="container-fluid">';
+echo '<div class="navbar-header">';
+echo '<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">';
+echo '<span class="icon-bar"></span>';
+echo '<span class="icon-bar"></span>';
+echo '<span class="icon-bar"></span> ';
+echo '</button>';
+echo '<a class="navbar-brand" href="#">' . $_SESSION[APP_NAME] . '</a>';
+echo '</div>';
+echo '<div class="collapse navbar-collapse" id="myNavbar">';
+echo '<ul class="nav navbar-nav">';
+echo '<li class="active"><a href="#">Inicio</a></li>';
+echo '<li><a href="#">Presentación</a></li>';
+echo '<li><a href="#">Funcionalidaes</a></li> ';
+echo '<li><a href="#">Ayuda</a></li> ';
+echo '</ul>';
+echo '<ul class="nav navbar-nav navbar-right">';
+echo '<li><a href="#"><span class="glyphicon glyphicon-user"></span> Registrar</a></li>';
+echo '<li><a href="login.php"><span class="glyphicon glyphicon-log-in"></span> Iniciar</a></li>';
+echo '</ul>';
+echo '</div>';
+echo '</div>';
+echo '</nav>';

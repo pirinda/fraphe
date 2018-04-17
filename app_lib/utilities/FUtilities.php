@@ -1,5 +1,5 @@
 <?php
-function f_sanitize_input($input)
+function f_sanitize_input(string $input): string
 {
     $input = trim($input);
     $input = stripslashes($input);
