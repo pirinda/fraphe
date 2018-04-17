@@ -1,6 +1,6 @@
 <?php
-require_once "../app/session/FUser.php";
-require_once "../app/session/FSession.php";
+require_once "../app_lib/session/FUser.php";
+require_once "../app_lib/session/FUserSession.php";
 session_start();
 ?>
 <!DOCTYPE html>
@@ -59,8 +59,9 @@ session_start();
                   echo "<p>Local currency: [", $session->getLocCurrency(), "]</p>";
                   echo "<p>Local time zone: [", $session->getLocTimeZone(), "]</p>";
 
+                  echo "<p>Current user ID: [", $session->getCurUser()->getId(), "]</p>";
                   echo "<p>Current user name: [", $session->getCurUser()->getName(), "]</p>";
-                  
+
                   echo "<p>Dumping \$session: ", var_dump($_SESSION['session']), "</p>";
               }
               ?>

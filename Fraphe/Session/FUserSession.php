@@ -3,7 +3,7 @@ namespace Fraphe\Session;
 
 require_once "FUser.php";
 
-class FSession
+class FUserSession
 {
     private $locLang;       // ISO 639-1
     private $locCountry;    // ISO 3166-1
@@ -12,12 +12,14 @@ class FSession
     private $curDate;
     private $curUser;
 
-    public function __construct()
+    public function __construct(int $curDate, FUser $curUser)
     {
         $this->locLang = "es";
         $this->locCountry = "MEX";
         $this->locCurrency = "MXN";
         $this->locTimeZone = "America/Mexico_City";
+        $this->curDate = $curDate;
+        $this->curUser = $curUser;
     }
 
     public function getLocLang(): string
@@ -38,12 +40,6 @@ class FSession
     public function getLocTimeZone(): string
     {
         return $this->locTimeZone;
-    }
-
-    public function setCurSettings(int $curDate, FUser $curUser)
-    {
-        $this->curDate = $curDate;
-        $this->curUser = $curUser;
     }
 
     public function getCurDate(): int

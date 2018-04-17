@@ -1,11 +1,7 @@
-<?php
-// start/resume new session:
-//session_start();
-require "utils/sessionstart.php";
-?>
+<?php require "../html/appstartsession.php"; ?>
 <!DOCTYPE html>
 <html>
-<?php require "apphead.php"; ?>
+<?php require "../html/htmlhead.php"; ?>
 <body>
   <div class="container">
     <h1>Iniciar sesión</h1>

@@ -1,20 +1,33 @@
 <?php
 namespace Fraphe\Session;
 
-require_once "../FApp.php";
-
 use Fraphe\FApp;
 
 abstract class FSession
 {
     /*
-    * Starts or resumes PHP session.
+    * Resumes current PHP session, if any, and destroys it.
     * Returns: nothing
     * Throws: nothing
     */
-    public function startSession()
+    public static function destroySession()
     {
-        // start/resume new session:
+        session_start();
+        session_unset();
+        session_destroy();
+    }
+
+    /*
+    * Starts a new and clean PHP session.
+    * Returns: nothing
+    * Throws: nothing
+    */
+    public static function startSession()
+    {
+        // destroy current session, if any:
+        self::destroySession();
+
+        // start a new and clean session:
         session_start();
 
         // validate application configuration:
@@ -31,26 +44,23 @@ abstract class FSession
 
     /*
     * Redirects to index page.
+    * Returns: nothing
+    * Throws: nothing
     */
-    private function redirectIndex()
+    private static function redirectIndex()
     {
-        // redirect to index page:
         header('Location: ../../app/index.php');
     }
 
     /*
-    * Closes PHP session.
-    * Redirects to index.php.
+    * Destroys current PHP session, and redirects to index.php.
     * Returns: nothing
     * Throws: nothing
     */
-    public function closeSession()
+    public static function closeSession()
     {
-        session_start();
-        session_unset();
-        session_destroy();
-
-        redirectIndex();
+        self::destroySession();
+        self::redirectIndex();
     }
 
     /*
@@ -59,13 +69,13 @@ abstract class FSession
     * Returns: nothing
     * Throws: nothing
     */
-    public function validateUserSession()
+    public static function validateUserSession()
     {
-        startSession();
+        self::startSession();
 
         // validate application user:
         if (!array_key_exists(FApp::USER_SESSION, $_SESSION)) {
-            redirectIndex();
+            self::redirectIndex();
         }
     }
 }

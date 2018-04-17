@@ -1,6 +1,4 @@
 <?php
-// start/resume new session:
-//session_start();
 require "utils/sessionvalidate.php";
 ?>
 <!DOCTYPE html>

@@ -1,6 +1,6 @@
 {
-  "appTitle":"LIMS AA 1.0",
-  "appVendor":"CEDIMI Laboratorios",
+  "appName":"APP 1.0",
+  "appVendor":"Mi Empresa SA de CV",
   "dbHost":"localhost",
   "dbPort":"3306",
   "dbName":"appdev"
