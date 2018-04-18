@@ -5,6 +5,8 @@ require_once "FUser.php";
 
 class FUserSession
 {
+    const ATT_USR_SESSION = "userSession";
+
     private $locLang;       // ISO 639-1
     private $locCountry;    // ISO 3166-1
     private $locCurrency;   // ISO 4217
