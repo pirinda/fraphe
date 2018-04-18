@@ -1,7 +1,5 @@
 <?php
-namespace Fraphe\Session;
-
-require_once "FUser.php";
+namespace Fraphe\App;
 
 class FUserSession
 {

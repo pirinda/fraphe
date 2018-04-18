@@ -1,8 +1,15 @@
 <?php
-// start/resume new session:
-require "utils/sessionvalidate.php";
+// bootstrap Fraphe:
+require "../fraphe.php";
 
-$_SESSION[SESSION_USER_ID] = 1;
-$_SESSION[SESSION_USER] = $_POST['username'];
+use Fraphe\App\FApp;
+use Fraphe\App\FUser;
+use Fraphe\App\FUserSession;
 
-header('Location: home.php');
+$user = new FUser(1, $_POST['username']);
+$date = mktime(0, 0, 0, date("m"), date("d"), date("Y"));
+$session = new FUserSession($date, $user);
+
+$_SESSION[FApp::ATT_USER_SESSION] = $session;
+
+FApp::show();

@@ -1,7 +1,10 @@
-<?php require "../html/appstartsession.php"; ?>
+<?php
+// bootstrap Fraphe:
+require "../fraphe.php";
+?>
 <!DOCTYPE html>
 <html>
-<?php require "../html/htmlhead.php"; ?>
+<?php echo Fraphe\App\FApp::composeHtmlHead(); ?>
 <body>
   <div class="container">
     <h1>Iniciar sesión</h1>
@@ -20,6 +23,6 @@
       <button type="submit" class="btn btn-primary">Iniciar</button>
     </form>
   </div>
-  <?php require "appfooter.php"; ?>
+  <?php echo Fraphe\App\FApp::composeFooter(); ?>
 </body>
 </html>
