@@ -1,6 +1,6 @@
 <?php
-// bootstrap Fraphe:
-require "../fraphe.php";
+session_start();
+require $_SESSION['rootDir'] . "/Fraphe/fraphe.php";
 ?>
 <!DOCTYPE html>
 <html>
@@ -10,8 +10,8 @@ require "../fraphe.php";
     <h1>Iniciar sesión</h1>
     <form action="loginaction.php" method="post">
       <div class="form-group">
-        <label for="username">Nombre de usuario o dirección de correo:</label>
-        <input type="username" class="form-control" name="username" placeholder="tu nombre de usuario..." autofocus required>
+        <label for="username">Nombre de usuario o mail:</label>
+        <input type="text" class="form-control" name="username" placeholder="tu nombre de usuario o mail..." autofocus required>
       </div>
       <div class="form-group">
         <label for="userpswd">Contraseña:</label>

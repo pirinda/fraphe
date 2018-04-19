@@ -10,6 +10,8 @@ abstract class FApp
     const ATT_DB_PORT = "dbPort";
     const ATT_DB_NAME = "dbName";
     const APP_CFG_FILE = "app/config/app.json";
+    const ROOT_DIR = "rootDir";
+    const ROOT_DIR_WEB = "rootDirWeb";
 
     /*
     * Composes HTML-element Head.
@@ -42,11 +44,6 @@ abstract class FApp
         $html .= '<div class="container" style="margin-top:50px">';
         $html .= '<h1>' . $_SESSION[self::ATT_APP_NAME] . '</h1>';
         $html .= '<div>';
-        $html .= 'App. root: ' . APP_ROOT_LOCAL;
-        $html .= '</div>';
-        $html .= '<div>';
-        $html .= 'App. root: ' . $_SERVER['PHP_SELF'];
-        $html .= '</div>';
         $html .= '</div>';
         $html .= self::composeFooter();
         $html .= '</body>';
@@ -102,7 +99,7 @@ abstract class FApp
         // validate application configuration:
         if (!self::isSessionActive()) {
           // read application configuration:
-          $name = APP_ROOT_LOCAL . self::APP_CFG_FILE;
+          $name = $_SESSION['RootDir'] . self::APP_CFG_FILE;
           $file = fopen($name, "r") or die("Unable to open file " . $name . "!");
           $json = json_decode(fread($file, filesize($name)), true);
 
@@ -121,9 +118,12 @@ abstract class FApp
     */
     public static function close()
     {
+        $rootDirWeb = $_SESSION[self::ROOT_DIR_WEB];
+
         session_start();
         session_unset();
         session_destroy();
-        header("Location: " . APP_ROOT_LOCAL . "index.php");
+        
+        header("Location: " .  $rootDirWeb . "index.php");
     }
 }

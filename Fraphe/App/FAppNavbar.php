@@ -24,10 +24,10 @@ abstract class FAppNavbar
         $html .= '</ul>';
         $html .= '<ul class="nav navbar-nav navbar-right">';
         if (!FApp::isUserSessionActive()) {
-            $html .= '<li><a href="Fraphe/Lib/login.php"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Iniciar</a></li>';
+            $html .= '<li><a href="' . $_SESSION[FApp::ROOT_DIR_WEB] . 'Fraphe/Lib/login.php"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Iniciar</a></li>';
         } else {
             $html .= '<li><p class="navbar-text">' . $_SESSION[FApp::ATT_USER_SESSION]->getCurUser()->getName() . '</p></li>';
-            $html .= '<li><a href="Fraphe/Lib/logout.php"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Salir</a></li>';
+            $html .= '<li><a href="' . $_SESSION[FApp::ROOT_DIR_WEB] . 'Fraphe/Lib/logout.php"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Salir</a></li>';
         }
         $html .= '</ul>';
         $html .= '</div>';

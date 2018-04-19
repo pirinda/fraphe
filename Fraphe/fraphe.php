@@ -1,27 +1,14 @@
 <?php
-//==============================================================================
-// BOOTSTRAP FRAPHE FRAMEWORK
-//==============================================================================
-
 //------------------------------------------------------------------------------
-//
+// Fraphé Framework Autoloader
 //------------------------------------------------------------------------------
 
-// set local application-root:
-if (!defined("APP_ROOT_LOCAL")) {
-    define("APP_ROOT_LOCAL", substr(__DIR__, 0, strpos(__DIR__, "Fraphe")));
-}
-
-// set HTTP application-root:
-if (!defined("APP_ROOT_HTTP")) {
-    define("APP_ROOT_HTTP", substr(__DIR__, 0, strpos(__DIR__, "Fraphe")));
+if (!isset($_SESSION)) {
+    session_start();
 }
 
 spl_autoload_register(function ($class_name) {
-    if (file_exists(APP_ROOT_LOCAL . $class_name . ".php")) {
-        require_once APP_ROOT_LOCAL . $class_name . ".php";
+    if (file_exists($_SESSION['rootDir'] . $class_name . ".php")) {
+        require_once $_SESSION['rootDir'] . $class_name . ".php";
     }
 });
-
-// starts/resumes session:
-session_start();

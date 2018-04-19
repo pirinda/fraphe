@@ -46,5 +46,8 @@
         </table>
       </div>
     </div>
+    <div class="container-fluid">
+        <?php echo "Session set? R= " . (isset($_SESSION) ? "yes" : "no"); ?>
+    </div>
   </body>
 </html>
