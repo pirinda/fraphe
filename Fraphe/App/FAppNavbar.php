@@ -5,7 +5,8 @@ abstract class FAppNavbar
 {
     public static function composeNav(): string
     {
-        $html = '<nav class="navbar navbar-inverse navbar-fixed-top">';
+        //$html = '<nav class="navbar navbar-inverse navbar-fixed-top">';
+        $html = '<nav class="navbar navbar-inverse">';
         $html .= '<div class="container-fluid">';
         $html .= '<div class="navbar-header">';
         $html .= '<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">';
@@ -26,7 +27,7 @@ abstract class FAppNavbar
         if (!FApp::isUserSessionActive()) {
             $html .= '<li><a href="' . $_SESSION[FApp::ROOT_DIR_WEB] . 'Fraphe/Lib/login.php"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Iniciar</a></li>';
         } else {
-            $html .= '<li><p class="navbar-text">' . $_SESSION[FApp::ATT_USER_SESSION]->getCurUser()->getName() . '</p></li>';
+            $html .= '<li><p class="navbar-text">' . unserialize($_SESSION[FApp::ATT_USER_SESSION])->getCurUser()->getName() . '</p></li>';
             $html .= '<li><a href="' . $_SESSION[FApp::ROOT_DIR_WEB] . 'Fraphe/Lib/logout.php"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Salir</a></li>';
         }
         $html .= '</ul>';

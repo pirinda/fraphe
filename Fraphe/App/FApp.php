@@ -43,7 +43,8 @@ abstract class FApp
         $html .= FAppNavbar::composeNav();
         $html .= '<div class="container" style="margin-top:50px">';
         $html .= '<h1>' . $_SESSION[self::ATT_APP_NAME] . '</h1>';
-        $html .= '<div>';
+        $html .= '</div>';
+        $html .= '<div class="container">';
         $html .= '</div>';
         $html .= self::composeFooter();
         $html .= '</body>';
@@ -99,7 +100,7 @@ abstract class FApp
         // validate application configuration:
         if (!self::isSessionActive()) {
           // read application configuration:
-          $name = $_SESSION['RootDir'] . self::APP_CFG_FILE;
+          $name = $_SESSION[self::ROOT_DIR] . self::APP_CFG_FILE;
           $file = fopen($name, "r") or die("Unable to open file " . $name . "!");
           $json = json_decode(fread($file, filesize($name)), true);
 
@@ -123,7 +124,19 @@ abstract class FApp
         session_start();
         session_unset();
         session_destroy();
-        
+
+        header("Location: " .  $rootDirWeb . "index.php");
+    }
+
+    /*
+    * Redirects to index.php.
+    * Returns: nothing
+    * Throws: nothing
+    */
+    public static function goHome()
+    {
+        $rootDirWeb = $_SESSION[self::ROOT_DIR_WEB];
+
         header("Location: " .  $rootDirWeb . "index.php");
     }
 }

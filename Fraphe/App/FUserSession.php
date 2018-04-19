@@ -3,23 +3,21 @@ namespace Fraphe\App;
 
 class FUserSession
 {
-    const ATT_USR_SESSION = "userSession";
-
     private $locLang;       // ISO 639-1
     private $locCountry;    // ISO 3166-1
     private $locCurrency;   // ISO 4217
     private $locTimeZone;
-    private $curDate;
     private $curUser;
+    private $curDate;
 
-    public function __construct(int $curDate, FUser $curUser)
+    public function __construct(FUser $curUser, int $curDate)
     {
         $this->locLang = "es";
         $this->locCountry = "MEX";
         $this->locCurrency = "MXN";
         $this->locTimeZone = "America/Mexico_City";
-        $this->curDate = $curDate;
         $this->curUser = $curUser;
+        $this->curDate = $curDate;
     }
 
     public function getLocLang(): string
@@ -42,14 +40,14 @@ class FUserSession
         return $this->locTimeZone;
     }
 
-    public function getCurDate(): int
-    {
-        return $this->curDate;
-    }
-
     public function getCurUser(): FUser
     {
         return $this->curUser;
+    }
+
+    public function getCurDate(): int
+    {
+        return $this->curDate;
     }
 
     public function getConnection(): PDO
