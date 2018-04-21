@@ -3,15 +3,21 @@ namespace Fraphe\App;
 
 abstract class FApp
 {
-    const ATT_APP_NAME = "appName";
-    const ATT_APP_VENDOR = "appVendor";
-    const ATT_USER_SESSION = "userSession";
-    const ATT_DB_HOST = "dbHost";
-    const ATT_DB_PORT = "dbPort";
-    const ATT_DB_NAME = "dbName";
-    const APP_CFG_FILE = "app/config/app.json";
+    const APP_NAME = "appName";
+    const APP_VENDOR = "appVendor";
+    const USER_ID = "userId";
+    const USER_NAME = "userName";
+    const USER_LOGIN_TS = "userLoginTs";
+    const CFG_FILE_APP = "app/config/app.json";
+    const CFG_FILE_DB = "app/config/db.json";
+    const CFG_FILE_MENU = "app/config/menu.json";
     const ROOT_DIR = "rootDir";
     const ROOT_DIR_WEB = "rootDirWeb";
+
+    const OPT = "option";
+    const OPT_HOME = "home";
+    const OPT_FEAT = "feat";
+    const OPT_HELP = "help";
 
     /*
     * Composes HTML-element Head.
@@ -21,7 +27,7 @@ abstract class FApp
     public static function composeHtmlHead(): string
     {
         $html = '<head>';
-        $html .= '<title>' . $_SESSION[self::ATT_APP_NAME] . '</title>';
+        $html .= '<title>' . $_SESSION[self::APP_NAME] . '</title>';
         $html .= '<meta charset="utf-8">';
         $html .= '<meta name="viewport" content="width=device-width, initial-scale=1">';
         $html .= '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">';
@@ -40,12 +46,8 @@ abstract class FApp
     public static function composeHtmlBody(): string
     {
         $html = '<body>';
-        $html .= FAppNavbar::composeNav();
-        $html .= '<div class="container" style="margin-top:50px">';
-        $html .= '<h1>' . $_SESSION[self::ATT_APP_NAME] . '</h1>';
-        $html .= '</div>';
-        $html .= '<div class="container">';
-        $html .= '</div>';
+        $html .= FAppNavbar::compose();
+        $html .= FAppBody::compose();
         $html .= self::composeFooter();
         $html .= '</body>';
 
@@ -59,9 +61,12 @@ abstract class FApp
     */
     public static function composeFooter(): string
     {
-        $html = '<div class="container">';
-        $html .= 'Copyright &copy;' . date("Y") . ' ' . $_SESSION[self::ATT_APP_VENDOR];
+        $html = '<footer>';
+        $html .= '<div class="container-fluid">';
+        $html .= '<hr>';
+        $html .= 'Copyright &copy;' . date("Y") . ' ' . $_SESSION[self::APP_VENDOR];
         $html .= '</div>';
+        $html .= '</footer>';
 
         return $html;
     }
@@ -82,12 +87,12 @@ abstract class FApp
 
     public static function isSessionActive(): bool
     {
-        return array_key_exists(self::ATT_APP_NAME, $_SESSION);
+        return array_key_exists(self::APP_NAME, $_SESSION);
     }
 
     public static function isUserSessionActive(): bool
     {
-        return array_key_exists(self::ATT_USER_SESSION, $_SESSION);
+        return array_key_exists(self::USER_ID, $_SESSION);
     }
 
     /*
@@ -100,13 +105,13 @@ abstract class FApp
         // validate application configuration:
         if (!self::isSessionActive()) {
           // read application configuration:
-          $name = $_SESSION[self::ROOT_DIR] . self::APP_CFG_FILE;
+          $name = $_SESSION[self::ROOT_DIR] . self::CFG_FILE_APP;
           $file = fopen($name, "r") or die("Unable to open file " . $name . "!");
           $json = json_decode(fread($file, filesize($name)), true);
 
           // set application-configuration session variables:
-          $_SESSION[self::ATT_APP_NAME] = $json[self::ATT_APP_NAME];
-          $_SESSION[self::ATT_APP_VENDOR] = $json[self::ATT_APP_VENDOR];
+          $_SESSION[self::APP_NAME] = $json[self::APP_NAME];
+          $_SESSION[self::APP_VENDOR] = $json[self::APP_VENDOR];
         }
 
         self::show();

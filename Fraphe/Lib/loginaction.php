@@ -5,14 +5,9 @@ if (!isset($_SESSION)) {
 require $_SESSION['rootDir'] . "Fraphe" . DIRECTORY_SEPARATOR . "fraphe.php";
 
 use Fraphe\App\FApp;
-use Fraphe\App\FUser;
-use Fraphe\App\FUserSession;
 
-$user = new FUser(1, $_POST['username']);
-
-$date = mktime(0, 0, 0, date("m"), date("d"), date("Y"));
-$session = new FUserSession($user, $date);
-
-$_SESSION[FApp::ATT_USER_SESSION] = serialize($session);
+$_SESSION[FApp::USER_ID] = 1;
+$_SESSION[FApp::USER_NAME] = $_POST['username'];
+$_SESSION[FApp::USER_LOGIN_TS] = gettimeofday(true);
 
 FApp::goHome();

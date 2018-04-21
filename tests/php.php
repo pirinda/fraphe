@@ -27,6 +27,38 @@
 <div class="container">
   <h3>Basic Navbar Example</h3>
   <p>A navigation bar is a navigation header that is placed at the top of the page.</p>
+  <?php
+  /*
+  $a;
+  echo "var \$a is " . (isset($a) ? "set" : "not set") . ".<br>";
+  echo "var \$b is " . (isset($b) ? "set" : "not set") . ".<br>";
+  */
+
+  $name = "../app/config/menu.json";
+  $file = fopen($name, "r") or die("Unable to open file " . $name . "!");
+  echo "<h1>\$file</h1>";
+  var_dump($file);
+  $json = json_decode(fread($file, filesize($name)), true);
+  echo "<h1>\$json</h1>";
+  var_dump($json);
+  echo "<h2>Loop through \$json</h2>";
+  foreach ($json as $x => $x_val) {
+      echo "<hr>key=" . $x . "<br>";
+      var_dump($x);
+      var_dump($x_val);
+      echo "<br>";
+      $lenx = count($x_val);
+      echo "count: " . $lenx;
+      foreach ($x_val as $m => $m_val) {
+          echo "<hr>key=" . $m . "<br>";
+          var_dump($m);
+          var_dump($m_val);
+          echo "<br>";
+          $lenm = count($m_val);
+          echo "count: " . $lenm;
+      }
+  }
+  ?>
 </div>
 
 </body>

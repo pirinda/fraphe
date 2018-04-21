@@ -3,5 +3,9 @@
   "appVendor":"Mi Empresa SA de CV",
   "dbHost":"localhost",
   "dbPort":"3306",
-  "dbName":"appdev"
+  "dbName":"appdev",
+  "locLang":"es",
+  "locCountry":"MEX",
+  "locCurrency":"MXN",
+  "locTimeZone":"America/Mexico_City"
 }
