@@ -7,22 +7,30 @@ use Fraphe\Session\FSession;
 
 abstract class FRegistry
 {
-    public const READ = 1;
-    public const WRITE = 2;
+    public const MODE_READ = 1;
+    public const MODE_WRITE = 2;
+
+    public const DATA_TYPE_BOOL = 1;
+    public const DATA_TYPE_INT = 2;
+    public const DATA_TYPE_FLOAT = 3;
+    public const DATA_TYPE_STRING = 4;
+    public const DATA_TYPE_ARRAY = 5;
 
     protected $session;
     protected $registryType;
     protected $registryId;
     protected $isRegistryNew;
     protected $isRegistryModified;
+    protected $lockId;
 
     public function __construct(FSession $session, int $registryType)
     {
         $this->session = $session;
         $this->registryType = $registryType;
         $this->registryId = 0;
-        $this->$isRegistryNew = true;
-        $this->$isRegistryModified = false;
+        $this->isRegistryNew = true;
+        $this->isRegistryModified = false;
+        $this->lockId = 0;
     }
 
     /* Initializes registry data.
@@ -42,7 +50,7 @@ abstract class FRegistry
      * Returns: nothing.
      * Throws: Exception if something fails.
      */
-    abstract public function setData(array $array);
+    abstract public function setData(array $data);
 
     /* Gets registry data.
      * Returns: associative array of registry data in the attribute=value form.
@@ -75,12 +83,12 @@ abstract class FRegistry
 
     }
 
-    public function relock()
+    public function unlock()
     {
 
     }
 
-    public function unlock()
+    private function isLocked(): bool
     {
 
     }
