@@ -9,15 +9,18 @@ abstract class FApp
     const USER_NAME = "userName";
     const USER_LOGIN_TS = "userLoginTs";
     const CFG_FILE_APP = "app/config/app.json";
-    const CFG_FILE_DB = "app/config/db.json";
     const CFG_FILE_MENU = "app/config/menu.json";
     const ROOT_DIR = "rootDir";
     const ROOT_DIR_WEB = "rootDirWeb";
+    const CUR_FEAT = "curFeature";
+    const CUR_MENU = "curMenu";
+    const CUR_SMENU = "curSubmenu";
 
     const OPT = "option";
     const OPT_HOME = "home";
-    const OPT_FEAT = "feat";
+    const OPT_FEAT = "feature";
     const OPT_HELP = "help";
+
 
     /*
     * Composes HTML-element Head.

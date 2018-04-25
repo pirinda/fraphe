@@ -1,0 +1,57 @@
+{
+    "id1":{
+        "feature":"Feature 1",
+        "descrip":"Feature 1 description, bla, bla, bla.",
+        "menus":{
+            "id1m1":{
+                "menu":"Menu 11",
+                "descrip":"Menu 11 description, bla, bla, bla.",
+                "submenus":{
+                    "id1m1s1":{
+                        "submenu":"Submenu 111",
+                        "descrip":"Submenu 111 description, bla, bla, bla.",
+                        "href":"submenu111.php"
+                    }
+                }
+            }
+        }
+    },
+    "id2":{
+        "feature":"Feature 2",
+        "descrip":"Feature 2 description, bla, bla, bla.",
+        "menus":{
+            "id2m1":{
+                "menu":"Menu 21",
+                "descrip":"Menu 21 description, bla, bla, bla.",
+                "submenus":{
+                    "id2m1s1":{
+                        "submenu":"Submenu 211",
+                        "descrip":"Submenu 211 description, bla, bla, bla.",
+                        "href":"submenu211.php"
+                    },
+                    "id2m1s2":{
+                        "submenu":"Submenu 212",
+                        "descrip":"Submenu 212 description, bla, bla, bla.",
+                        "href":"submenu212.php"
+                    }
+                }
+            },
+            "id2m2":{
+                "menu":"Menu 22",
+                "descrip":"Menu 22 description, bla, bla, bla.",
+                "submenus":{
+                    "id2m2s1":{
+                        "submenu":"Submenu 221",
+                        "descrip":"Submenu 221 description, bla, bla, bla.",
+                        "href":"submenu221.php"
+                    },
+                    "id2m2s2":{
+                        "submenu":"Submenu 222",
+                        "descrip":"Submenu 222 description, bla, bla, bla.",
+                        "href":"submenu222.php"
+                    }
+                }
+            }
+        }
+    }
+}

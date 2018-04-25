@@ -1,5 +1,35 @@
 {
-    {
-        
+    "cats":{
+        "feature":"Catálogos",
+        "descrip":"Gestión de catálogos de usuario.",
+        "menus":{
+            "cats1":{
+                "menu":"Análisis",
+                "descrip":"Análisis: ensayos, determinaciones, estudios, etc.",
+                "submenus":{
+                    "cats11":{
+                        "submenu":"Análisis",
+                        "descrip":"Análisis.",
+                        "href":"cats11.php"
+                    }
+                }
+            },
+            "cats2":{
+                "menu":"Asociados negocios",
+                "descrip":"Clientes y proveedores",
+                "submenus":{
+                    "cats21":{
+                        "submenu":"Clientes",
+                        "descrip":"Clientes.",
+                        "href":"cats21.php"
+                    },
+                    "cats22":{
+                        "submenu":"Proveedores",
+                        "descrip":"Proveedores.",
+                        "href":"cats22.php"
+                    }
+                }
+            }
+        }
     }
 }

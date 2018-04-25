@@ -42,20 +42,43 @@
   echo "<h1>\$json</h1>";
   var_dump($json);
   echo "<h2>Loop through \$json</h2>";
-  foreach ($json as $x => $x_val) {
-      echo "<hr>key=" . $x . "<br>";
-      var_dump($x);
-      var_dump($x_val);
-      echo "<br>";
-      $lenx = count($x_val);
-      echo "count: " . $lenx;
-      foreach ($x_val as $m => $m_val) {
-          echo "<hr>key=" . $m . "<br>";
+  foreach ($json as $f => $f_val) {
+      echo "<hr>";
+      echo "<h3>key=" . $f . "</h3>";
+      var_dump($f);
+      var_dump($f_val);
+      foreach ($f_val as $m => $m_val) {
+          echo "<h4>-key=" . $m . "</h4>";
           var_dump($m);
           var_dump($m_val);
-          echo "<br>";
-          $lenm = count($m_val);
-          echo "count: " . $lenm;
+          if (is_array($m_val)) {
+              foreach ($m_val as $s => $s_val) {
+                  echo "<h4>--key=" . $s . "</h4>";
+                  var_dump($s);
+                  var_dump($s_val);
+                  if (is_array($s_val)) {
+                      foreach ($s_val as $ss => $ss_val) {
+                          echo "<h5>---key=" . $ss . "</h5>";
+                          var_dump($ss);
+                          var_dump($ss_val);
+                          if (is_array($ss_val)) {
+                              foreach ($ss_val as $sss => $sss_val) {
+                                  echo "<h5>----key=" . $sss . "</h5>";
+                                  var_dump($sss);
+                                  var_dump($sss_val);
+                                  if (is_array($sss_val)) {
+                                      foreach ($sss_val as $ssss => $ssss_val) {
+                                          echo "<h6>-----key=" . $ssss . "</h6>";
+                                          var_dump($ssss);
+                                          var_dump($ssss_val);
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+          }
       }
   }
   ?>
