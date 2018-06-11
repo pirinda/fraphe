@@ -5,9 +5,10 @@ if (!isset($_SESSION)) {
 require $_SESSION['rootDir'] . "Fraphe" . DIRECTORY_SEPARATOR . "fraphe.php";
 
 use Fraphe\App\FApp;
+use Fraphe\App\FAppConsts;
 
-$_SESSION[FApp::USER_ID] = 1;
-$_SESSION[FApp::USER_NAME] = $_POST['username'];
-$_SESSION[FApp::USER_LOGIN_TS] = gettimeofday(true);
+$_SESSION[FAppConsts::USER_ID] = 1;
+$_SESSION[FAppConsts::USER_NAME] = $_POST['username'];
+$_SESSION[FAppConsts::USER_LOGIN_TS] = gettimeofday(true);
 
 FApp::goHome();

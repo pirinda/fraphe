@@ -1,32 +1,89 @@
 {
-    "cats":{
-        "feature":"Catálogos",
-        "descrip":"Gestión de catálogos de usuario.",
+    "catalogs":{
+        "module":"Catálogos",
+        "href":"app/modules.php?module=catalogs",
         "menus":{
-            "cats1":{
-                "menu":"Análisis",
-                "descrip":"Análisis: ensayos, determinaciones, estudios, etc.",
+            "customer":{
+                "menu":"Clientes",
+                "href":"menu=customer",
                 "submenus":{
-                    "cats11":{
-                        "submenu":"Análisis",
-                        "descrip":"Análisis.",
-                        "href":"cats11.php"
+                    "customer":{
+                        "submenu":"Clientes",
+                        "href":"app/views.php?view=customer"
+                    },
+                    "customerAddress":{
+                        "submenu":"Domicilios clientes",
+                        "href":"app/views.php?view=customerAddress"
+                    },
+                    "marketSegment":{
+                        "submenu":"Segmentos mercado",
+                        "href":"app/views/catalogs/view_market_segment.php"
                     }
                 }
             },
-            "cats2":{
-                "menu":"Asociados negocios",
-                "descrip":"Clientes y proveedores",
+            "provider":{
+                "menu":"Proveedores",
+                "href":"menu=provider",
                 "submenus":{
-                    "cats21":{
-                        "submenu":"Clientes",
-                        "descrip":"Clientes.",
-                        "href":"cats21.php"
-                    },
-                    "cats22":{
+                    "customer":{
                         "submenu":"Proveedores",
-                        "descrip":"Proveedores.",
-                        "href":"cats22.php"
+                        "href":"app/views.php?view=provider"
+                    },
+                    "customerAddress":{
+                        "submenu":"Domicilios proveedores",
+                        "href":"app/views.php?view=providerAddress"
+                    }
+                }
+            },
+            "test":{
+                "menu":"Ensayos",
+                "href":"menu=tests",
+                "submenus":{
+                    "test":{
+                        "submenu":"Ensayos",
+                        "href":"app/views.php?view=test"
+                    },
+                    "testProfile":{
+                        "submenu":"Perfiles ensayos",
+                        "href":"app/views.php?view=testProfile"
+                    },
+                    "testPackage":{
+                        "submenu":"Paquetes ensayos",
+                        "href":"app/views.php?view=testPackage"
+                    },
+                    "testingMethod":{
+                        "submenu":"Métodos ensayos",
+                        "href":"app/views.php?view=testingMethod"
+                    },
+                    "samplingMethod":{
+                        "submenu":"Métodos muestreo",
+                        "href":"app/views.php?view=samplingMethod"
+                    }
+                }
+            },
+            "results":{
+                "menu":"Informes resultados",
+                "href":"menu=results",
+                "submenus":{
+                    "resultUnit":{
+                        "submenu":"Unidades",
+                        "href":"php.php"
+                    },
+                    "resultUnitValue":{
+                        "submenu":"Valores unidades",
+                        "href":"php.php"
+                    },
+                    "resultPermissLimit":{
+                        "submenu":"Límites permisibles",
+                        "href":"php.php"
+                    },
+                    "testingNote":{
+                        "submenu":"Notas ensayo",
+                        "href":"php.php"
+                    },
+                    "samplingNote":{
+                        "submenu":"Notas muestreo",
+                        "href":"php.php"
                     }
                 }
             }

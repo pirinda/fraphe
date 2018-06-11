@@ -1,9 +1,12 @@
 {
   "appName":"LIMS 1.0",
   "appVendor":"CEDIMI Laboratorios",
+  "appCatalogs":["catalogs"],
   "dbHost":"localhost",
   "dbPort":"3306",
-  "dbName":"appdev",
+  "dbName":"test1",
+  "dbUserName":"root",
+  "dbUserPswd":"msroot",
   "locLang":"es",
   "locCountry":"MEX",
   "locCurrency":"MXN",

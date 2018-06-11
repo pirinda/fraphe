@@ -5,14 +5,14 @@ class FGuiMenu
 {
     protected $id;
     protected $name;
-    protected $descrip;
+    protected $href;
     protected $submenus;
 
-    public function __construct(string $id, string $name, string $descrip, array $submenus)
+    public function __construct(string $id, string $name, string $href, array $submenus)
     {
         $this->id = $id;
         $this->name = $name;
-        $this->descrip = $descrip;
+        $this->href = $href;
         $this->submenus = $submenus;
     }
 
@@ -26,9 +26,9 @@ class FGuiMenu
         return $this->name;
     }
 
-    public function getDescrip(): string
+    public function getHref(): string
     {
-        return $this->descrip;
+        return $this->href;
     }
 
     public function getSubmenus(): array

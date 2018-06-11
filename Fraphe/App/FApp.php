@@ -3,24 +3,22 @@ namespace Fraphe\App;
 
 abstract class FApp
 {
-    const APP_NAME = "appName";
-    const APP_VENDOR = "appVendor";
-    const USER_ID = "userId";
-    const USER_NAME = "userName";
-    const USER_LOGIN_TS = "userLoginTs";
-    const CFG_FILE_APP = "app/config/app.json";
-    const CFG_FILE_MENU = "app/config/menu.json";
-    const ROOT_DIR = "rootDir";
-    const ROOT_DIR_WEB = "rootDirWeb";
-    const CUR_FEAT = "curFeature";
-    const CUR_MENU = "curMenu";
-    const CUR_SMENU = "curSubmenu";
+    /*
+    * Composes application footer. It should be rendered at the and of HTML Body element.
+    * Return: string.
+    * Throws: nothing.
+    */
+    public static function composeFooter(): string
+    {
+        $html = '<footer>';
+        $html .= '<div class="container-fluid">';
+        $html .= '<hr>';
+        $html .= 'Copyright &copy;' . date("Y") . ' ' . $_SESSION[FAppConsts::APP_VENDOR];
+        $html .= '</div>';
+        $html .= '</footer>';
 
-    const OPT = "option";
-    const OPT_HOME = "home";
-    const OPT_FEAT = "feature";
-    const OPT_HELP = "help";
-
+        return $html;
+    }
 
     /*
     * Composes HTML-element Head.
@@ -30,9 +28,10 @@ abstract class FApp
     public static function composeHtmlHead(): string
     {
         $html = '<head>';
-        $html .= '<title>' . $_SESSION[self::APP_NAME] . '</title>';
+        $html .= '<title>' . $_SESSION[FAppConsts::APP_NAME] . '</title>';
         $html .= '<meta charset="utf-8">';
         $html .= '<meta name="viewport" content="width=device-width, initial-scale=1">';
+        $html .= '<link rel="stylesheet" href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'css/sidenav.css">';
         $html .= '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">';
         $html .= '<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>';
         $html .= '<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>';
@@ -50,26 +49,9 @@ abstract class FApp
     {
         $html = '<body>';
         $html .= FAppNavbar::compose();
-        $html .= FAppBody::compose();
+        $html .= FAppBodyHome::compose();
         $html .= self::composeFooter();
         $html .= '</body>';
-
-        return $html;
-    }
-
-    /*
-    * Composes application footer.
-    * Return: string.
-    * Throws: nothing.
-    */
-    public static function composeFooter(): string
-    {
-        $html = '<footer>';
-        $html .= '<div class="container-fluid">';
-        $html .= '<hr>';
-        $html .= 'Copyright &copy;' . date("Y") . ' ' . $_SESSION[self::APP_VENDOR];
-        $html .= '</div>';
-        $html .= '</footer>';
 
         return $html;
     }
@@ -90,12 +72,12 @@ abstract class FApp
 
     public static function isSessionActive(): bool
     {
-        return array_key_exists(self::APP_NAME, $_SESSION);
+        return array_key_exists(FAppConsts::APP_NAME, $_SESSION);
     }
 
     public static function isUserSessionActive(): bool
     {
-        return array_key_exists(self::USER_ID, $_SESSION);
+        return array_key_exists(FAppConsts::USER_ID, $_SESSION);
     }
 
     /*
@@ -107,14 +89,17 @@ abstract class FApp
     {
         // validate application configuration:
         if (!self::isSessionActive()) {
-          // read application configuration:
-          $name = $_SESSION[self::ROOT_DIR] . self::CFG_FILE_APP;
-          $file = fopen($name, "r") or die("Unable to open file " . $name . "!");
-          $json = json_decode(fread($file, filesize($name)), true);
+            // read and decode JSON file of application configuration:
+            $json = FGuiUtils::decodeJson($_SESSION[FAppConsts::ROOT_DIR] . FAppConsts::CFG_FILE_APP);
 
-          // set application-configuration session variables:
-          $_SESSION[self::APP_NAME] = $json[self::APP_NAME];
-          $_SESSION[self::APP_VENDOR] = $json[self::APP_VENDOR];
+            // set application-configuration session variables:
+            $_SESSION[FAppConsts::APP_NAME] = $json[FAppConsts::APP_NAME];
+            $_SESSION[FAppConsts::APP_VENDOR] = $json[FAppConsts::APP_VENDOR];
+            $_SESSION[FAppConsts::DB_HOST] = $json[FAppConsts::DB_HOST];
+            $_SESSION[FAppConsts::DB_PORT] = $json[FAppConsts::DB_PORT];
+            $_SESSION[FAppConsts::DB_NAME] = $json[FAppConsts::DB_NAME];
+            $_SESSION[FAppConsts::DB_USER_NAME] = $json[FAppConsts::DB_USER_NAME];
+            $_SESSION[FAppConsts::DB_USER_PSWD] = $json[FAppConsts::DB_USER_PSWD];
         }
 
         self::show();
@@ -127,7 +112,7 @@ abstract class FApp
     */
     public static function close()
     {
-        $rootDirWeb = $_SESSION[self::ROOT_DIR_WEB];
+        $rootDirWeb = $_SESSION[FAppConsts::ROOT_DIR_WEB];
 
         session_start();
         session_unset();
@@ -143,7 +128,7 @@ abstract class FApp
     */
     public static function goHome()
     {
-        $rootDirWeb = $_SESSION[self::ROOT_DIR_WEB];
+        $rootDirWeb = $_SESSION[FAppConsts::ROOT_DIR_WEB];
 
         header("Location: " .  $rootDirWeb . "index.php");
     }

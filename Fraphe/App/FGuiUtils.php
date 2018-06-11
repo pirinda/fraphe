@@ -3,110 +3,134 @@ namespace Fraphe\App;
 
 abstract class FGuiUtils
 {
-    public function getFeature(string $featureId): FGuiFeature
+    public static function decodeJson(string $filename): array
     {
-        $feature = new FGuiFeature("", "", "", array());
+        $file = fopen($filename, "r") or die("Unable to open file " . $filename . "!");
+        return json_decode(fread($file, filesize($filename)), true);
+    }
 
-        $name = $_SESSION[FApp::ROOT_DIR] . FApp::CFG_FILE_MENU;
-        $file = fopen($name, "r") or die("Unable to open file " . $name . "!");
-        $json = json_decode(fread($file, filesize($name)), true);
+    private static function digestModule(string $moduleId, array $jsonMenu): FGuiModule
+    {
+        $module;
 
         // loop through features:
-        foreach ($json as $featKey => $featVal) {
-            if ($featureId == $featKey) {
-                $featureName;
-                $featureDescrip;
+        foreach ($jsonMenu as $moduleKey => $moduleVal) {
+            if ($moduleId == $moduleKey) {
+                $moduleName;
+                $moduleHref;
                 $menus = array();
 
                 // loop through feature attributes:
-                foreach ($featVal as $featAttKey => $featAttVal) {
-                    switch ($featAttKey) {
-                        case "feature":
-                            $featureName = $featAttVal;
+                foreach ($moduleVal as $moduleAttKey => $moduleAttVal) {
+                    switch ($moduleAttKey) {
+                        case FGuiModule::JSON_MOD:
+                            $moduleName = $moduleAttVal;
                             break;
 
-                        case "descrip":
-                            $featureDescrip = $featAttVal;
+                        case FGuiModule::JSON_HREF:
+                            $moduleHref = $moduleAttVal;
                             break;
 
-                        case "menus":
-                            if (is_array($featAttVal)) {
+                        case FGuiModule::JSON_MENUS:
+                            if (is_array($moduleAttVal)) {
                                 // loop through feature menus:
-                                foreach ($featAttVal as $menuKey => $menuVal) {
+                                foreach ($moduleAttVal as $menuKey => $menuVal) {
                                     $menuId = $menuKey;
                                     $menuName;
-                                    $menuDescrip;
+                                    $menuHref;
                                     $submenus = array();
 
                                     if (is_array($menuVal)) {
                                         // loop through current menu attributes:
                                         foreach ($menuVal as $menuAttKey => $menuAttVal) {
                                             switch ($menuAttKey) {
-                                                case "menu":
+                                                case FGuiModule::JSON_MENU:
                                                     $menuName = $menuAttVal;
                                                     break;
 
-                                                case "descrip":
-                                                    $menuDescrip = $menuAttVal;
+                                                case FGuiModule::JSON_HREF:
+                                                    $menuHref = $menuAttVal;
                                                     break;
 
-                                                case "submenus":
+                                                case FGuiModule::JSON_SUBMENUS:
                                                     if (is_array($menuAttVal)) {
                                                         // loop through menu submenus:
                                                         foreach ($menuAttVal as $submenuKey => $submenuVal) {
                                                             $submenuId = $submenuKey;
                                                             $submenuName;
-                                                            $submenuDescrip;
                                                             $submenuHref;
 
                                                             if (is_array($submenuVal)) {
                                                                 // loop through current submenu attributes:
                                                                 foreach ($submenuVal as $submenuAttKey => $submenuAttVal) {
                                                                     switch ($submenuAttKey) {
-                                                                        case "submenu":
+                                                                        case FGuiModule::JSON_SUBMENU:
                                                                             $submenuName = $submenuAttVal;
                                                                             break;
 
-                                                                        case "descrip":
-                                                                            $submenuDescrip = $submenuAttVal;
-                                                                            break;
-
-                                                                        case "href":
+                                                                        case FGuiModule::JSON_HREF:
                                                                             $submenuHref = $submenuAttVal;
                                                                             break;
 
                                                                         default:
-                                                                            throw new Exception("Unknown feature/menu/submenue attribute '$submenuAttKey'!");
+                                                                            throw new Exception("Unknown " . SGuiModule::JSON_MOD . "/" . SGuiModule::JSON_MENU . "/" . SGuiModule::JSON_SUBMENU . " attribute '$submenuAttKey'!");
                                                                     }
                                                                 }
 
-                                                                $submenus[] = new FGuiSubmenu($submenuId, $submenuName, $submenuDescrip, $submenuHref);
+                                                                $submenus[$submenuId] = new FGuiSubmenu($submenuId, $submenuName, $submenuHref);
                                                             }
                                                         }
                                                     }
                                                     break;
 
                                                 default:
-                                                    throw new Exception("Unknown feature/menu attribute '$menuAttKey'!");
+                                                    throw new Exception("Unknown " . SGuiModule::JSON_MOD . "/" . SGuiModule::JSON_MENU . " attribute '$menuAttKey'!");
                                             }
                                         }
 
-                                        $menus[] = new FGuiMenu($menuId, $menuName, $menuDescrip, $submenus);
+                                        $menus[$menuId] = new FGuiMenu($menuId, $menuName, $menuHref, $submenus);
                                     }
                                 }
                             }
                             break;
 
                         default:
-                            throw new Exception("Unknown feature attribute '$featAttKey'!");
+                            throw new Exception("Unknown " . SGuiModule::JSON_MOD . " attribute '$moduleAttKey'!");
                     }
                 }
 
-                $feature = new FGuiFeature($featureId, $featureName, $featureDescrip, $menus);
+                $module = new FGuiModule($moduleId, $moduleName, $moduleHref, $menus);
                 break;
             }
         }
 
-        return $feature;
+        return $module;
+    }
+
+    public static function getModule(string $moduleId): FGuiModule
+    {
+        // read and decode JSON file of application menu:
+        $jsonMenu = self::decodeJson($_SESSION[FAppConsts::ROOT_DIR] . FAppConsts::CFG_FILE_MENU);
+
+        return self::digestModule($moduleId, $jsonMenu);
+    }
+
+    public static function echoException($e) {
+        echo 'Error: ' . $e->getMessage();
+    }
+
+    public static function createConnection()
+    {
+        $connection;
+
+        try {
+            $dsn = "mysql:host=" . $_SESSION[FAppConsts::DB_HOST] . ";port=" . $_SESSION[FAppConsts::DB_PORT] . ";dbname=" . $_SESSION[FAppConsts::DB_NAME];
+            $connection = new PDO($dsn, $_SESSION[FAppConsts::DB_USER_NAME], $_SESSION[FAppConsts::DB_USER_PSWD]);
+            $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            self::echoException($e);
+        }
+
+        return $connection;
     }
 }
