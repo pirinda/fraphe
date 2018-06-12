@@ -4,7 +4,7 @@
 
 <?php
 echo "<table style='border: solid 1px black;'>";
-echo "<tr><th>Id</th><th>name</th><th>id</th></tr>";
+echo "<tr><th>name</th><th>id</th></tr>";
 
 class TableRows extends RecursiveIteratorIterator {
     function __construct($it) {
@@ -30,7 +30,7 @@ $password = "msroot";
 $dbname = "test1";
 
 try {
-    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+    $conn = new PDO("mysql:host=$servername;dbname=$dbname;charset=UTF8", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $stmt = $conn->prepare("SELECT name, id_market_segment FROM cc_market_segment");
     $stmt->execute();

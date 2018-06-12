@@ -3,15 +3,19 @@ namespace Fraphe\App;
 
 abstract class FGuiUtils
 {
+    /*
+    */
     public static function decodeJson(string $filename): array
     {
         $file = fopen($filename, "r") or die("Unable to open file " . $filename . "!");
         return json_decode(fread($file, filesize($filename)), true);
     }
 
+    /*
+    */
     private static function digestModule(string $moduleId, array $jsonMenu): FGuiModule
     {
-        $module;
+        $module = new FGuiModule("", "", "", array());
 
         // loop through features:
         foreach ($jsonMenu as $moduleKey => $moduleVal) {
@@ -107,6 +111,8 @@ abstract class FGuiUtils
         return $module;
     }
 
+    /*
+    */
     public static function getModule(string $moduleId): FGuiModule
     {
         // read and decode JSON file of application menu:
@@ -115,22 +121,16 @@ abstract class FGuiUtils
         return self::digestModule($moduleId, $jsonMenu);
     }
 
+    /*
+    */
     public static function echoException($e) {
         echo 'Error: ' . $e->getMessage();
     }
 
-    public static function createConnection()
+    /*
+    */
+    public static function composeConnectionDsn(): string
     {
-        $connection;
-
-        try {
-            $dsn = "mysql:host=" . $_SESSION[FAppConsts::DB_HOST] . ";port=" . $_SESSION[FAppConsts::DB_PORT] . ";dbname=" . $_SESSION[FAppConsts::DB_NAME];
-            $connection = new PDO($dsn, $_SESSION[FAppConsts::DB_USER_NAME], $_SESSION[FAppConsts::DB_USER_PSWD]);
-            $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            self::echoException($e);
-        }
-
-        return $connection;
+        return "mysql:host=" . $_SESSION[FAppConsts::DB_HOST] . ";port=" . $_SESSION[FAppConsts::DB_PORT] . ";dbname=" . $_SESSION[FAppConsts::DB_NAME] . ";charset=UTF8";
     }
 }

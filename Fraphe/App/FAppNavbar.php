@@ -54,15 +54,16 @@ abstract class FAppNavbar
         return $html;
     }
 
-    public static function composeSessionActive(): string
+    public static function composeSessionActive(string $optModuleId = ""): string
     {
-        $moduleId = "";
+        $moduleId = $optModuleId;
         $module;
 
-        if (isset($_GET[FAppConsts::TAG_MOD])) {
+        if ($moduleId === "" && isset($_GET[FAppConsts::TAG_MOD])) {
             $moduleId = $_GET[FAppConsts::TAG_MOD];
-            $module = FGuiUtils::getModule($moduleId);
         }
+
+        $module = FGuiUtils::getModule($moduleId);
 
         // navbar:
         //$html = '<nav class="navbar navbar-inverse navbar-fixed-top">';
@@ -109,15 +110,16 @@ abstract class FAppNavbar
         return $html;
     }
 
-    public static function compose(): string
+    public static function compose(string $optModuleId = ""): string
     {
         $html;
+
         if (!FApp::isUserSessionActive()) {
             // session is inactive
             $html = self::composeSessionInactive();
         } else {
             // session is active
-            $html = self::composeSessionActive();
+            $html = self::composeSessionActive($optModuleId);
         }
 
         return $html;

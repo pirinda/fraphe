@@ -19,19 +19,20 @@ echo '<body>';
 echo FAppNavbar::compose("catalogs");
 
 echo '<div class="container" style="margin-top:50px">';
-echo '<h3>Segmentos de mercado</h3>';
+echo '<h3>Ensayos</h3>';
+echo '<a href="#" class="btn btn-primary btn-sm" role="button">Crear</a>';
 
 $conn = new PDO(FGuiUtils::composeConnectionDsn(), $_SESSION[FAppConsts::DB_USER_NAME], $_SESSION[FAppConsts::DB_USER_PSWD]);
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 $sql = <<<SQL
-SELECT c.name AS c_name, c.id_market_segment AS c_id,
+SELECT c.name AS c_name, c.id_test AS c_id,
 c.ts_user_ins AS c_ts_user_ins, c.ts_user_upd AS c_ts_user_upd,
 ui.name AS ui_name, uu.name AS uu_name
-FROM cc_market_segment AS c
+FROM oc_test AS c
 INNER JOIN cc_user AS ui ON c.fk_user_ins = ui.id_user
 INNER JOIN cc_user AS uu ON c.fk_user_upd = uu.id_user
 WHERE NOT c.is_deleted
-ORDER BY c.name, c.id_market_segment
+ORDER BY c.name, c.id_test
 SQL;
 
 echo '<table class="table table-striped">';

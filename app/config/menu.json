@@ -41,7 +41,7 @@
                 "submenus":{
                     "test":{
                         "submenu":"Ensayos",
-                        "href":"app/views.php?view=test"
+                        "href":"app/views/operations/view_test.php"
                     },
                     "testProfile":{
                         "submenu":"Perfiles ensayos",
@@ -53,11 +53,11 @@
                     },
                     "testingMethod":{
                         "submenu":"Métodos ensayos",
-                        "href":"app/views.php?view=testingMethod"
+                        "href":"app/views/operations/view_testing_method.php"
                     },
                     "samplingMethod":{
                         "submenu":"Métodos muestreo",
-                        "href":"app/views.php?view=samplingMethod"
+                        "href":"app/views/operations/view_sampling_method.php"
                     }
                 }
             },
@@ -66,24 +66,24 @@
                 "href":"menu=results",
                 "submenus":{
                     "resultUnit":{
-                        "submenu":"Unidades",
-                        "href":"php.php"
+                        "submenu":"Unidades resultados",
+                        "href":"app/views/operations/view_result_unit.php"
                     },
                     "resultUnitValue":{
-                        "submenu":"Valores unidades",
+                        "submenu":"Valores unidades resultados",
                         "href":"php.php"
                     },
                     "resultPermissLimit":{
                         "submenu":"Límites permisibles",
-                        "href":"php.php"
+                        "href":"app/views/operations/view_result_permiss_limit.php"
                     },
                     "testingNote":{
                         "submenu":"Notas ensayo",
-                        "href":"php.php"
+                        "href":"app/views/operations/view_testing_note.php"
                     },
                     "samplingNote":{
                         "submenu":"Notas muestreo",
-                        "href":"php.php"
+                        "href":"app/views/operations/view_sampling_note.php"
                     }
                 }
             }
