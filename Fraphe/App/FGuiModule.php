@@ -3,12 +3,12 @@ namespace Fraphe\App;
 
 class FGuiModule
 {
-    const JSON_HREF = "href";
-    const JSON_MOD = "module";
-    const JSON_MENU = "menu";
-    const JSON_MENUS = "menus";
-    const JSON_SUBMENU = "submenu";
-    const JSON_SUBMENUS = "submenus";
+    public const JSON_HREF = "href";
+    public const JSON_MOD = "module";
+    public const JSON_MENU = "menu";
+    public const JSON_MENUS = "menus";
+    public const JSON_SUBMENU = "submenu";
+    public const JSON_SUBMENUS = "submenus";
 
     protected $id;
     protected $name;

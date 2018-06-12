@@ -19,47 +19,21 @@ echo '<body>';
 echo FAppNavbar::compose("catalogs");
 
 echo '<div class="container" style="margin-top:50px">';
-echo '<h3>Ensayos</h3>';
-echo '<a href="#" class="btn btn-primary btn-sm" role="button">Crear</a>';
+echo '<h3>Ensayo</h3>';
+echo '<form class="form-horizontal" action="action_page.php">';
 
-$conn = new PDO(FGuiUtils::composeConnectionDsn(), $_SESSION[FAppConsts::DB_USER_NAME], $_SESSION[FAppConsts::DB_USER_PSWD]);
-$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-$sql = <<<SQL
-SELECT c.name AS c_name, c.id_test AS c_id,
-c.ts_user_ins AS c_ts_user_ins, c.ts_user_upd AS c_ts_user_upd,
-ui.name AS ui_name, uu.name AS uu_name
-FROM oc_test AS c
-INNER JOIN cc_user AS ui ON c.fk_user_ins = ui.id_user
-INNER JOIN cc_user AS uu ON c.fk_user_upd = uu.id_user
-WHERE NOT c.is_deleted
-ORDER BY c.name, c.id_test
-SQL;
+echo '<div class="form_group">';
+echo '<label class="control-label col-sm-2" for="process_area">Área proceso:</label>';
+echo '<div class="col-sm-10">';
+echo '<select class="form-control" id="process_area">';
 
-echo '<table class="table table-striped">';
-echo '<thead>';
-echo '<tr>';
-echo '<th>Nombre</th>';
-echo '<th class="small">Creador</th>';
-echo '<th class="small">Creación</th>';
-echo '<th class="small">Modificador</th>';
-echo '<th class="small">Modificación</th>';
-echo '</tr>';
-echo '</thead>';
-echo '<tbody>';
+echo '</select>';
+echo '</div>';
+echo '</div>';
 
-foreach ($conn->query($sql) as $row) {
-    echo '<tr>';
-    echo '<td>' . $row['c_name'] . '</td>';
-    echo '<td class="small">' . $row['ui_name'] . '</td>';
-    echo '<td class="small">' . $row['c_ts_user_ins'] . '</td>';
-    echo '<td class="small">' . $row['uu_name'] . '</td>';
-    echo '<td class="small">' . $row['c_ts_user_upd'] . '</td>';
-    echo '</tr>';
-}
+echo ' <button type="submit" class="btn btn-default">Guardar</button>';
 
-echo '</tbody>';
-echo '</table>';
-
+echo '</form>';
 echo '</div>';
 
 echo FApp::composeFooter();
