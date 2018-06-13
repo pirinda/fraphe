@@ -1,0 +1,41 @@
+<?php
+namespace app;
+
+abstract class AppUtils
+{
+    public static function getSelectOptions(\PDO $connection, int $catalog): array
+    {
+        $sql;
+        $options = array();
+
+        switch ($catalog) {
+            case AppConsts::OC_PROCESS_AREA:
+                $sql = "SELECT id_process_area AS _val, name AS _opt FROM oc_process_area WHERE NOT is_deleted ORDER BY id_process_area, name;";
+                break;
+            case AppConsts::OC_SAMPLE_CLASS:
+                $sql = "SELECT id_sample_class AS _val, name AS _opt FROM oc_sample_class WHERE NOT is_deleted ORDER BY id_sample_class, name;";
+                break;
+            case AppConsts::OC_SAMPLE_TYPE:
+                $sql = "SELECT id_sample_type AS _val, name AS _opt FROM oc_sample_type WHERE NOT is_deleted ORDER BY id_sample_type, name;";
+                break;
+            case AppConsts::OC_SAMPLING_METHOD:
+                $sql = "SELECT id_sampling_method AS _val, name AS _opt FROM oc_sampling_method WHERE NOT is_deleted ORDER BY name, id_sampling_method;";
+                break;
+            case AppConsts::OC_TESTING_METHOD:
+                $sql = "SELECT id_testing_method AS _val, name AS _opt FROM oc_testing_method WHERE NOT is_deleted ORDER BY name, id_testing_method;";
+                break;
+            case AppConsts::OC_TEST_ACREDIT_ATTRIB:
+                $sql = "SELECT id_test_acredit_attrib AS _val, name AS _opt FROM oc_test_acredit_attrib WHERE NOT is_deleted ORDER BY id_test_acredit_attrib, name;";
+                break;
+            default:
+        }
+
+        if (isset($sql)) {
+            foreach ($connection->query($sql) as $row) {
+                $options[] = '<option value="' . $row['_val'] . '">' . $row['_opt'] . '</option>';
+            }
+        }
+
+        return $options;
+    }
+}

@@ -20,10 +20,8 @@ echo FAppNavbar::compose("catalogs");
 
 echo '<div class="container" style="margin-top:50px">';
 echo '<h3>Ensayos</h3>';
-echo '<a href="#" class="btn btn-primary btn-sm" role="button">Crear</a>';
+echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_test.php" class="btn btn-primary btn-sm" role="button">Crear</a>';
 
-$conn = new PDO(FGuiUtils::composeConnectionDsn(), $_SESSION[FAppConsts::DB_USER_NAME], $_SESSION[FAppConsts::DB_USER_PSWD]);
-$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 $sql = <<<SQL
 SELECT c.name AS c_name, c.id_test AS c_id,
 c.ts_user_ins AS c_ts_user_ins, c.ts_user_upd AS c_ts_user_upd,
@@ -32,7 +30,7 @@ FROM oc_test AS c
 INNER JOIN cc_user AS ui ON c.fk_user_ins = ui.id_user
 INNER JOIN cc_user AS uu ON c.fk_user_upd = uu.id_user
 WHERE NOT c.is_deleted
-ORDER BY c.name, c.id_test
+ORDER BY c.name, c.id_test;
 SQL;
 
 echo '<table class="table table-striped">';
@@ -47,6 +45,7 @@ echo '</tr>';
 echo '</thead>';
 echo '<tbody>';
 
+$conn = FGuiUtils::createConnection();
 foreach ($conn->query($sql) as $row) {
     echo '<tr>';
     echo '<td>' . $row['c_name'] . '</td>';

@@ -133,4 +133,13 @@ abstract class FGuiUtils
     {
         return "mysql:host=" . $_SESSION[FAppConsts::DB_HOST] . ";port=" . $_SESSION[FAppConsts::DB_PORT] . ";dbname=" . $_SESSION[FAppConsts::DB_NAME] . ";charset=UTF8";
     }
+
+    /*
+    */
+    public static function createConnection(): \PDO
+    {
+        $connection = new \PDO(self::composeConnectionDsn(), $_SESSION[FAppConsts::DB_USER_NAME], $_SESSION[FAppConsts::DB_USER_PSWD]);
+        $connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        return $connection;
+    }
 }
