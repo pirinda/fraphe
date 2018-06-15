@@ -142,4 +142,12 @@ abstract class FGuiUtils
         $connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         return $connection;
     }
+
+    /*
+    */
+    public static function createUserSession(): FUserSession
+    {
+        $user = new FUser($_SESSION[FAppConsts::USER_ID], $_SESSION[FAppConsts::USER_NAME]);
+        return new FUserSession($user, $_SESSION[FAppConsts::USER_LOGIN_TS]);
+    }
 }

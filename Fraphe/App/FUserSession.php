@@ -8,16 +8,16 @@ class FUserSession
     private $locCurrency;   // ISO 4217
     private $locTimeZone;
     private $curUser;
-    private $curDate;
+    private $curUserLoginTs;
 
-    public function __construct(FUser $curUser, int $curDate)
+    public function __construct(FUser $curUser, \DateTime $curUserLoginTs)
     {
         $this->locLang = "es";
         $this->locCountry = "MEX";
         $this->locCurrency = "MXN";
         $this->locTimeZone = "America/Mexico_City";
         $this->curUser = $curUser;
-        $this->curDate = $curDate;
+        $this->curUserLoginTs = $curUserLoginTs;
     }
 
     public function getLocLang(): string
@@ -45,22 +45,8 @@ class FUserSession
         return $this->curUser;
     }
 
-    public function getCurDate(): int
+    public function getCurUserLoginTs(): \DateTime
     {
-        return $this->curDate;
-    }
-
-    public function getConnection(): PDO
-    {
-        $connection = null;
-
-        try {
-            $connection = new PDO("mysql:host=localhost;port=3306;dbname=fraphe", "root", "msroot");
-            $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-
-        }
-
-        return $connection;
+        return $this->curUserLoginTs;
     }
 }

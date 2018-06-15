@@ -9,6 +9,6 @@ use Fraphe\App\FAppConsts;
 
 $_SESSION[FAppConsts::USER_ID] = 1;
 $_SESSION[FAppConsts::USER_NAME] = $_POST['username'];
-$_SESSION[FAppConsts::USER_LOGIN_TS] = gettimeofday(true);
+$_SESSION[FAppConsts::USER_LOGIN_TS] = new \DateTime();
 
 FApp::goHome();

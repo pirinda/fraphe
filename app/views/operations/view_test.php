@@ -45,8 +45,8 @@ echo '</tr>';
 echo '</thead>';
 echo '<tbody>';
 
-$conn = FGuiUtils::createConnection();
-foreach ($conn->query($sql) as $row) {
+$connection = FGuiUtils::createConnection();
+foreach ($connection->query($sql) as $row) {
     echo '<tr>';
     echo '<td>' . $row['c_name'] . '</td>';
     echo '<td class="small">' . $row['ui_name'] . '</td>';

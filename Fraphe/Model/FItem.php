@@ -26,19 +26,14 @@ class FItem
 
     function __construct(int $dataType, string $key, string $name, bool $optional)
     {
-        self::__construct($dataType, $key, $name, self::produceDefault($dataType), $optional, $optional, "");
-    }
-
-    function __construct(int $dataType, string $key, string $name, $default, bool $canBeNull, bool $canBeEmpty, string $description)
-    {
         $this->dataType = $dataType;
         $this->key = $key;
         $this->name = $name;
-        $this->value = $default;
-        $this->default = $default;
-        $this->canBeNull = $canBeNull;
-        $this->canBeEmpty = $canBeEmpty;
-        $this->description = $description;
+        $this->value = self::produceDefault($dataType);
+        $this->default = $this->value;
+        $this->canBeNull = $optional;
+        $this->canBeEmpty = $optional;
+        $this->description = "";
     }
 
     public static function produceDefault(int $dataType)
@@ -46,23 +41,26 @@ class FItem
         $default;
 
         switch ($dataType) {
-            case DATA_TYPE_BOOL:
+            case self::DATA_TYPE_BOOL:
                 $default = false;
                 break;
 
-            case DATA_TYPE_INT:
-            case DATA_TYPE_DATE:
-            case DATA_TYPE_DATETIME:
-            case DATA_TYPE_TIME:
+            case self::DATA_TYPE_INT:
                 $default = 0;
                 break;
 
-            case DATA_TYPE_FLOAT:
+            case self::DATA_TYPE_FLOAT:
                 $default = 0.0;
                 break;
 
-            case DATA_TYPE_STRING:
+            case self::DATA_TYPE_STRING:
                 $default = "";
+                break;
+
+            case self::DATA_TYPE_DATE:
+            case self::DATA_TYPE_DATETIME:
+            case self::DATA_TYPE_TIME:
+                $default = null;
                 break;
 
             default:
@@ -168,51 +166,75 @@ class FItem
         }
         else {
             switch ($this->dataType) {
-                case DATA_TYPE_BOOL:
+                case self::DATA_TYPE_BOOL:
                     if (!is_bool($value)) {
                         throw new Exception(composeItemName() . "debe ser booleano.");
                     }
                     break;
 
-                case DATA_TYPE_INT:
-                case DATA_TYPE_DATE:
-                case DATA_TYPE_DATETIME:
-                case DATA_TYPE_TIME:
+                case self::DATA_TYPE_INT:
                     if (!is_int($value)) {
                         throw new Exception(composeItemName() . "debe ser número entero.");
-                    } else if (!$this->canBeEmpty && $value === 0) {
+                    }
+                    else if (!$this->canBeEmpty && empty($value)) {
                         throw new Exception(composeItemName() . "no puede ser cero.");
-                    } else if (isset($this->valueMin) && is_int($valueMin) && $this->value < $this->valueMin) {
+                    }
+                    else if (isset($this->valueMin) && is_int($valueMin) && $this->value < $this->valueMin) {
                         throw new Exception(composeItemName() . "no puede ser menor a " . $this->valueMin . ".");
-                    } else if (isset($this->valueMax) && is_int($valueMax) && $this->value > $this->valueMax) {
+                    }
+                    else if (isset($this->valueMax) && is_int($valueMax) && $this->value > $this->valueMax) {
                         throw new Exception(composeItemName() . "no puede ser mayor a " . $this->valueMax . ".");
                     }
                     break;
 
-                case DATA_TYPE_FLOAT:
+                case self::DATA_TYPE_FLOAT:
                     if (!is_float($value)) {
                         throw new Exception(composeItemName() . "debe ser número decimal.");
-                    } else if (!$this->canBeEmpty && $value === 0.0) {
+                    }
+                    else if (!$this->canBeEmpty && empty($value)) {
                         throw new Exception(composeItemName() . "no puede ser cero.");
-                    } else if (isset($this->valueMin) && is_float($valueMin) && $this->value < $this->valueMin) {
+                    }
+                    else if (isset($this->valueMin) && is_float($valueMin) && $this->value < $this->valueMin) {
                         throw new Exception(composeItemName() . "no puede ser menor a " . $this->valueMin . ".");
-                    } else if (isset($this->valueMax) && is_float($valueMax) && $this->value > $this->valueMax) {
+                    }
+                    else if (isset($this->valueMax) && is_float($valueMax) && $this->value > $this->valueMax) {
                         throw new Exception(composeItemName() . "no puede ser mayor a " . $this->valueMax . ".");
                     }
                     break;
 
-                case DATA_TYPE_STRING:
+                case self::DATA_TYPE_STRING:
                     if (!is_string($value)) {
                         throw new Exception(composeItemName() . "debe ser texto.");
-                    } else if (!$this->canBeEmpty && $value === "") {
+                    }
+                    else if (!$this->canBeEmpty && empty($value)) {
                         throw new Exception(composeItemName() . "no puede estar vacío.");
-                    } else if (isset($this->lengthMin) && is_int($lengthMin) && strlen($this->value) < $this->lengthMin) {
+                    }
+                    else if (isset($this->lengthMin) && is_int($lengthMin) && strlen($this->value) < $this->lengthMin) {
                         throw new Exception(composeItemName() . "no puede tener longitud menor a " . $this->lengthMin . ".");
-                    } else if (isset($this->lengthMax) && is_int($lengthMax) && strlen($this->value) > $this->lengthMax) {
+                    }
+                    else if (isset($this->lengthMax) && is_int($lengthMax) && strlen($this->value) > $this->lengthMax) {
                         throw new Exception(composeItemName() . "no puede tener longitud mayor a " . $this->lengthMax . ".");
                     }
                     break;
 
+                case self::DATA_TYPE_DATE:
+                case self::DATA_TYPE_DATETIME:
+                case self::DATA_TYPE_TIME:
+                /*
+                    if (!is_a("DateTime")) {
+                        throw new Exception(composeItemName() . "debe ser fecha o fecha-hora.");
+                    }
+                    else if (!$this->canBeEmpty && empty($value)) {
+                        throw new Exception(composeItemName() . "no puede estar vacío.");
+                    }
+                    else if (isset($this->valueMin) && is_int($valueMin) && $this->value < $this->valueMin) {
+                        throw new Exception(composeItemName() . "no puede ser anterior a " . $this->valueMin . ".");
+                    }
+                    else if (isset($this->valueMax) && is_int($valueMax) && $this->value > $this->valueMax) {
+                        throw new Exception(composeItemName() . "no puede ser posterior a " . $this->valueMax . ".");
+                    }
+                    break;
+                */
                 default:
                     throw new Exception("Tipo de dato desconocido.");
             }

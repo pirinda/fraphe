@@ -23,7 +23,19 @@ abstract class FRegistry
         $this->registryType = $registryType;
         $this->items = array();
 
-        initialize();
+        $this->initialize();
+    }
+
+    private function validateKey($key) {
+        if (empty($key)) {
+            throw new Exception("La clave está vacía.");
+        }
+        else if (!is_string($key)) {
+            throw new Exception("La clave '$key' debe ser texto.");
+        }
+        else if (!array_key_exists($key, $this->items)) {
+            throw new Exception("La clave '$key' no existe.");
+        }
     }
 
     /* Initializes registry data.
@@ -59,44 +71,48 @@ abstract class FRegistry
      * Returns: nothing.
      * Throws: Exception if something fails.
      */
-    public function setItems(array $items)
+    public function setData(array $data)
     {
-        foreach ($items as $key => $val) {
-            if (!is_string($key)) {
-                throw new Exception("La clave '$key' debe ser texto.");
-            } else if (!array_key_exists($key, $this->items)) {
-                throw new Exception("La clave '$key' no existe en los datos del registro.");
-            } else if (!is_a($val, "FItem")) {
-                throw new Exception("El valor '$val' debe ser FItem.");
-            } else {
-                $this->items[$key] = $val;
-                $this->isRegistryModified = true;
-            }
+        foreach ($data as $key => $val) {
+            $this->validateKey($key);
+            $this->items[$key]->setValue($val);
+            $this->isRegistryModified = true;
         }
-    }
-
-    /* Gets registry data.
-     * Returns: required item.
-     * Throws: Exception if something fails.
-     */
-    public function getItem($key): FItem
-    {
-        if (!is_string($key)) {
-            throw new Exception("La clave '$key' debe ser texto.");
-        } else if (!array_key_exists($key, $this->items)) {
-            throw new Exception("La clave '$key' no existe en los datos del registro.");
-        }
-
-        return $this->items[$key];
     }
 
     /* Gets registry data.
      * Returns: associative array of registry data in the attribute=value form.
      * Throws: Exception if something fails.
      */
-    public function getItems(): array
+    public function getData(): array
     {
-        return $this->items;
+        $data = array();
+
+        foreach ($this->items as $key => $item) {
+            $data[$key] = $item->getValue();
+        }
+
+        return $data;
+    }
+
+    /* Gets registry datum.
+     * Returns: required data.
+     * Throws: Exception if something fails.
+     */
+    public function getDatum($key)
+    {
+        $this->validateKey($key);
+        return $this->items[$key]->getValue();
+    }
+
+    /* Gets registry item.
+     * Returns: required item.
+     * Throws: Exception if something fails.
+     */
+    public function getItem($key)
+    {
+        $this->validateKey($key);
+        return $this->items[$key];
     }
 
     public function getRegistryType(): int

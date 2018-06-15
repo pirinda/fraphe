@@ -117,7 +117,8 @@ abstract class FAppNavbar
         if (!FApp::isUserSessionActive()) {
             // session is inactive
             $html = self::composeSessionInactive();
-        } else {
+        }
+        else {
             // session is active
             $html = self::composeSessionActive($optModuleId);
         }

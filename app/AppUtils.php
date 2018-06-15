@@ -3,7 +3,7 @@ namespace app;
 
 abstract class AppUtils
 {
-    public static function getSelectOptions(\PDO $connection, int $catalog): array
+    public static function getSelectOptions(\PDO $connection, int $catalog, $selectedValue = 0): array
     {
         $sql;
         $options = array();
@@ -32,7 +32,7 @@ abstract class AppUtils
 
         if (isset($sql)) {
             foreach ($connection->query($sql) as $row) {
-                $options[] = '<option value="' . $row['_val'] . '">' . $row['_opt'] . '</option>';
+                $options[] = '<option value="' . $row['_val'] . '"' . (!empty($selectedValue) && $selectedValue === $row['_val'] ? " selected" : "") . '>' . $row['_opt'] . '</option>';
             }
         }
 
