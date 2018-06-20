@@ -23,8 +23,9 @@ abstract class AppConsts
     public const CC_CONTACT = 101056;
 
     public const OC_PROCESS_AREA = 201011;
-    public const OC_SAMPLE_CLASS = 201021;
-    public const OC_SAMPLE_TYPE = 201022;
+    public const OC_SAMPLE_CATEGORY = 201021;
+    public const OC_SAMPLE_CLASS = 201022;
+    public const OC_SAMPLE_TYPE = 201023;
     public const OC_SAMPLING_METHOD = 201026;
     public const OC_TESTING_METHOD = 201036;
     public const OC_TEST_ACREDIT_ATTRIB = 201039;

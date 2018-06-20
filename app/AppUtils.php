@@ -12,6 +12,9 @@ abstract class AppUtils
             case AppConsts::OC_PROCESS_AREA:
                 $sql = "SELECT id_process_area AS _val, name AS _opt FROM oc_process_area WHERE NOT is_deleted ORDER BY id_process_area, name;";
                 break;
+            case AppConsts::OC_SAMPLE_CATEGORY:
+                $sql = "SELECT id_sample_category AS _val, name AS _opt FROM oc_sample_category WHERE NOT is_deleted ORDER BY id_sample_category, name;";
+                break;
             case AppConsts::OC_SAMPLE_CLASS:
                 $sql = "SELECT id_sample_class AS _val, name AS _opt FROM oc_sample_class WHERE NOT is_deleted ORDER BY id_sample_class, name;";
                 break;

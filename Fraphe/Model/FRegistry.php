@@ -74,8 +74,14 @@ abstract class FRegistry
     public function setData(array $data)
     {
         foreach ($data as $key => $val) {
-            $this->validateKey($key);
-            $this->items[$key]->setValue($val);
+            if ($key === "id") {
+                $this->registryId = $val;
+                $this->isRegistryNew = false;
+            }
+            else {
+                $this->validateKey($key);
+                $this->items[$key]->setValue($val);
+            }
             $this->isRegistryModified = true;
         }
     }
