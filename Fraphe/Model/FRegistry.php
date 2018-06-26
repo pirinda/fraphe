@@ -15,7 +15,7 @@ abstract class FRegistry
     protected $isRegistryModified;
     protected $mode;
     protected $lock;
-    protected $items;
+    protected $items;   // array of FItem objects
 
     public function __construct(\PDO $connection, int $registryType)
     {
@@ -67,27 +67,27 @@ abstract class FRegistry
     }
 
     /* Sets registry data.
-     * Param $array: associative array of registry data in the attribute=value form.
+     * Param $array: associative array of registry data in the key=value form.
      * Returns: nothing.
      * Throws: Exception if something fails.
      */
     public function setData(array $data)
     {
-        foreach ($data as $key => $val) {
+        foreach ($data as $key => $value) {
             if ($key === "id") {
-                $this->registryId = $val;
+                $this->registryId = $value;
                 $this->isRegistryNew = false;
             }
             else {
                 $this->validateKey($key);
-                $this->items[$key]->setValue($val);
+                $this->items[$key]->setValue($value);
             }
             $this->isRegistryModified = true;
         }
     }
 
     /* Gets registry data.
-     * Returns: associative array of registry data in the attribute=value form.
+     * Returns: associative array of registry data in the key=value form.
      * Throws: Exception if something fails.
      */
     public function getData(): array

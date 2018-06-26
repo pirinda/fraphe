@@ -6,7 +6,7 @@ use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
 
-class CatTest extends FRegistry
+class ModTest extends FRegistry
 {
     protected $id_test;
     protected $name;
@@ -68,7 +68,7 @@ class CatTest extends FRegistry
 
     public function read(FUserSession $session, int $id, int $mode)
     {
-        self::initialize();
+        $this->initialize();
 
         $sql = "SELECT * FROM oc_test WHERE id_test = $id;";
         $statement = $this->connection->query($sql);
@@ -98,6 +98,8 @@ class CatTest extends FRegistry
 
     public function save(FUserSession $session)
     {
+        $this->validate();
+
         $statement;
 
         if ($this->isRegistryNew) {
@@ -146,7 +148,9 @@ class CatTest extends FRegistry
                 "fk_sample_category = :fk_sample_category, " .
                 "fk_testing_method = :fk_testing_method, " .
                 "fk_test_acredit_attrib = :fk_test_acredit_attrib, " .
+                //"fk_user_ins = :fk_user_ins, " .
                 "fk_user_upd = :fk_user, " .
+                //"ts_user_ins = :ts_user_ins, " .
                 "ts_user_upd = NOW() " .
                 "WHERE id_test = :id;");
         }
@@ -166,6 +170,7 @@ class CatTest extends FRegistry
         //$fk_user_upd = $this->fk_user_upd->getValue();
         //$ts_user_ins = $this->ts_user_ins->getValue();
         //$ts_user_upd = $this->ts_user_upd->getValue();
+
         $fk_user = $session->getCurUser()->getId();
 
         //$statement->bindParam(":id_test", $id_test);
@@ -179,10 +184,12 @@ class CatTest extends FRegistry
         $statement->bindParam(":fk_sample_category", $fk_sample_category);
         $statement->bindParam(":fk_testing_method", $fk_testing_method);
         $statement->bindParam(":fk_test_acredit_attrib", $fk_test_acredit_attrib);
-        $statement->bindParam(":fk_user", $fk_user);
+        //$statement->bindParam(":fk_user_ins", $fk_user_ins);
         //$statement->bindParam(":fk_user_upd", $fk_user_upd);
         //$statement->bindParam(":ts_user_ins", $ts_user_ins);
         //$statement->bindParam(":ts_user_upd", $ts_user_upd);
+
+        $statement->bindParam(":fk_user", $fk_user);
 
         if (!$this->isRegistryNew) {
             $statement->bindParam(":id", $this->registryId);

@@ -15,11 +15,11 @@ use Fraphe\Lib\FUtils;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
 use app\AppUtils;
-use app\models\operations\CatTest;
+use app\models\operations\ModTest;
 
 $userSession = FGuiUtils::createUserSession();
 $connection = FGuiUtils::createConnection();
-$registry = new CatTest($connection);
+$registry = new ModTest($connection);
 $errmsg = "";
 
 switch ($_SERVER["REQUEST_METHOD"]) {
@@ -95,7 +95,7 @@ echo '<form method="post" action="' . FUtils::sanitizeInput($_SERVER["PHP_SELF"]
 echo '<div class="form_group">';
 echo '<label for="fk_process_area">Área proceso: *</label>';
 echo '<select class="form-control" name="fk_process_area">';
-foreach(AppUtils::getSelectOptions($connection, AppConsts::OC_PROCESS_AREA) as $option) {
+foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_PROCESS_AREA) as $option) {
     echo $option;
 }
 echo '</select>';
@@ -114,7 +114,7 @@ echo '</div>';
 echo '<div class="form_group">';
 echo '<label for="fk_sample_category">Categoría muestra: *</label>';
 echo '<select class="form-control" name="fk_sample_category">';
-foreach(AppUtils::getSelectOptions($connection, AppConsts::OC_SAMPLE_CATEGORY, $registry->getDatum("fk_sample_category")) as $option) {
+foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_SAMPLE_CATEGORY, $registry->getDatum("fk_sample_category")) as $option) {
     echo $option;
 }
 echo '</select>';
@@ -123,7 +123,7 @@ echo '</div>';
 echo '<div class="form_group">';
 echo '<label for="fk_testing_method">Método analítico: *</label>';
 echo '<select class="form-control" name="fk_testing_method">';
-foreach(AppUtils::getSelectOptions($connection, AppConsts::OC_TESTING_METHOD, $registry->getDatum("fk_testing_method")) as $option) {
+foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_TESTING_METHOD, $registry->getDatum("fk_testing_method")) as $option) {
     echo $option;
 }
 echo '</select>';
@@ -132,7 +132,7 @@ echo '</div>';
 echo '<div class="form_group">';
 echo '<label for="fk_test_acredit_attrib">Acreditado/autorizado: *</label>';
 echo '<select class="form-control" name="fk_test_acredit_attrib">';
-foreach(AppUtils::getSelectOptions($connection, AppConsts::OC_TEST_ACREDIT_ATTRIB, $registry->getDatum("fk_test_acredit_attrib")) as $option) {
+foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_TEST_ACREDIT_ATTRIB, $registry->getDatum("fk_test_acredit_attrib")) as $option) {
     echo $option;
 }
 echo '</select>';
