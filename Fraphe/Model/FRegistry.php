@@ -15,7 +15,8 @@ abstract class FRegistry
     protected $isRegistryModified;
     protected $mode;
     protected $lock;
-    protected $items;   // array of FItem objects
+    protected $items;   // associative array of FItem objects
+    protected $ids;     // associative array of integers
 
     public function __construct(\PDO $connection, int $registryType)
     {
