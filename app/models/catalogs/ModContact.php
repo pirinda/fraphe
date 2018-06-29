@@ -77,7 +77,7 @@ class ModContact extends FRegistry
         $this->mail->setRangeLength(0, 200);
         $this->phone->setRangeLength(0, 100);
         $this->mobile->setRangeLength(0, 100);
-        }
+    }
 
     public function read(FUserSession $session, int $id, int $mode)
     {
@@ -109,6 +109,9 @@ class ModContact extends FRegistry
 
             $this->isRegistryNew = false;
             $this->mode = $mode;
+        }
+        else {
+            throw new \Exception(FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
         }
     }
 
@@ -153,8 +156,8 @@ class ModContact extends FRegistry
                 ":fk_entity, " .
                 ":fk_entity_address, " .
                 ":fk_contact_type, " .
-                ":fk_user_ins, " .
-                ":fk_user_upd, " .
+                ":fk_user, " .
+                "1, " .
                 "NOW(), " .
                 "NOW());");
         }
@@ -210,8 +213,8 @@ class ModContact extends FRegistry
         $statement->bindParam(":mail", $mail);
         $statement->bindParam(":phone", $phone);
         $statement->bindParam(":mobile", $mobile);
-        //$statement->bindParam(":is_system", $is_system);
-        //$statement->bindParam(":is_deleted", $is_deleted);
+        $statement->bindParam(":is_system", $is_system);
+        $statement->bindParam(":is_deleted", $is_deleted);
         $statement->bindParam(":fk_entity", $fk_entity);
         $statement->bindParam(":fk_entity_address", $fk_entity_address);
         $statement->bindParam(":fk_contact_type", $fk_contact_type);

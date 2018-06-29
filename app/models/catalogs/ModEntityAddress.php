@@ -92,6 +92,11 @@ class ModEntityAddress extends FRegistry
         $this->childContacts = array();
     }
 
+    public function getChildContacts()
+    {
+        return $this->childContacts;
+    }
+
     public function read(FUserSession $session, int $id, int $mode)
     {
         $this->initialize();
@@ -125,10 +130,10 @@ class ModEntityAddress extends FRegistry
             $this->isRegistryNew = false;
             $this->mode = $mode;
 
-            // read child contacts:
-
+            // create connection for reading children:
             $connection = FGuiUtils::createConnection();
 
+            // read child contacts:
             $sql = "SELECT id_contact FROM cc_contact WHERE fk_entity_address = $this->registryId ORDER BY id_contact;";
             $statement = $this->connection->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
@@ -136,6 +141,9 @@ class ModEntityAddress extends FRegistry
                 $contact->read($session, $row["id_contact"], $mode);
                 $this->childContacts[] = $contact;
             }
+        }
+        else {
+            throw new \Exception(FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
         }
     }
 
@@ -146,7 +154,7 @@ class ModEntityAddress extends FRegistry
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $this->connection->prepare("INSERT INTO oc_test (" .
+            $statement = $this->connection->prepare("INSERT INTO cc_entity_address (" .
                 "id_entity_address, " .
                 "name, " .
                 "street, " .
@@ -190,7 +198,7 @@ class ModEntityAddress extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $this->connection->prepare("UPDATE oc_test SET " .
+            $statement = $this->connection->prepare("UPDATE cc_entity_address SET " .
                 "name = :name, " .
                 "street = :street, " .
                 "district = :district, " .
@@ -203,14 +211,14 @@ class ModEntityAddress extends FRegistry
                 "location = :location, " .
                 "notes = :notes, " .
                 "is_main = :is_main, " .
-                //"is_system = :is_system, " .
-                //"is_deleted = :is_deleted, " .
+                "is_system = :is_system, " .
+                "is_deleted = :is_deleted, " .
                 "fk_entity = :fk_entity, " .
                 //"fk_user_ins = :fk_user_ins, " .
                 "fk_user_upd = :fk_user, " .
                 //"ts_user_ins = :ts_user_ins, " .
                 "ts_user_upd = NOW() " .
-                "WHERE id_test = :id;");
+                "WHERE id_entity_address = :id;");
         }
 
         //$id_entity_address = $this->id_entity_address->getValue();
@@ -249,8 +257,8 @@ class ModEntityAddress extends FRegistry
         $statement->bindParam(":location", $location);
         $statement->bindParam(":notes", $notes);
         $statement->bindParam(":is_main", $is_main);
-        //$statement->bindParam(":is_system", $is_system);
-        //$statement->bindParam(":is_deleted", $is_deleted);
+        $statement->bindParam(":is_system", $is_system);
+        $statement->bindParam(":is_deleted", $is_deleted);
         $statement->bindParam(":fk_entity", $fk_entity);
         //$statement->bindParam(":fk_user_ins", $fk_user_ins);
         //$statement->bindParam(":fk_user_upd", $fk_user_upd);
@@ -274,10 +282,13 @@ class ModEntityAddress extends FRegistry
         // save child contacts:
 
         foreach ($this->childContacts as $contact) {
+            // assure link to parent:
             $data = array();
             $data["fk_entity"] = $fk_entity;
             $data["fk_entity_address"] = $this->registryId;
             $contact->setData($data);
+
+            // save child:
             $contact->save($session);
         }
     }

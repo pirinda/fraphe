@@ -24,6 +24,8 @@ class ModTest extends FRegistry
     protected $ts_user_ins;
     protected $ts_user_upd;
 
+    protected $childProcessOpts;
+
     function __construct(\PDO $connection)
     {
         parent::__construct($connection, AppConsts::OC_TEST);
@@ -94,6 +96,9 @@ class ModTest extends FRegistry
             $this->isRegistryNew = false;
             $this->mode = $mode;
         }
+        else {
+            throw new \Exception(FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
+        }
     }
 
     public function save(FUserSession $session)
@@ -125,8 +130,8 @@ class ModTest extends FRegistry
                 ":code, " .
                 ":sample_quantity, " .
                 ":sample_directs, " .
-                "true, " .
-                "false, " .
+                ":is_system, " .
+                ":is_deleted, " .
                 ":fk_process_area, " .
                 ":fk_sample_category, " .
                 ":fk_testing_method, " .
@@ -142,8 +147,8 @@ class ModTest extends FRegistry
                 "code = :code, " .
                 "sample_quantity = :sample_quantity, " .
                 "sample_directs = :sample_directs, " .
-                //"is_system = :is_system, " .
-                //"is_deleted = :is_deleted, " .
+                "is_system = :is_system, " .
+                "is_deleted = :is_deleted, " .
                 "fk_process_area = :fk_process_area, " .
                 "fk_sample_category = :fk_sample_category, " .
                 "fk_testing_method = :fk_testing_method, " .
@@ -178,8 +183,8 @@ class ModTest extends FRegistry
         $statement->bindParam(":code", $code);
         $statement->bindParam(":sample_quantity", $sample_quantity);
         $statement->bindParam(":sample_directs", $sample_directs);
-        //$statement->bindParam(":is_system", $is_system);
-        //$statement->bindParam(":is_deleted", $is_deleted);
+        $statement->bindParam(":is_system", $is_system);
+        $statement->bindParam(":is_deleted", $is_deleted);
         $statement->bindParam(":fk_process_area", $fk_process_area);
         $statement->bindParam(":fk_sample_category", $fk_sample_category);
         $statement->bindParam(":fk_testing_method", $fk_testing_method);

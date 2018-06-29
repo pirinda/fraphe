@@ -35,7 +35,8 @@ class ModEntity extends FRegistry
     protected $ts_user_ins;
     protected $ts_user_upd;
 
-    protected $childEntityAddresses;
+    protected $childEntityTypes;
+    protected $childAddresses;
 
     function __construct(\PDO $connection)
     {
@@ -105,7 +106,18 @@ class ModEntity extends FRegistry
         $this->billing_prefs->setRangeLength(0, 100);
         $this->notes->setRangeLength(0, 500);
 
-        $this->childEntityAddresses = array();
+        $this->childEntityTypes = array();
+        $this->childAddresses = array();
+    }
+
+    public function getChildEntityTypes()
+    {
+        return $this->childEntityTypes;
+    }
+
+    public function getChildAddresses()
+    {
+        return $this->childAddresses;
     }
 
     public function read(FUserSession $session, int $id, int $mode)
@@ -147,17 +159,33 @@ class ModEntity extends FRegistry
             $this->isRegistryNew = false;
             $this->mode = $mode;
 
-            // read child entity addresses:
-
+            // create connection for reading children:
             $connection = FGuiUtils::createConnection();
 
+            // read child entity entity types:
+            $sql = "SELECT id_entity, id_entity_type FROM cc_entity_entity_type WHERE id_entity = $this->registryId ORDER BY id_entity, id_entity_type;";
+            $statement = $this->connection->query($sql);
+            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                $ids = array();
+                $ids["id_entity"] = $row["id_entity"];
+                $ids["id_entity_type"] = $row["id_entity_type"];
+
+                $entityEntityType = new ModEntityEntityType($connection);
+                $entityEntityType->retrieve($session, $ids, $mode);
+                $this->childEntityTypes[] = $entityEntityType;
+            }
+
+            // read child entity addresses:
             $sql = "SELECT id_entity_address FROM cc_entity_address WHERE fk_entity = $this->registryId ORDER BY id_entity_address;";
             $statement = $this->connection->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                 $entityAddress = new ModEntityAddress($connection);
                 $entityAddress->read($session, $row["id_entity_address"], $mode);
-                $this->childEntityAddresses[] = $entityAddress;
+                $this->childAddresses[] = $entityAddress;
             }
+        }
+        else {
+            throw new \Exception(FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
         }
     }
 
@@ -237,8 +265,8 @@ class ModEntity extends FRegistry
                 "credit_days = :credit_days, " .
                 "billing_prefs = :billing_prefs, " .
                 "notes = :notes, " .
-                //"is_system = :is_system, " .
-                //"is_deleted = :is_deleted, " .
+                "is_system = :is_system, " .
+                "is_deleted = :is_deleted, " .
                 "fk_entity_class = :fk_entity_class, " .
                 "nk_market_segment = :nk_market_segment, " .
                 "nk_entity_parent = :nk_entity_parent, " .
@@ -295,8 +323,8 @@ class ModEntity extends FRegistry
         $statement->bindParam(":credit_days", $credit_days);
         $statement->bindParam(":billing_prefs", $billing_prefs);
         $statement->bindParam(":notes", $notes);
-        //$statement->bindParam(":is_system", $is_system);
-        //$statement->bindParam(":is_deleted", $is_deleted);
+        $statement->bindParam(":is_system", $is_system);
+        $statement->bindParam(":is_deleted", $is_deleted);
         $statement->bindParam(":fk_entity_class", $fk_entity_class);
         $statement->bindParam(":nk_market_segment", $nk_market_segment);
         $statement->bindParam(":nk_entity_parent", $nk_entity_parent);
@@ -323,9 +351,18 @@ class ModEntity extends FRegistry
             $this->isRegistryNew = false;
         }
 
-        // save child entity addresses:
+        // save child entity entity types:
+        $this->connection->exec("DELETE FROM cc_entity_entity_type WHERE id_entity = $this->registryId;");
+        foreach ($this->childEntityTypes as $entityEntityType) {
+            $ids = array();
+            $ids["id_entity"] = $this->registryId;
+            $entityEntityType->setRelationIds($ids);
+            $entityEntityType->forceRegistryNew();
+            $entityEntityType->save($session);
+        }
 
-        foreach ($this->childEntityAddresses as $entityAddress) {
+        // save child entity addresses:
+        foreach ($this->childAddresses as $entityAddress) {
             $data = array();
             $data["fk_entity"] = $this->registryId;
             $entityAddress->setData($data);

@@ -3,104 +3,121 @@ namespace Fraphe\Model;
 
 use Fraphe\App\FUserSession;
 
-abstract class FRelation
+abstract class FRelation extends FRegisistry
 {
-    protected $connection;
-    protected $registryType;
-    protected $ids;     // associative array of integers
+    protected $relationIds; // associative array of int values
 
+    /* Creates new base registry. Each field of registry must be contained in member array $items. Relation IDs are a subset of this registry items.
+     */
     public function __construct(\PDO $connection, int $registryType)
     {
-        $this->connection = $connection;
-        $this->registryType = $registryType;
-        $this->ids = array();
+        $this->relationIds = array();
 
-        $this->initialize();
+        parent::__construct($connection, $registryType);
     }
 
-    private function validateKey($key) {
-        if (empty($key)) {
-            throw new Exception("La clave está vacía.");
-        }
-        else if (!is_string($key)) {
-            throw new Exception("La clave '$key' debe ser texto.");
-        }
-        else if (!array_key_exists($key, $this->ids)) {
-            throw new Exception("La clave '$key' no existe.");
+    protected function validateRelationIds(array $ids)
+    {
+        foreach ($ids as $key => $id) {
+            $this->validateKey($key);
         }
     }
 
-    /* Initializes relation data.
+    protected function copyRelationIdsFromItems() {
+        foreach ($this->relationIds as $key => $id) {
+            $this->relationIds[$key] = $this->items[$key]->getValue();
+        }
+    }
+
+    /* Initializes registry data.
      * Returns: nothing.
      * Throws: Exception if something fails.
      */
     public function initialize()
     {
-        foreach ($this->ids as $key => $id) {
-            $this->ids[$key] = 0;
+        parent::initialize();
+
+        foreach ($this->relationIds as $key => $id) {
+            $this->relationIds[$key] = 0;
         }
     }
 
-    /* Validates relation IDs.
+    /* Validates registry data.
      * Returns: nothing.
      * Throws: Exception if something fails.
      */
     public function validate()
     {
-        foreach ($this->ids as $key => $id) {
-            if (empty($id)) {
-                throw new \Exception("El ID '$key' no tiene valor.");
+        parent::validate();
+
+        foreach ($this->relationIds as $key => $id) {
+            if (!is_int($id)) {
+                throw new \Exception("El ID '$key' debe ser número entero.");
+            }
+            else if ($id == 0) {
+                throw new \Exception("El ID '$key' debe ser diferente de cero.");
             }
         }
     }
 
     /* Sets relation IDs.
-     * Param $array: associative array of registry IDs in the key=id form.
+     * Param $ids: associative array of relation IDs in the key=id format.
      * Returns: nothing.
      * Throws: Exception if something fails.
      */
-    public function setIds(array $ids)
+    public function setRelationIds(array $ids)
     {
+        $this->validateRelationIds($ids);
+
         foreach ($ids as $key => $id) {
-            $this->validateKey($key);
-            $this->ids[$key] = $id;
+            $this->relationIds[$key] = $id;
+
+            $this->isRegistryModified = true;
         }
     }
 
     /* Gets relation IDs.
-     * Returns: associative array of registry IDs in the key=id form.
+     * Returns: associative array of relation IDs in the key=id form.
      * Throws: Exception if something fails.
      */
-    public function getIds(): array
+    public function getRelationIds(): array
     {
         $ids = array();
 
-        foreach ($this->ids as $key => $id) {
-            $ids[$key] = $id;
+        foreach ($this->relationIds as $key => $id) {
+            $data[$key] = $item->getValue();
         }
 
-        return $ids;
+        return $data;
     }
 
-    /* Gets registry ID.
+    /* Gets relation ID.
+     * Param $key: key of required ID.
      * Returns: required ID.
      * Throws: Exception if something fails.
      */
-    public function getId($key): int
+    public function getRelationId($key): int
     {
         $this->validateKey($key);
-        return $this->ids[$key];
+        return $this->relationIds[$key];
     }
 
-    public function getRegistryType(): int
+    public function getRegistryId(): int
     {
-        return $this->registryType;
+        throw new \Exception("La relación no tiene ID, sino un conjunto de IDs.");
     }
 
-    public function canSave(): bool
+    public function read(FUserSession $session, int $id, int $mode)
     {
-        return true;
+        throw new \Exception("Método no disponible para relaciones.");
     }
 
-    abstract public function save(FUserSession $session);
+    /* Similar to base method read(), but for relations.
+     * Param $session: user session.
+     * Param $ids: associative array of relation IDs in the key=id format.
+     * Param $mode: read mode. Options declared in class Fraphe\Model\FRegistry.
+     * Returns: nothing.
+     * Throws: Exception if something fails.
+     */
+    abstract public function retrieve(FUserSession $session, array $ids, int $mode);
 }
