@@ -2,6 +2,7 @@
 namespace app\models\operations;
 
 use Fraphe\App\FUserSession;
+use Fraphe\App\FGuiUtils;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
@@ -30,21 +31,21 @@ class ModTest extends FRegistry
     {
         parent::__construct($connection, AppConsts::OC_TEST);
 
-        $this->id_test = new FItem(FItem::DATA_TYPE_INT, "id_test", "ID ensayo", true);
-        $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", false);
-        $this->code = new FItem(FItem::DATA_TYPE_STRING, "code", "Código", false);
-        $this->sample_quantity = new FItem(FItem::DATA_TYPE_STRING, "sample_quantity", "Cantidad muestra", false);
-        $this->sample_directs = new FItem(FItem::DATA_TYPE_STRING, "sample_directs", "Indicaciones muestra", false);
-        $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Es de sistema", false);
-        $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Está eliminado", false);
-        $this->fk_process_area = new FItem(FItem::DATA_TYPE_INT, "fk_process_area", "Área de proceso", false);
-        $this->fk_sample_category = new FItem(FItem::DATA_TYPE_INT, "fk_sample_category", "Clase de muestra", false);
-        $this->fk_testing_method = new FItem(FItem::DATA_TYPE_INT, "fk_testing_method", "Método analítico", false);
-        $this->fk_test_acredit_attrib = new FItem(FItem::DATA_TYPE_INT, "fk_test_acredit_attrib", "Acreditación, autorización", false);
-        $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", true);
-        $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", true);
-        $this->ts_user_ins = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_ins", "Creado", true);
-        $this->ts_user_upd = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_upd", "Modificado", true);
+        $this->id_test = new FItem(FItem::DATA_TYPE_INT, "id_test", "ID ensayo", false);
+        $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", true);
+        $this->code = new FItem(FItem::DATA_TYPE_STRING, "code", "Código", true);
+        $this->sample_quantity = new FItem(FItem::DATA_TYPE_STRING, "sample_quantity", "Cantidad muestra", true);
+        $this->sample_directs = new FItem(FItem::DATA_TYPE_STRING, "sample_directs", "Indicaciones muestra", true);
+        $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", true);
+        $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", true);
+        $this->fk_process_area = new FItem(FItem::DATA_TYPE_INT, "fk_process_area", "Área proceso", true);
+        $this->fk_sample_category = new FItem(FItem::DATA_TYPE_INT, "fk_sample_category", "Categoría muestra", true);
+        $this->fk_testing_method = new FItem(FItem::DATA_TYPE_INT, "fk_testing_method", "Método analítico", true);
+        $this->fk_test_acredit_attrib = new FItem(FItem::DATA_TYPE_INT, "fk_test_acredit_attrib", "Acreditación/ autorización", true);
+        $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", false);
+        $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", false);
+        $this->ts_user_ins = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_ins", "Creado", false);
+        $this->ts_user_upd = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_upd", "Modificado", false);
 
         $this->items["id_test"] = $this->id_test;
         $this->items["name"] = $this->name;
@@ -66,6 +67,27 @@ class ModTest extends FRegistry
         $this->code->setRangeLength(1, 25);
         $this->sample_quantity->setRangeLength(1, 100);
         $this->sample_directs->setRangeLength(1, 500);
+
+        $this->childProcessOpts = array();
+    }
+
+    public function getChildProcessOpts(): array
+    {
+        return $this->childProcessOpts;
+    }
+
+    public function addChildProcessOpt(ModTestProcessOpt $processOpt)
+    {
+        return $this->childProcessOpts[] = $processOpt;
+    }
+
+    public function validate()
+    {
+        parent::validate();
+
+        foreach ($this->childProcessOpts as $processOpt) {
+            $processOpt->validate();
+        }
     }
 
     public function read(FUserSession $session, int $id, int $mode)
@@ -75,7 +97,7 @@ class ModTest extends FRegistry
         $sql = "SELECT * FROM oc_test WHERE id_test = $id;";
         $statement = $this->connection->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->registryId = $row["id_test"];
+            $this->registryId = intval($row["id_test"]);
 
             $this->id_test->setValue($row["id_test"]);
             $this->name->setValue($row["name"]);
@@ -95,9 +117,25 @@ class ModTest extends FRegistry
 
             $this->isRegistryNew = false;
             $this->mode = $mode;
+
+            // create connection for reading children:
+            $connection = FGuiUtils::createConnection();
+
+            // read child process options:
+            $sql = "SELECT id_test, id_entity FROM oc_test_process_opt WHERE id_test = $this->registryId ORDER BY id_test, id_entity;";
+            $statement = $this->connection->query($sql);
+            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                $ids = array();
+                $ids["id_test"] = intval($row["id_test"]);
+                $ids["id_entity"] = intval($row["id_entity"]);
+
+                $processOpt = new ModTestProcessOpt($connection);
+                $processOpt->retrieve($session, $ids, $mode);
+                $this->childProcessOpts[] = $processOpt;
+            }
         }
         else {
-            throw new \Exception(FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
+            throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
         }
     }
 
@@ -183,8 +221,8 @@ class ModTest extends FRegistry
         $statement->bindParam(":code", $code);
         $statement->bindParam(":sample_quantity", $sample_quantity);
         $statement->bindParam(":sample_directs", $sample_directs);
-        $statement->bindParam(":is_system", $is_system);
-        $statement->bindParam(":is_deleted", $is_deleted);
+        $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
+        $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
         $statement->bindParam(":fk_process_area", $fk_process_area);
         $statement->bindParam(":fk_sample_category", $fk_sample_category);
         $statement->bindParam(":fk_testing_method", $fk_testing_method);
@@ -197,7 +235,7 @@ class ModTest extends FRegistry
         $statement->bindParam(":fk_user", $fk_user);
 
         if (!$this->isRegistryNew) {
-            $statement->bindParam(":id", $this->registryId);
+            $statement->bindParam(":id", $this->registryId, \PDO::PARAM_INT);
         }
 
         $statement->execute();
@@ -206,6 +244,15 @@ class ModTest extends FRegistry
         if ($this->isRegistryNew) {
             $this->registryId = $this->connection->lastInsertId();
             $this->isRegistryNew = false;
+        }
+
+        // save child process options:
+        foreach ($this->childProcessOpts as $processOpt) {
+            $ids = array();
+            $ids["id_test"] = $this->registryId;
+
+            $processOpt->setRelationIds($ids);
+            $processOpt->save($session);
         }
     }
 

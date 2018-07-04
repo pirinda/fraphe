@@ -31,24 +31,6 @@ abstract class FRegistry
         $this->initialize();
     }
 
-    protected function validateKey($key) {
-        if (empty($key)) {
-            throw new \Exception("La clave está vacía.");
-        }
-        else if (!is_string($key)) {
-            throw new \Exception("La clave '$key' debe ser texto.");
-        }
-        else if (!array_key_exists($key, $this->items)) {
-            throw new \Exception("La clave '$key' no existe.");
-        }
-    }
-
-    /* Forces member flag as if this registry were new.
-     */
-    public function forceRegistryNew() {
-        $this->isRegistryNew = true;
-    }
-
     /* Initializes registry data.
      * Returns: nothing.
      * Throws: Exception if something fails.
@@ -77,6 +59,24 @@ abstract class FRegistry
         }
     }
 
+    protected function validateItemKey($key) {
+        if (empty($key)) {
+            throw new \Exception(__METHOD__ . ": La clave está vacía.");
+        }
+        else if (!is_string($key)) {
+            throw new \Exception(__METHOD__ . ": La clave '$key' debe ser texto.");
+        }
+        else if (!array_key_exists($key, $this->items)) {
+            throw new \Exception(__METHOD__ . ": La clave '$key' no existe.");
+        }
+    }
+
+    /* Forces member flag as if this registry were new.
+     */
+    public function forceRegistryNew() {
+        $this->isRegistryNew = true;
+    }
+
     /* Sets registry data.
      * Param $array: associative array of registry data in the key=value format. Special case: key="id", that is used for setting ID of this registry.
      * Returns: nothing.
@@ -84,15 +84,28 @@ abstract class FRegistry
      */
     public function setData(array $data)
     {
+        // validate keys:
         foreach ($data as $key => $value) {
-            if ($key === "id") {
+            if ($key == "id") {
+                if (!is_int($value)) {
+                    throw new \Exception(__METHOD__ . ": El ID debe ser número entero.");
+                }
+            }
+            else {
+                $this->validateItemKey($key);
+            }
+        }
+
+        // set data:
+        foreach ($data as $key => $value) {
+            if ($key == "id") {
                 $this->registryId = $value;
                 $this->isRegistryNew = false;
             }
             else {
-                $this->validateKey($key);
                 $this->items[$key]->setValue($value);
             }
+
             $this->isRegistryModified = true;
         }
     }
@@ -104,6 +117,7 @@ abstract class FRegistry
     public function getData(): array
     {
         $data = array();
+        $data["id"] = $this->registryId;
 
         foreach ($this->items as $key => $item) {
             $data[$key] = $item->getValue();
@@ -119,7 +133,7 @@ abstract class FRegistry
      */
     public function getDatum($key)
     {
-        $this->validateKey($key);
+        $this->validateItemKey($key);
         return $this->items[$key]->getValue();
     }
 
@@ -130,7 +144,7 @@ abstract class FRegistry
      */
     public function getItem($key): FItem
     {
-        $this->validateKey($key);
+        $this->validateItemKey($key);
         return $this->items[$key];
     }
 

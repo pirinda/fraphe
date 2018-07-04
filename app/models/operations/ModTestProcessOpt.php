@@ -26,18 +26,18 @@ class ModTestProcessOpt extends FRelation
     {
         parent::__construct($connection, AppConsts::OC_TEST_PROCESS_OPT);
 
-        $this->id_test = new FItem(FItem::DATA_TYPE_INT, "id_test", "ID ensayo", false);
-        $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", false);
-        $this->process_min = new FItem(FItem::DATA_TYPE_INT, "process_min", "Días mínimos de procesamiento", false);
-        $this->process_max = new FItem(FItem::DATA_TYPE_INT, "process_max", "Días máximos de procesamiento", false);
+        $this->id_test = new FItem(FItem::DATA_TYPE_INT, "id_test", "ID ensayo", true);
+        $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", true);
+        $this->process_min = new FItem(FItem::DATA_TYPE_INT, "process_min", "Días mínimos proceso", true);
+        $this->process_max = new FItem(FItem::DATA_TYPE_INT, "process_max", "Días máximos proceso", true);
         $this->cost = new FItem(FItem::DATA_TYPE_FLOAT, "cost", "Costo", false);
-        $this->is_default = new FItem(FItem::DATA_TYPE_BOOL, "is_default", "Es predeterminado", false);
-        $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Es de sistema", false);
-        $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Está eliminado", false);
-        $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", true);
-        $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", true);
-        $this->ts_user_ins = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_ins", "Creado", true);
-        $this->ts_user_upd = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_upd", "Modificado", true);
+        $this->is_default = new FItem(FItem::DATA_TYPE_BOOL, "is_default", "Predeterminado", true);
+        $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", true);
+        $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", true);
+        $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", false);
+        $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", false);
+        $this->ts_user_ins = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_ins", "Creado", false);
+        $this->ts_user_upd = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_upd", "Modificado", false);
 
         $this->items["id_test"] = $this->id_test;
         $this->items["id_entity"] = $this->id_entity;
@@ -59,8 +59,8 @@ class ModTestProcessOpt extends FRelation
 
     public function retrieve(FUserSession $session, array $ids, int $mode)
     {
-        $this->setRelationIds($ids);
         $this->initialize();
+        $this->setRelationIds($ids);
 
         // copy relation IDs to simplify query:
         $id_test = $this->relationIds["id_test"];
@@ -82,22 +82,20 @@ class ModTestProcessOpt extends FRelation
             $this->ts_user_ins->setValue($row["ts_user_ins"]);
             $this->ts_user_upd->setValue($row["ts_user_upd"]);
 
-            // retrieve as well relation IDs:
-            $this->copyRelationIdsFromItems();
-
             $this->isRegistryNew = false;
             $this->mode = $mode;
         }
         else {
-            throw new \Exception(FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
+            throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
         }
     }
 
     public function save(FUserSession $session)
     {
-        $this->validate();
+        $this->validateOnSave();
 
         $statement;
+        $this->isRegistryNew = $this->checkRegistryNew($session, "oc_test_process_opt") == 0;
 
         if ($this->isRegistryNew) {
             $statement = $this->connection->prepare("INSERT INTO oc_test_process_opt (" .
@@ -162,9 +160,9 @@ class ModTestProcessOpt extends FRelation
         $statement->bindParam(":process_min", $process_min);
         $statement->bindParam(":process_max", $process_max);
         $statement->bindParam(":cost", $cost);
-        $statement->bindParam(":is_default", $is_default);
-        $statement->bindParam(":is_system", $is_system);
-        $statement->bindParam(":is_deleted", $is_deleted);
+        $statement->bindParam(":is_default", $is_default, \PDO::PARAM_BOOL);
+        $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
+        $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
         //$statement->bindParam(":fk_user_ins", $fk_user_ins);
         //$statement->bindParam(":fk_user_upd", $fk_user_upd);
         //$statement->bindParam(":ts_user_ins", $ts_user_ins);
@@ -178,5 +176,15 @@ class ModTestProcessOpt extends FRelation
         if ($this->isRegistryNew) {
             $this->isRegistryNew = false;
         }
+    }
+
+    public function delete(FUserSession $session)
+    {
+
+    }
+
+    public function undelete(FUserSession $session)
+    {
+
     }
 }

@@ -25,15 +25,15 @@ class FItem
     protected $lengthMin;
     protected $lengthMax;
 
-    function __construct(int $dataType, string $key, string $name, bool $optional)
+    function __construct(int $dataType, string $key, string $name, bool $mandatory)
     {
         $this->dataType = $dataType;
         $this->key = $key;
         $this->name = $name;
         $this->value = self::produceDefault($dataType);
         $this->default = $this->value;
-        $this->canBeNull = $optional;
-        $this->canBeEmpty = $optional;
+        $this->canBeNull = !$mandatory;
+        $this->canBeEmpty = !$mandatory;
         $this->description = "";
     }
 

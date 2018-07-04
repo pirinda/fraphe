@@ -29,8 +29,8 @@ class ModEntityEntityType extends FRelation
 
     public function retrieve(FUserSession $session, array $ids, int $mode)
     {
-        $this->setRelationIds($ids);
         $this->initialize();
+        $this->setRelationIds($ids);
 
         // copy relation IDs to simplify query:
         $id_entity = $this->relationIds["id_entity"];
@@ -42,14 +42,11 @@ class ModEntityEntityType extends FRelation
             $this->id_entity->setValue($row["id_entity"]);
             $this->id_entity_type->setValue($row["id_entity_type"]);
 
-            // retrieve as well relation IDs:
-            $this->copyRelationIdsFromItems();
-
             $this->isRegistryNew = false;
             $this->mode = $mode;
         }
         else {
-            throw new \Exception(FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
+            throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
         }
     }
 
@@ -68,7 +65,7 @@ class ModEntityEntityType extends FRelation
                 ":id_entity_type);");
         }
         else {
-            throw new \Exception(FRegistry::ERR_MSG_REGISTRY_NON_UPDATABLE);
+            throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NON_UPDATABLE);
         }
 
         $id_entity = $this->ids["id_entity"];

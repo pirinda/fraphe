@@ -15,8 +15,11 @@ use Fraphe\Lib\FUtils;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
 use app\AppUtils;
-use app\models\operations\ModTest;
-use app\models\operations\ModTestProcessOpt;
+use app\models\ModUtils;
+use app\models\catalogs\ModEntity;
+use app\models\catalogs\ModEntityEntityType;
+use app\models\catalogs\ModEntityAddress;
+use app\models\catalogs\ModContact;
 
 echo '<!DOCTYPE html>';
 echo '<html>';
@@ -26,13 +29,21 @@ echo FAppNavbar::compose("catalogs");
 
 $userSession = FGuiUtils::createUserSession();
 $connection = FGuiUtils::createConnection();
-$registry = new ModTest($connection);
+$registry = new ModEntity($connection);
 $errmsg = "";
+$class = 1;
+$nature = 1;
 
 switch ($_SERVER["REQUEST_METHOD"]) {
     case "GET":
         if (!empty($_GET["id"])) {
             $registry->read($userSession, $_GET["id"], FRegistry::MODE_WRITE);
+        }
+        if (!empty($_GET["class"])) {
+            $class = intval($_GET["class"]);
+        }
+        if (!empty($_GET["nature"])) {
+            $nature = intval($_GET["nature"]);
         }
         break;
 
@@ -78,7 +89,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 }
 
 echo '<div class="container" style="margin-top:50px">';
-echo '<h3>Ensayo</h3>';
+echo '<h3>' . ModUtils::getEntityClassSing($class) . '</h3>';
 
 if (!empty($errmsg)) {
     echo '<div class="alert alert-danger alert-dismissible">';
@@ -92,68 +103,82 @@ if (!empty($errmsg)) {
 echo '<form method="post" action="' . FUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '">';
 
 echo '<div class="form_group">';
-echo '<label for="fk_process_area">' . $registry->getItem("fk_process_area")->getName() . ': *</label>';
-echo '<select class="form-control" name="fk_process_area">';
-foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_PROCESS_AREA) as $option) {
-    echo $option;
-}
-echo '</select>';
-echo '</div>';
-
-echo '<div class="form_group">';
 echo '<label for="code">' . $registry->getItem("code")->getName() . ': *</label>';
 echo '<input type="text" class="form-control" name="code" value="' . $registry->getDatum("code") . '">';
 echo '</div>';
 
+if ($nature == ModUtils::ENTITY_NATURE_PER) {
+    echo '<div class="form_group">';
+    echo '<label for="surname">' . $registry->getItem("surname")->getName() . ': *</label>';
+    echo '<input type="text" class="form-control" name="surname" value="' . $registry->getDatum("surname") . '">';
+    echo '</div>';
+
+    echo '<div class="form_group">';
+    echo '<label for="forename">' . $registry->getItem("forename")->getName() . ': *</label>';
+    echo '<input type="text" class="form-control" name="forename" value="' . $registry->getDatum("forename") . '">';
+    echo '</div>';
+
+    echo '<div class="form_group">';
+    echo '<label for="prefix">' . $registry->getItem("prefix")->getName() . ': *</label>';
+    echo '<input type="text" class="form-control" name="prefix" value="' . $registry->getDatum("prefix") . '">';
+    echo '</div>';
+}
+else {
+    echo '<div class="form_group">';
+    echo '<label for="name">' . $registry->getItem("name")->getName() . ': *</label>';
+    echo '<input type="text" class="form-control" name="name" value="' . $registry->getDatum("name") . '">';
+    echo '</div>';
+}
+
 echo '<div class="form_group">';
-echo '<label for="name">' . $registry->getItem("name")->getName() . ': *</label>';
-echo '<input type="text" class="form-control" name="name" value="' . $registry->getDatum("name") . '">';
+echo '<label for="alias">' . $registry->getItem("alias")->getName() . ': *</label>';
+echo '<input type="text" class="form-control" name="alias" value="' . $registry->getDatum("alias") . '">';
 echo '</div>';
 
 echo '<div class="form_group">';
-echo '<label for="fk_sample_category">' . $registry->getItem("fk_sample_category")->getName() . ': *</label>';
-echo '<select class="form-control" name="fk_sample_category">';
-foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_SAMPLE_CATEGORY, $registry->getDatum("fk_sample_category")) as $option) {
+echo '<label for="fiscal_id">' . $registry->getItem("fiscal_id")->getName() . ': *</label>';
+echo '<input type="text" class="form-control" name="fiscal_id" value="' . $registry->getDatum("fiscal_id") . '">';
+echo '</div>';
+
+echo '<div class="checkbox">';
+echo '<label><input type="checkbox" name="is_credit" value="1"' . ($registry->getDatum("is_credit") ? " checked" : "") . '>' . $registry->getItem("is_credit")->getName() . '</label>';
+echo '</div>';
+
+echo '<div class="form_group">';
+echo '<label for="credit_days">' . $registry->getItem("credit_days")->getName() . ': *</label>';
+echo '<input type="text" class="form-control" name="credit_days" value="' . $registry->getDatum("credit_days") . '">';
+echo '</div>';
+
+echo '<div class="form_group">';
+echo '<label for="notes">' . $registry->getItem("notes")->getName() . ': *</label>';
+echo '<textarea class="form-control" name="notes" rows="3">' . $registry->getDatum("notes") . '</textarea>';
+echo '</div>';
+
+echo '<div class="form_group">';
+echo '<label for="nk_market_segment">' . $registry->getItem("nk_market_segment")->getName() . ': *</label>';
+echo '<select class="form-control" name="nk_market_segment">';
+foreach (AppUtils::getSelectOptions($connection, AppConsts::CC_MARKET_SEGMENT) as $option) {
     echo $option;
 }
 echo '</select>';
 echo '</div>';
 
 echo '<div class="form_group">';
-echo '<label for="fk_testing_method">' . $registry->getItem("fk_testing_method")->getName() . ': *</label>';
-echo '<select class="form-control" name="fk_testing_method">';
-foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_TESTING_METHOD, $registry->getDatum("fk_testing_method")) as $option) {
+echo '<label for="nk_report_delivery_opt">' . $registry->getItem("nk_report_delivery_opt")->getName() . ': *</label>';
+echo '<select class="form-control" name="nk_report_delivery_opt">';
+foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_REPORT_DELIVERY_OPT) as $option) {
     echo $option;
 }
 echo '</select>';
-echo '</div>';
-
-echo '<div class="form_group">';
-echo '<label for="fk_test_acredit_attrib">' . $registry->getItem("fk_test_acredit_attrib")->getName() . ': *</label>';
-echo '<select class="form-control" name="fk_test_acredit_attrib">';
-foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_TEST_ACREDIT_ATTRIB, $registry->getDatum("fk_test_acredit_attrib")) as $option) {
-    echo $option;
-}
-echo '</select>';
-echo '</div>';
-
-echo '<div class="form_group">';
-echo '<label for="sample_quantity">' . $registry->getItem("sample_quantity")->getName() . ': *</label>';
-echo '<input type="text" class="form-control" name="sample_quantity" value="' . $registry->getDatum("sample_quantity") . '">';
-echo '</div>';
-
-echo '<div class="form_group">';
-echo '<label for="sample_directs">' . $registry->getItem("sample_directs")->getName() . ': *</label>';
-echo '<textarea class="form-control" name="sample_directs" rows="3">' . $registry->getDatum("sample_directs") . '</textarea>';
 echo '</div>';
 
 if (!$registry->isRegistryNew()) {
     echo '<div class="form_group collapse">';
-    echo '<label for="id">' . $registry->getItem("id_test")->getName() . ':</label>';
+    echo '<label for="id">' . $registry->getItem("id_entity")->getName() . ':</label>';
     echo '<input type="text" class="form-control" name="id" value="' . $registry->getRegistryId() . '" readonly>';
     echo '</div>';
 }
-
+/*
 // child test process options:
 
 $childProcessOpt;
@@ -169,11 +194,6 @@ else {
 }
 
 echo '<div class="form_group">';
-echo '<label for="po_process_min">' . $childProcessOpt->getItem("process_min")->getName() . ': *</label>';
-echo '<input type="text" class="form-control" name="po_process_min" value="' . $childProcessOpt->getDatum("process_min") . '">';
-echo '</div>';
-
-echo '<div class="form_group">';
 echo '<label for="po_process_max">' . $childProcessOpt->getItem("process_max")->getName() . ': *</label>';
 echo '<input type="text" class="form-control" name="po_process_max" value="' . $childProcessOpt->getDatum("process_max") . '">';
 echo '</div>';
@@ -186,9 +206,10 @@ echo '</div>';
 echo '<div class="checkbox">';
 echo '<label><input type="checkbox" name="po_is_default" value="1"' . ($childProcessOpt->getDatum("is_default") ? " checked" : "") . '>' . $childProcessOpt->getItem("is_default")->getName() . '</label>';
 echo '</div>';
+*/
 
 echo '<br><button type="submit" class="btn btn-primary">Guardar</button>';
-echo '&nbsp;<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_test.php" class="btn btn-danger" role="button">Cancelar</a>';
+echo '&nbsp;<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/catalogs/view_entity.php?class=' . $class . '" class="btn btn-danger" role="button">Cancelar</a>';
 
 echo '</form>';
 echo '</div>';

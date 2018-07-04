@@ -68,7 +68,7 @@ foreach ($connection->query($sql) as $row) {
     echo '<td class="small">' . $row['c_ts_user_ins'] . '</td>';
     echo '<td class="small">' . $row['uu_name'] . '</td>';
     echo '<td class="small">' . $row['c_ts_user_upd'] . '</td>';
-    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_test.php?id=' . $row['c_id'] . '" class="btn btn-default btn-sm" role="button"><span class="glyphicon glyphicon-edit"></span></a></td>';
+    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_test.php?id=' . $row['c_id'] . '" class="btn btn-success btn-sm" role="button"><span class="glyphicon glyphicon-edit"></span></a></td>';
     echo '</tr>';
 }
 

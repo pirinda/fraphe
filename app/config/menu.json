@@ -9,7 +9,7 @@
                 "submenus":{
                     "customer":{
                         "submenu":"Clientes",
-                        "href":"app/views.php?view=customer"
+                        "href":"app/views/catalogs/view_entity.php?class=2"
                     },
                     "customerAddress":{
                         "submenu":"Domicilios clientes",
@@ -27,7 +27,7 @@
                 "submenus":{
                     "customer":{
                         "submenu":"Proveedores",
-                        "href":"app/views.php?view=provider"
+                        "href":"app/views/catalogs/view_entity.php?class=3"
                     },
                     "customerAddress":{
                         "submenu":"Domicilios proveedores",

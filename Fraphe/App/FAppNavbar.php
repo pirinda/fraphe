@@ -26,8 +26,8 @@ abstract class FAppNavbar
         }
 
         // navbar:
-        $html = '<nav class="navbar navbar-default navbar-fixed-top">';
-        //$html = '<nav class="navbar navbar-default">';
+        //$html = '<nav class="navbar navbar-default navbar-fixed-top">';
+        $html = '<nav class="navbar navbar-default">';
 
         // navbar header:
         $html .= '<div class="container-fluid">';
@@ -66,8 +66,8 @@ abstract class FAppNavbar
         $module = FGuiUtils::getModule($moduleId);
 
         // navbar:
-        $html = '<nav class="navbar navbar-inverse navbar-fixed-top">';
-        //$html = '<nav class="navbar navbar-inverse">';
+        //$html = '<nav class="navbar navbar-inverse navbar-fixed-top">';
+        $html = '<nav class="navbar navbar-inverse">';
 
         // navbar header:
         $html .= '<div class="container-fluid">';

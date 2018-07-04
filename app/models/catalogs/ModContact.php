@@ -32,19 +32,19 @@ class ModContact extends FRegistry
         parent::__construct($connection, AppConsts::CC_CONTACT);
 
         $this->id_contact = new FItem(FItem::DATA_TYPE_INT, "id_contact", "ID contacto", false);
-        $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", false);
-        $this->prefix = new FItem(FItem::DATA_TYPE_STRING, "prefix", "Prefijo", false);
-        $this->surname = new FItem(FItem::DATA_TYPE_STRING, "surname", "Apellidos", false);
-        $this->forename = new FItem(FItem::DATA_TYPE_STRING, "forename", "Nombres", false);
-        $this->job = new FItem(FItem::DATA_TYPE_STRING, "job", "Puesto", false);
-        $this->mail = new FItem(FItem::DATA_TYPE_STRING, "mail", "Mail", false);
-        $this->phone = new FItem(FItem::DATA_TYPE_STRING, "phone", "Teléfono", false);
-        $this->mobile = new FItem(FItem::DATA_TYPE_STRING, "mobile", "Móvil", false);
-        $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Es de sistema", false);
-        $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Está eliminado", false);
-        $this->fk_entity = new FItem(FItem::DATA_TYPE_INT, "fk_entity", "Entidad", false);
-        $this->fk_entity_address = new FItem(FItem::DATA_TYPE_INT, "fk_entity_address", "Domicilio", false);
-        $this->fk_contact_type = new FItem(FItem::DATA_TYPE_INT, "fk_contact_type", "Tipo contacto", false);
+        $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", true);
+        $this->prefix = new FItem(FItem::DATA_TYPE_STRING, "prefix", "Prefijo", true);
+        $this->surname = new FItem(FItem::DATA_TYPE_STRING, "surname", "Apellidos", true);
+        $this->forename = new FItem(FItem::DATA_TYPE_STRING, "forename", "Nombres", true);
+        $this->job = new FItem(FItem::DATA_TYPE_STRING, "job", "Puesto", true);
+        $this->mail = new FItem(FItem::DATA_TYPE_STRING, "mail", "Mail", true);
+        $this->phone = new FItem(FItem::DATA_TYPE_STRING, "phone", "Teléfono", true);
+        $this->mobile = new FItem(FItem::DATA_TYPE_STRING, "mobile", "Móvil", true);
+        $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", true);
+        $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", true);
+        $this->fk_entity = new FItem(FItem::DATA_TYPE_INT, "fk_entity", "Entidad", true);
+        $this->fk_entity_address = new FItem(FItem::DATA_TYPE_INT, "fk_entity_address", "Domicilio", true);
+        $this->fk_contact_type = new FItem(FItem::DATA_TYPE_INT, "fk_contact_type", "Tipo contacto", true);
         $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", false);
         $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", false);
         $this->ts_user_ins = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_ins", "Creado", false);
@@ -111,7 +111,7 @@ class ModContact extends FRegistry
             $this->mode = $mode;
         }
         else {
-            throw new \Exception(FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
+            throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
         }
     }
 
@@ -213,8 +213,8 @@ class ModContact extends FRegistry
         $statement->bindParam(":mail", $mail);
         $statement->bindParam(":phone", $phone);
         $statement->bindParam(":mobile", $mobile);
-        $statement->bindParam(":is_system", $is_system);
-        $statement->bindParam(":is_deleted", $is_deleted);
+        $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
+        $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
         $statement->bindParam(":fk_entity", $fk_entity);
         $statement->bindParam(":fk_entity_address", $fk_entity_address);
         $statement->bindParam(":fk_contact_type", $fk_contact_type);

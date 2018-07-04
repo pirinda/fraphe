@@ -42,32 +42,32 @@ class ModEntity extends FRegistry
     {
         parent::__construct($connection, AppConsts::CC_ENTITY);
 
-        $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", true);
-        $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", false);
-        $this->code = new FItem(FItem::DATA_TYPE_STRING, "code", "Código", false);
-        $this->alias = new FItem(FItem::DATA_TYPE_STRING, "alias", "Alias", false);
-        $this->prefix = new FItem(FItem::DATA_TYPE_STRING, "prefix", "Prefijo", false);
-        $this->surname = new FItem(FItem::DATA_TYPE_STRING, "surname", "Apellidos", false);
-        $this->forename = new FItem(FItem::DATA_TYPE_STRING, "forename", "Nombres", false);
-        $this->fiscal_id = new FItem(FItem::DATA_TYPE_STRING, "fiscal_id", "ID fiscal", false);
-        $this->is_person = new FItem(FItem::DATA_TYPE_BOOL, "is_person", "Es persona", false);
-        $this->is_credit = new FItem(FItem::DATA_TYPE_BOOL, "is_credit", "Tiene crédito", false);
-        $this->credit_days = new FItem(FItem::DATA_TYPE_INT, "credit_days", "Días crédito", false);
-        $this->billing_prefs = new FItem(FItem::DATA_TYPE_STRING, "billing_prefs", "Preferencias facturación", false);
-        $this->notes = new FItem(FItem::DATA_TYPE_STRING, "notes", "Notas", false);
-        $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Es de sistema", false);
-        $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Está eliminado", false);
-        $this->fk_entity_class = new FItem(FItem::DATA_TYPE_INT, "fk_entity_class", "Clase entidad", false);
+        $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", false);
+        $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", true);
+        $this->code = new FItem(FItem::DATA_TYPE_STRING, "code", "Código", true);
+        $this->alias = new FItem(FItem::DATA_TYPE_STRING, "alias", "Alias", true);
+        $this->prefix = new FItem(FItem::DATA_TYPE_STRING, "prefix", "Prefijo", true);
+        $this->surname = new FItem(FItem::DATA_TYPE_STRING, "surname", "Apellidos", true);
+        $this->forename = new FItem(FItem::DATA_TYPE_STRING, "forename", "Nombres", true);
+        $this->fiscal_id = new FItem(FItem::DATA_TYPE_STRING, "fiscal_id", "ID fiscal", true);
+        $this->is_person = new FItem(FItem::DATA_TYPE_BOOL, "is_person", "Es persona", true);
+        $this->is_credit = new FItem(FItem::DATA_TYPE_BOOL, "is_credit", "Tiene crédito", true);
+        $this->credit_days = new FItem(FItem::DATA_TYPE_INT, "credit_days", "Días crédito", true);
+        $this->billing_prefs = new FItem(FItem::DATA_TYPE_STRING, "billing_prefs", "Preferencias facturación", true);
+        $this->notes = new FItem(FItem::DATA_TYPE_STRING, "notes", "Notas", true);
+        $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", true);
+        $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", true);
+        $this->fk_entity_class = new FItem(FItem::DATA_TYPE_INT, "fk_entity_class", "Clase entidad", true);
         $this->nk_market_segment = new FItem(FItem::DATA_TYPE_INT, "nk_market_segment", "Segmento mercado", false);
         $this->nk_entity_parent = new FItem(FItem::DATA_TYPE_INT, "nk_entity_parent", "Entidad padre", false);
         $this->nk_entity_billing = new FItem(FItem::DATA_TYPE_INT, "nk_entity_billing", "Entidad facturación", false);
         $this->nk_entity_agent = new FItem(FItem::DATA_TYPE_INT, "nk_entity_agent", "Comisionista", false);
         $this->nk_user_agent = new FItem(FItem::DATA_TYPE_INT, "nk_user_agent", "Agente comercial", false);
         $this->nk_report_delivery_opt = new FItem(FItem::DATA_TYPE_INT, "nk_report_delivery_opt", "Opción entrega informes resultados", false);
-        $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", true);
-        $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", true);
-        $this->ts_user_ins = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_ins", "Creado", true);
-        $this->ts_user_upd = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_upd", "Modificado", true);
+        $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", false);
+        $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", false);
+        $this->ts_user_ins = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_ins", "Creado", false);
+        $this->ts_user_upd = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_upd", "Modificado", false);
 
         $this->items["id_entity"] = $this->id_entity;
         $this->items["name"] = $this->name;
@@ -110,14 +110,27 @@ class ModEntity extends FRegistry
         $this->childAddresses = array();
     }
 
-    public function getChildEntityTypes()
+    public function getChildEntityTypes(): array
     {
         return $this->childEntityTypes;
     }
 
-    public function getChildAddresses()
+    public function getChildAddresses(): array
     {
         return $this->childAddresses;
+    }
+
+    public function validate()
+    {
+        parent::validate();
+
+        foreach ($this->childEntityTypes as $entityType) {
+            $entityType->validate();
+        }
+
+        foreach ($this->childAddresses as $address) {
+            $address->validate();
+        }
     }
 
     public function read(FUserSession $session, int $id, int $mode)
@@ -170,22 +183,22 @@ class ModEntity extends FRegistry
                 $ids["id_entity"] = $row["id_entity"];
                 $ids["id_entity_type"] = $row["id_entity_type"];
 
-                $entityEntityType = new ModEntityEntityType($connection);
-                $entityEntityType->retrieve($session, $ids, $mode);
-                $this->childEntityTypes[] = $entityEntityType;
+                $entityType = new ModEntityEntityType($connection);
+                $entityType->retrieve($session, $ids, $mode);
+                $this->childEntityTypes[] = $entityType;
             }
 
             // read child entity addresses:
             $sql = "SELECT id_entity_address FROM cc_entity_address WHERE fk_entity = $this->registryId ORDER BY id_entity_address;";
             $statement = $this->connection->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $entityAddress = new ModEntityAddress($connection);
-                $entityAddress->read($session, $row["id_entity_address"], $mode);
-                $this->childAddresses[] = $entityAddress;
+                $address = new ModEntityAddress($connection);
+                $address->read($session, $row["id_entity_address"], $mode);
+                $this->childAddresses[] = $address;
             }
         }
         else {
-            throw new \Exception(FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
+            throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
         }
     }
 
@@ -318,13 +331,13 @@ class ModEntity extends FRegistry
         $statement->bindParam(":surname", $surname);
         $statement->bindParam(":forename", $forename);
         $statement->bindParam(":fiscal_id", $fiscal_id);
-        $statement->bindParam(":is_person", $is_person);
-        $statement->bindParam(":is_credit", $is_credit);
+        $statement->bindParam(":is_person", $is_person, \PDO::PARAM_BOOL);
+        $statement->bindParam(":is_credit", $is_credit, \PDO::PARAM_BOOL);
         $statement->bindParam(":credit_days", $credit_days);
         $statement->bindParam(":billing_prefs", $billing_prefs);
         $statement->bindParam(":notes", $notes);
-        $statement->bindParam(":is_system", $is_system);
-        $statement->bindParam(":is_deleted", $is_deleted);
+        $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
+        $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
         $statement->bindParam(":fk_entity_class", $fk_entity_class);
         $statement->bindParam(":nk_market_segment", $nk_market_segment);
         $statement->bindParam(":nk_entity_parent", $nk_entity_parent);
@@ -352,21 +365,23 @@ class ModEntity extends FRegistry
         }
 
         // save child entity entity types:
-        $this->connection->exec("DELETE FROM cc_entity_entity_type WHERE id_entity = $this->registryId;");
-        foreach ($this->childEntityTypes as $entityEntityType) {
+        $this->connection->exec("DELETE FROM cc_entity_entity_type WHERE id_entity = $this->registryId;");  // pure relations
+        foreach ($this->childEntityTypes as $entityType) {
             $ids = array();
             $ids["id_entity"] = $this->registryId;
-            $entityEntityType->setRelationIds($ids);
-            $entityEntityType->forceRegistryNew();
-            $entityEntityType->save($session);
+
+            $entityType->setRelationIds($ids);
+            $entityType->forceRegistryNew();    // pure relation
+            $entityType->save($session);
         }
 
         // save child entity addresses:
-        foreach ($this->childAddresses as $entityAddress) {
+        foreach ($this->childAddresses as $address) {
             $data = array();
             $data["fk_entity"] = $this->registryId;
-            $entityAddress->setData($data);
-            $entityAddress->save($session);
+
+            $address->setData($data);
+            $address->save($session);
         }
     }
 
