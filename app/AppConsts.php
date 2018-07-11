@@ -26,7 +26,10 @@ abstract class AppConsts
     public const OC_SAMPLE_CATEGORY = 201021;
     public const OC_SAMPLE_CLASS = 201022;
     public const OC_SAMPLE_TYPE = 201023;
-    public const OC_SAMPLING_METHOD = 201026;
+    public const OC_SAMPLE_STATUS = 201024;
+    public const OC_SAMPLING_EQUIPT_TYPE = 201026;
+    public const OC_SAMPLING_EQUIPT = 201027;
+    public const OC_SAMPLING_METHOD = 201031;
     public const OC_TESTING_METHOD = 201036;
     public const OC_TEST_ACREDIT_ATTRIB = 201039;
     public const OC_TEST = 201041;
@@ -44,7 +47,15 @@ abstract class AppConsts
     public const OC_RESULT_UNIT_VALUE = 201087;
     public const OC_RESULT_PERMISS_LIMIT = 201088;
     public const OC_SAMPLING_NOTE = 201101;
-    public const OC_TESTING_NOTE = 201111;
+    public const OC_TESTING_NOTE = 201106;
+    public const OC_JOB_STATUS = 201121;
+
+    public const O_SAMPLE = 202001;
+    public const O_SAMPLE_TEST = 202006;
+    public const O_SAMPLE_STATUS_LOG = 202009;
+    public const O_RECEPT = 202011;
+    public const O_JOB = 202021;
+    public const O_JOB_STATUS_LOG = 202026;
 
     public static $tables = array(
         self::CC_CONFIG_SETTING => "cc_config_setting",
@@ -69,6 +80,9 @@ abstract class AppConsts
         self::OC_PROCESS_AREA => "oc_process_area",
         self::OC_SAMPLE_CLASS => "oc_sample_class",
         self::OC_SAMPLE_TYPE => "oc_sample_type",
+        self::OC_SAMPLE_STATUS => "oc_sample_status",
+        self::OC_SAMPLING_EQUIPT_TYPE => "oc_sampling_equipt_type",
+        self::OC_SAMPLING_EQUIPT => "oc_sampling_equipt",
         self::OC_SAMPLING_METHOD => "oc_sampling_method",
         self::OC_TESTING_METHOD => "oc_testing_method",
         self::OC_TEST_ACREDIT_ATTRIB => "oc_test_acredit_attrib",
@@ -88,5 +102,13 @@ abstract class AppConsts
         self::OC_RESULT_PERMISS_LIMIT => "oc_result_permiss_limit",
         self::OC_SAMPLING_NOTE => "oc_sampling_note",
         self::OC_TESTING_NOTE => "oc_testing_note"
+        self::OC_JOB_STATUS => "oc_job_status",
+
+        self::O_SAMPLE => "o_sample",
+        self::O_SAMPLE_TEST => "o_sample_test",
+        self::O_SAMPLE_STATUS_LOG => "o_sample_status_log",
+        self::O_RECEPT => "o_recept",
+        self::O_JOB => "o_job",
+        self::O_JOB_STATUS_LOG => "o_job_status_log",
     );
 }
