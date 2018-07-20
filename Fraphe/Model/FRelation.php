@@ -5,15 +5,15 @@ use Fraphe\App\FUserSession;
 
 abstract class FRelation extends FRegistry
 {
-    protected $relationIds; // associative array of int values
+    protected $ids; // associative array of int values
 
     /* Creates new base registry. Each field of registry must be contained in member array $items. Relation IDs are a subset of this registry items.
      */
     public function __construct(\PDO $connection, int $registryType)
     {
-        $this->relationIds = array();
+        $this->ids = array();
 
-        parent::__construct($connection, $registryType);
+        parent::__construct($connection, $registryType, "");
     }
 
     /* Initializes registry data.
@@ -24,8 +24,8 @@ abstract class FRelation extends FRegistry
     {
         parent::initialize();
 
-        foreach ($this->relationIds as $key => $id) {
-            $this->relationIds[$key] = 0;
+        foreach ($this->ids as $key => $id) {
+            $this->ids[$key] = 0;
         }
     }
 
@@ -37,7 +37,7 @@ abstract class FRelation extends FRegistry
     {
         parent::validate();
 
-        foreach ($this->relationIds as $key => $id) {
+        foreach ($this->ids as $key => $id) {
             if (!is_int($id)) {
                 throw new \Exception(__METHOD__ . ": El ID '$key' debe ser número entero.");
             }
@@ -52,28 +52,28 @@ abstract class FRelation extends FRegistry
     {
         $this->validate();
 
-        foreach ($this->relationIds as $key => $id) {
+        foreach ($this->ids as $key => $id) {
             if ($id == 0) {
                 throw new \Exception(__METHOD__ . ": El ID '$key' debe ser diferente de cero.");
             }
         }
     }
 
-    protected function copyRelationIdsToItems()
+    protected function copyIdsToItems()
     {
         $data = array();
 
-        foreach ($this->relationIds as $key => $id) {
+        foreach ($this->ids as $key => $id) {
             $data[$key] = intval($id);
         }
 
         $this->setData($data);
     }
 
-    protected function copyRelationIdsFromItems()
+    protected function copyIdsFromItems()
     {
-        foreach ($this->relationIds as $key => $id) {
-            $this->relationIds[$key] = $this->items[$key]->getValue();
+        foreach ($this->ids as $key => $id) {
+            $this->ids[$key] = $this->items[$key]->getValue();
         }
     }
 
@@ -86,7 +86,7 @@ abstract class FRelation extends FRegistry
     {
         parent::setData($data);
 
-        $this->copyRelationIdsFromItems();
+        $this->copyIdsFromItems();
     }
 
     /* Sets relation IDs.
@@ -94,33 +94,33 @@ abstract class FRelation extends FRegistry
      * Returns: nothing.
      * Throws: Exception if something fails.
      */
-    public function setRelationIds(array $ids)
+    public function setIds(array $ids)
     {
         // validate keys:
         foreach ($ids as $key => $id) {
             $this->validateItemKey($key);
             if (!is_int($id)) {
-                throw new \Exception(__METHOD__ . ": El ID '$key' debe ser número entero.");
+                throw new \Exception(__METHOD__ . ": El ID '$key' debe ser número entero: $id.");
             }
         }
 
         // set relation IDs:
         foreach ($ids as $key => $id) {
-            $this->relationIds[$key] = $id;
+            $this->ids[$key] = $id;
 
             $this->isRegistryModified = true;
         }
 
-        $this->copyRelationIdsToItems();
+        $this->copyIdsToItems();
     }
 
     /* Gets relation IDs.
      * Returns: associative array of relation IDs in the key=id form.
      * Throws: Exception if something fails.
      */
-    public function getRelationIds(): array
+    public function getIds(): array
     {
-        return $this->relationIds;
+        return $this->ids;
     }
 
     /* Gets relation ID.
@@ -131,10 +131,10 @@ abstract class FRelation extends FRegistry
     public function getRelationId($key): int
     {
         $this->validateItemKey($key);
-        return $this->relationIds[$key];
+        return $this->ids[$key];
     }
 
-    public function getRegistryId(): int
+    public function getId(): int
     {
         throw new \Exception(__METHOD__ . ": La relación no tiene ID, sino un conjunto de IDs.");
     }
@@ -160,7 +160,7 @@ abstract class FRelation extends FRegistry
     {
         $sql = "SELECT COUNT(*) AS _count FROM $table WHERE ";
         $where = "";
-        foreach ($this->relationIds as $key => $id) {
+        foreach ($this->ids as $key => $id) {
             $where .= ($where == "" ? "" : "AND ") . "$key = $id ";
         }
         $sql .= $where;

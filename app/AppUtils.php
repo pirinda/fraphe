@@ -31,7 +31,7 @@ abstract class AppUtils
                 $sql = "SELECT id_testing_method AS _val, name AS _opt FROM oc_testing_method WHERE NOT is_deleted ORDER BY name, id_testing_method;";
                 break;
             case AppConsts::OC_TEST_ACREDIT_ATTRIB:
-                $sql = "SELECT id_test_acredit_attrib AS _val, name AS _opt FROM oc_test_acredit_attrib WHERE NOT is_deleted ORDER BY id_test_acredit_attrib, name;";
+                $sql = "SELECT id_test_acredit_attrib AS _val, CONCAT(code, ' - ', name) AS _opt FROM oc_test_acredit_attrib WHERE NOT is_deleted ORDER BY id_test_acredit_attrib, name;";
                 break;
             case AppConsts::OC_REPORT_DELIVERY_OPT:
                 $sql = "SELECT id_report_delivery_opt AS _val, name AS _opt FROM oc_report_delivery_opt WHERE NOT is_deleted ORDER BY id_report_delivery_opt, name;";
@@ -39,9 +39,11 @@ abstract class AppUtils
             default:
         }
 
+        $options[] = '<option value="0"' . ($selectedValue == 0 ? " selected" : "") . '>- seleccionar -</option>';
+
         if (isset($sql)) {
             foreach ($connection->query($sql) as $row) {
-                $options[] = '<option value="' . $row['_val'] . '"' . (!empty($selectedValue) && $selectedValue === $row['_val'] ? " selected" : "") . '>' . $row['_opt'] . '</option>';
+                $options[] = '<option value="' . $row['_val'] . '"' . (!empty($selectedValue) && $selectedValue == $row['_val'] ? " selected" : "") . '>' . $row['_opt'] . '</option>';
             }
         }
 

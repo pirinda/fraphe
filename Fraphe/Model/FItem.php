@@ -89,17 +89,23 @@ class FItem
         $this->lengthMax = $lengthMax;
     }
 
-    public function getDataType()
+    function setMandatory(bool $mandatory)
+    {
+        $this->canBeNull = !$mandatory;
+        $this->canBeEmpty = !$mandatory;
+    }
+
+    public function getDataType(): int
     {
         return $this->dataType;
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return $this->key;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -114,17 +120,17 @@ class FItem
         return $this->default;
     }
 
-    public function canBeNull()
+    public function canBeNull(): bool
     {
         return $this->canBeNull;
     }
 
-    public function canBeEmpty()
+    public function canBeEmpty(): bool
     {
         return $this->canBeEmpty;
     }
 
-    public function getdescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -139,12 +145,12 @@ class FItem
         return $this->valueMax;
     }
 
-    public function getLengthMin()
+    public function getLengthMin(): int
     {
         return $this->lengthMin;
     }
 
-    public function getLengthMax()
+    public function getLengthMax(): int
     {
         return $this->lengthMax;
     }
@@ -227,7 +233,7 @@ class FItem
                     if (!is_a("DateTime")) {
                         throw new \Exception($this->composeItemName() . "debe ser fecha o fecha-hora.");
                     }
-                    else if (!$this->canBeEmpty && empty($value)) {
+                    else if (!$this->canBeEmpty && empty($this->value)) {
                         throw new \Exception($this->composeItemName() . "no puede estar vacío.");
                     }
                     else if (isset($this->valueMin) && is_int($valueMin) && $this->value < $this->valueMin) {

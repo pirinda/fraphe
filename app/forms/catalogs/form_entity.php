@@ -31,54 +31,76 @@ $userSession = FGuiUtils::createUserSession();
 $connection = FGuiUtils::createConnection();
 $registry = new ModEntity($connection);
 $errmsg = "";
-$class = 1;
-$nature = 1;
+$entityClass = 1;   // 1=company; 2=customer; 3=provider
+$entityNature = 1;  // 1=person; 2=organization
 
 switch ($_SERVER["REQUEST_METHOD"]) {
     case "GET":
-        if (!empty($_GET["id"])) {
-            $registry->read($userSession, $_GET["id"], FRegistry::MODE_WRITE);
+        if (!empty($_GET[FRegistry::ID])) {
+            $registry->read($userSession, intval($_GET[FRegistry::ID]), FRegistry::MODE_WRITE);
+            $entityNature = $registry->getDatum("is_person") ? ModUtils::ENTITY_NATURE_PER : ModUtils::ENTITY_NATURE_ORG;
         }
         if (!empty($_GET["class"])) {
-            $class = intval($_GET["class"]);
+            $entityClass = intval($_GET["class"]);
         }
         if (!empty($_GET["nature"])) {
-            $nature = intval($_GET["nature"]);
+            $entityNature = intval($_GET["nature"]);
         }
         break;
 
     case "POST":
         $data = array();
-        $data["name"] = $_POST["name"];
-        $data["code"] = $_POST["code"];
-        $data["sample_quantity"] = $_POST["sample_quantity"];
-        $data["sample_directs"] = $_POST["sample_directs"];
-        $data["fk_process_area"] = intval($_POST["fk_process_area"]);
-        $data["fk_sample_category"] = intval($_POST["fk_sample_category"]);
-        $data["fk_testing_method"] = intval($_POST["fk_testing_method"]);
-        $data["fk_test_acredit_attrib"] = intval($_POST["fk_test_acredit_attrib"]);
 
-        $childData = array();
-        $childData["id_entity"] = 1;    // current company
-        $childData["process_min"] = intval($_POST["po_process_min"]);
-        $childData["process_max"] = intval($_POST["po_process_max"]);
-        $childData["cost"] = floatval($_POST["po_cost"]);
-        $childData["is_default"] = boolval($_POST["po_is_default"]);
-
-        if (!empty($_POST["id"])) {
-            $data["id"] = intval($_POST["id"]);
-            $childData["id_test"] = $data["id"];
+        if (!empty($_POST[FRegistry::ID])) {
+            $data["id_entity"] = intval($_POST[FRegistry::ID]);
+        }
+        if (!empty($_POST["class"])) {
+            $entityClass = intval($_POST["class"]);
+        }
+        if (!empty($_POST["nature"])) {
+            $entityNature = intval($_POST["nature"]);
         }
 
-        $childProcessOpt = new ModTestProcessOpt($connection);
-        $childProcessOpt->setData($childData);
-        $registry->addChildProcessOpt($childProcessOpt);
+        if ($entityNature == ModUtils::ENTITY_NATURE_ORG) {
+            $data["name"] = $_POST["name"];
+        }
+
+        $data["code"] = $_POST["code"];
+        $data["alias"] = $_POST["alias"];
+
+        if ($entityNature == ModUtils::ENTITY_NATURE_PER) {
+            $data["prefix"] = $_POST["prefix"];
+            $data["surname"] = $_POST["surname"];
+            $data["forename"] = $_POST["forename"];
+        }
+
+        $data["fiscal_id"] = $_POST["fiscal_id"];
+        $data["is_person"] = $entityNature == ModUtils::ENTITY_NATURE_PER;
+        $data["is_credit"] = empty($_POST["is_credit"]) ? false : intval($_POST["is_credit"]) == 1;
+        $data["credit_days"] = intval($_POST["credit_days"]);
+        //$data["billing_prefs"] = $_POST["billing_prefs"];
+        $data["web_page"] = $_POST["web_page"];
+        $data["notes"] = $_POST["notes"];
+        //$data["is_system"] = $_POST["is_system"];
+        //$data["is_deleted"] = $_POST["is_deleted"];
+        $data["fk_entity_class"] = $entityClass;
+
+        if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
+            $data["nk_market_segment"] = intval($_POST["nk_market_segment"]);
+        }
+        //$data["nk_entity_parent"] = $_POST["nk_entity_parent"];
+        //$data["nk_entity_billing"] = $_POST["nk_entity_billing"];
+        //$data["nk_entity_agent"] = $_POST["nk_entity_agent"];
+        //$data["nk_user_agent"] = $_POST["nk_user_agent"];
+        if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
+            $data["nk_report_delivery_opt"] = intval($_POST["nk_report_delivery_opt"]);
+        }
 
         try {
             $registry->setData($data);
             $registry->validate();
             $registry->save($userSession);
-            header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/operations/view_test.php");
+            header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/catalogs/view_entity.php?class=$entityClass");
         }
         catch (Exception $e) {
             $errmsg = $e->getMessage();
@@ -89,7 +111,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 }
 
 echo '<div class="container" style="margin-top:50px">';
-echo '<h3>' . ModUtils::getEntityClassSing($class) . '</h3>';
+echo '<h3>' . ModUtils::getEntityClassSingular($entityClass) . ' (' . strtolower(ModUtils::getEntityNature($entityNature)) . ')</h3>';
 
 if (!empty($errmsg)) {
     echo '<div class="alert alert-danger alert-dismissible">';
@@ -102,12 +124,20 @@ if (!empty($errmsg)) {
 
 echo '<form method="post" action="' . FUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '">';
 
+// preserve entity class and nature in post:
+echo '<div class="form_group collapse">';
+echo '<input type="text" class="form-control" name="class" value="' . $entityClass . '" readonly>';
+echo '<input type="text" class="form-control" name="nature" value="' . $entityNature . '" readonly>';
+echo '</div>';
+
 echo '<div class="form_group">';
 echo '<label for="code">' . $registry->getItem("code")->getName() . ': *</label>';
 echo '<input type="text" class="form-control" name="code" value="' . $registry->getDatum("code") . '">';
 echo '</div>';
 
-if ($nature == ModUtils::ENTITY_NATURE_PER) {
+if ($entityNature == ModUtils::ENTITY_NATURE_PER) {
+    // person:
+
     echo '<div class="form_group">';
     echo '<label for="surname">' . $registry->getItem("surname")->getName() . ': *</label>';
     echo '<input type="text" class="form-control" name="surname" value="' . $registry->getDatum("surname") . '">';
@@ -119,11 +149,13 @@ if ($nature == ModUtils::ENTITY_NATURE_PER) {
     echo '</div>';
 
     echo '<div class="form_group">';
-    echo '<label for="prefix">' . $registry->getItem("prefix")->getName() . ': *</label>';
+    echo '<label for="prefix">' . $registry->getItem("prefix")->getName() . ':</label>';
     echo '<input type="text" class="form-control" name="prefix" value="' . $registry->getDatum("prefix") . '">';
     echo '</div>';
 }
 else {
+    // organization:
+
     echo '<div class="form_group">';
     echo '<label for="name">' . $registry->getItem("name")->getName() . ': *</label>';
     echo '<input type="text" class="form-control" name="name" value="' . $registry->getDatum("name") . '">';
@@ -145,19 +177,24 @@ echo '<label><input type="checkbox" name="is_credit" value="1"' . ($registry->ge
 echo '</div>';
 
 echo '<div class="form_group">';
-echo '<label for="credit_days">' . $registry->getItem("credit_days")->getName() . ': *</label>';
+echo '<label for="credit_days">' . $registry->getItem("credit_days")->getName() . ':</label>';
 echo '<input type="text" class="form-control" name="credit_days" value="' . $registry->getDatum("credit_days") . '">';
 echo '</div>';
 
 echo '<div class="form_group">';
-echo '<label for="notes">' . $registry->getItem("notes")->getName() . ': *</label>';
+echo '<label for="web_page">' . $registry->getItem("web_page")->getName() . ':</label>';
+echo '<input type="text" class="form-control" name="web_page" value="' . $registry->getDatum("web_page") . '">';
+echo '</div>';
+
+echo '<div class="form_group">';
+echo '<label for="notes">' . $registry->getItem("notes")->getName() . ':</label>';
 echo '<textarea class="form-control" name="notes" rows="3">' . $registry->getDatum("notes") . '</textarea>';
 echo '</div>';
 
 echo '<div class="form_group">';
 echo '<label for="nk_market_segment">' . $registry->getItem("nk_market_segment")->getName() . ': *</label>';
 echo '<select class="form-control" name="nk_market_segment">';
-foreach (AppUtils::getSelectOptions($connection, AppConsts::CC_MARKET_SEGMENT) as $option) {
+foreach (AppUtils::getSelectOptions($connection, AppConsts::CC_MARKET_SEGMENT, $registry->getDatum("nk_market_segment")) as $option) {
     echo $option;
 }
 echo '</select>';
@@ -166,16 +203,16 @@ echo '</div>';
 echo '<div class="form_group">';
 echo '<label for="nk_report_delivery_opt">' . $registry->getItem("nk_report_delivery_opt")->getName() . ': *</label>';
 echo '<select class="form-control" name="nk_report_delivery_opt">';
-foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_REPORT_DELIVERY_OPT) as $option) {
+foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_REPORT_DELIVERY_OPT, $registry->getDatum("nk_report_delivery_opt")) as $option) {
     echo $option;
 }
 echo '</select>';
 echo '</div>';
 
 if (!$registry->isRegistryNew()) {
-    echo '<div class="form_group collapse">';
-    echo '<label for="id">' . $registry->getItem("id_entity")->getName() . ':</label>';
-    echo '<input type="text" class="form-control" name="id" value="' . $registry->getRegistryId() . '" readonly>';
+    echo '<div class="form_group">';
+    echo '<label for="' . FRegistry::ID . '">' . $registry->getItem("id_entity")->getName() . ':</label>';
+    echo '<input type="text" class="form-control" name="' . FRegistry::ID . '" value="' . $registry->getId() . '" readonly>';
     echo '</div>';
 }
 /*
@@ -194,8 +231,8 @@ else {
 }
 
 echo '<div class="form_group">';
-echo '<label for="po_process_max">' . $childProcessOpt->getItem("process_max")->getName() . ': *</label>';
-echo '<input type="text" class="form-control" name="po_process_max" value="' . $childProcessOpt->getDatum("process_max") . '">';
+echo '<label for="po_process_days_max">' . $childProcessOpt->getItem("process_days_max")->getName() . ': *</label>';
+echo '<input type="text" class="form-control" name="po_process_days_max" value="' . $childProcessOpt->getDatum("process_days_max") . '">';
 echo '</div>';
 
 echo '<div class="form_group">';
@@ -209,7 +246,7 @@ echo '</div>';
 */
 
 echo '<br><button type="submit" class="btn btn-primary">Guardar</button>';
-echo '&nbsp;<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/catalogs/view_entity.php?class=' . $class . '" class="btn btn-danger" role="button">Cancelar</a>';
+echo '&nbsp;<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/catalogs/view_entity.php?class=' . $entityClass . '" class="btn btn-danger" role="button">Cancelar</a>';
 
 echo '</form>';
 echo '</div>';

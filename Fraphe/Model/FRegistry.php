@@ -7,25 +7,28 @@ abstract class FRegistry
 {
     public const MODE_READ = 1;
     public const MODE_WRITE = 2;
+    public const ID = "id";
     public const ERR_MSG_REGISTRY_NOT_FOUND = "El registro no fue encontrado.";
     public const ERR_MSG_REGISTRY_NON_UPDATABLE = "El registro no se puede modificar.";
 
     protected $connection;
     protected $registryType;
-    protected $registryId;
+    protected $idName;
+    protected $items;   // associative array of FItem objects
+
+    protected $id;
     protected $isRegistryNew;
     protected $isRegistryModified;
     protected $mode;
     protected $lock;
-    protected $items;   // associative array of FItem objects
 
     /* Creates new base registry. Each field of registry must be contained in member array $items.
      */
-    public function __construct(\PDO $connection, int $registryType)
+    public function __construct(\PDO $connection, int $registryType, string $idName)
     {
         $this->connection = $connection;
         $this->registryType = $registryType;
-
+        $this->idName = $idName;
         $this->items = array();
 
         $this->initialize();
@@ -37,7 +40,7 @@ abstract class FRegistry
      */
     public function initialize()
     {
-        $this->registryId = 0;
+        $this->id = 0;
         $this->isRegistryNew = true;
         $this->isRegistryModified = false;
         $this->mode = 0;
@@ -59,7 +62,8 @@ abstract class FRegistry
         }
     }
 
-    protected function validateItemKey($key) {
+    protected function validateItemKey($key)
+    {
         if (empty($key)) {
             throw new \Exception(__METHOD__ . ": La clave está vacía.");
         }
@@ -73,7 +77,8 @@ abstract class FRegistry
 
     /* Forces member flag as if this registry were new.
      */
-    public function forceRegistryNew() {
+    public function forceRegistryNew()
+    {
         $this->isRegistryNew = true;
     }
 
@@ -86,26 +91,23 @@ abstract class FRegistry
     {
         // validate keys:
         foreach ($data as $key => $value) {
-            if ($key == "id") {
-                if (!is_int($value)) {
-                    throw new \Exception(__METHOD__ . ": El ID debe ser número entero.");
-                }
-            }
-            else {
-                $this->validateItemKey($key);
-            }
+            $this->validateItemKey($key);
         }
 
         // set data:
         foreach ($data as $key => $value) {
-            if ($key == "id") {
-                $this->registryId = $value;
+            if ($key == $this->idName) {
+                if (!is_int($value)) {
+                    throw new \Exception(__METHOD__ . ": El dato '$this->idName' debe ser número entero.");
+                }
+                $this->id = $value;
                 $this->isRegistryNew = false;
             }
-            else {
-                $this->items[$key]->setValue($value);
-            }
 
+            $this->items[$key]->setValue($value);
+        }
+
+        if (count($data) > 1) {
             $this->isRegistryModified = true;
         }
     }
@@ -117,7 +119,6 @@ abstract class FRegistry
     public function getData(): array
     {
         $data = array();
-        $data["id"] = $this->registryId;
 
         foreach ($this->items as $key => $item) {
             $data[$key] = $item->getValue();
@@ -153,9 +154,14 @@ abstract class FRegistry
         return $this->registryType;
     }
 
-    public function getRegistryId(): int
+    public function getIdName(): string
     {
-        return $this->registryId;
+        return $this->idName;
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 
     public function isRegistryNew(): bool

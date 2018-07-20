@@ -33,7 +33,7 @@ class ModEntityAddress extends FRegistry
 
     function __construct(\PDO $connection)
     {
-        parent::__construct($connection, AppConsts::CC_ENTITY_ADDRESS);
+        parent::__construct($connection, AppConsts::CC_ENTITY_ADDRESS, "id_entity_address");
 
         $this->id_entity_address = new FItem(FItem::DATA_TYPE_INT, "id_entity_address", "ID domicilio", false);
         $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", true);
@@ -113,7 +113,7 @@ class ModEntityAddress extends FRegistry
         $sql = "SELECT * FROM cc_entity_address WHERE id_entity_address = $id;";
         $statement = $this->connection->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->registryId = $row["id_entity_address"];
+            $this->id = $row["id_entity_address"];
 
             $this->id_entity_address->setValue($row["id_entity_address"]);
             $this->name->setValue($row["name"]);
@@ -143,7 +143,7 @@ class ModEntityAddress extends FRegistry
             $connection = FGuiUtils::createConnection();
 
             // read child contacts:
-            $sql = "SELECT id_contact FROM cc_contact WHERE fk_entity_address = $this->registryId ORDER BY id_contact;";
+            $sql = "SELECT id_contact FROM cc_contact WHERE fk_entity_address = $this->id ORDER BY id_contact;";
             $statement = $this->connection->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                 $contact = new ModContact($connection);
@@ -277,14 +277,14 @@ class ModEntityAddress extends FRegistry
         $statement->bindParam(":fk_user", $fk_user);
 
         if (!$this->isRegistryNew) {
-            $statement->bindParam(":id", $this->registryId);
+            $statement->bindParam(":id", $this->id);
         }
 
         $statement->execute();
 
         $this->isRegistryModified = false;
         if ($this->isRegistryNew) {
-            $this->registryId = $this->connection->lastInsertId();
+            $this->id = intval($this->connection->lastInsertId());
             $this->isRegistryNew = false;
         }
 
@@ -294,7 +294,7 @@ class ModEntityAddress extends FRegistry
             // assure link to parent:
             $data = array();
             $data["fk_entity"] = $fk_entity;
-            $data["fk_entity_address"] = $this->registryId;
+            $data["fk_entity_address"] = $this->id;
             $contact->setData($data);
 
             // save child:

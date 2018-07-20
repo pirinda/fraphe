@@ -29,7 +29,7 @@ class ModTest extends FRegistry
 
     function __construct(\PDO $connection)
     {
-        parent::__construct($connection, AppConsts::OC_TEST);
+        parent::__construct($connection, AppConsts::OC_TEST, "id_test");
 
         $this->id_test = new FItem(FItem::DATA_TYPE_INT, "id_test", "ID ensayo", false);
         $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", true);
@@ -97,7 +97,7 @@ class ModTest extends FRegistry
         $sql = "SELECT * FROM oc_test WHERE id_test = $id;";
         $statement = $this->connection->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->registryId = intval($row["id_test"]);
+            $this->id = intval($row["id_test"]);
 
             $this->id_test->setValue($row["id_test"]);
             $this->name->setValue($row["name"]);
@@ -122,7 +122,7 @@ class ModTest extends FRegistry
             $connection = FGuiUtils::createConnection();
 
             // read child process options:
-            $sql = "SELECT id_test, id_entity FROM oc_test_process_opt WHERE id_test = $this->registryId ORDER BY id_test, id_entity;";
+            $sql = "SELECT id_test, id_entity FROM oc_test_process_opt WHERE id_test = $this->id ORDER BY id_test, id_entity;";
             $statement = $this->connection->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                 $ids = array();
@@ -235,23 +235,23 @@ class ModTest extends FRegistry
         $statement->bindParam(":fk_user", $fk_user);
 
         if (!$this->isRegistryNew) {
-            $statement->bindParam(":id", $this->registryId, \PDO::PARAM_INT);
+            $statement->bindParam(":id", $this->id, \PDO::PARAM_INT);
         }
 
         $statement->execute();
 
         $this->isRegistryModified = false;
         if ($this->isRegistryNew) {
-            $this->registryId = $this->connection->lastInsertId();
+            $this->id = intval($this->connection->lastInsertId());
             $this->isRegistryNew = false;
         }
 
         // save child process options:
         foreach ($this->childProcessOpts as $processOpt) {
             $ids = array();
-            $ids["id_test"] = $this->registryId;
+            $ids["id_test"] = $this->id;
 
-            $processOpt->setRelationIds($ids);
+            $processOpt->setIds($ids);
             $processOpt->save($session);
         }
     }

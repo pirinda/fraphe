@@ -23,18 +23,18 @@ class ModEntityEntityType extends FRelation
         $this->items["id_entity_type"] = $this->id_entity_type;
 
         // create relation IDs:
-        $this->relationIds["id_entity"] = 0;
-        $this->relationIds["id_entity_type"] = 0;
+        $this->ids["id_entity"] = 0;
+        $this->ids["id_entity_type"] = 0;
     }
 
     public function retrieve(FUserSession $session, array $ids, int $mode)
     {
         $this->initialize();
-        $this->setRelationIds($ids);
+        $this->setIds($ids);
 
         // copy relation IDs to simplify query:
-        $id_entity = $this->relationIds["id_entity"];
-        $id_entity_type = $this->relationIds["id_entity_type"];
+        $id_entity = $this->ids["id_entity"];
+        $id_entity_type = $this->ids["id_entity_type"];
 
         $sql = "SELECT * FROM cc_entity_entity_type WHERE id_entity = $id_entity AND id_entity_type = $id_entity_type;";
         $statement = $this->connection->query($sql);

@@ -29,7 +29,7 @@ class ModContact extends FRegistry
 
     function __construct(\PDO $connection)
     {
-        parent::__construct($connection, AppConsts::CC_CONTACT);
+        parent::__construct($connection, AppConsts::CC_CONTACT, "id_contact");
 
         $this->id_contact = new FItem(FItem::DATA_TYPE_INT, "id_contact", "ID contacto", false);
         $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", true);
@@ -86,7 +86,7 @@ class ModContact extends FRegistry
         $sql = "SELECT * FROM cc_contact WHERE id_contact = $id;";
         $statement = $this->connection->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->registryId = $row["id_contact"];
+            $this->id = $row["id_contact"];
 
             $this->id_contact->setValue($row["id_contact"]);
             $this->name->setValue($row["name"]);
@@ -226,14 +226,14 @@ class ModContact extends FRegistry
         $statement->bindParam(":fk_user", $fk_user);
 
         if (!$this->isRegistryNew) {
-            $statement->bindParam(":id", $this->registryId);
+            $statement->bindParam(":id", $this->id);
         }
 
         $statement->execute();
 
         $this->isRegistryModified = false;
         if ($this->isRegistryNew) {
-            $this->registryId = $this->connection->lastInsertId();
+            $this->id = intval($this->connection->lastInsertId());
             $this->isRegistryNew = false;
         }
     }

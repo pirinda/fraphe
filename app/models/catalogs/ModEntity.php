@@ -1,10 +1,12 @@
 <?php
 namespace app\models\catalogs;
 
+use Fraphe\App\FGuiUtils;
 use Fraphe\App\FUserSession;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
+use app\models\ModUtils;
 
 class ModEntity extends FRegistry
 {
@@ -20,6 +22,7 @@ class ModEntity extends FRegistry
     protected $is_credit;
     protected $credit_days;
     protected $billing_prefs;
+    protected $web_page;
     protected $notes;
     protected $is_system;
     protected $is_deleted;
@@ -40,21 +43,22 @@ class ModEntity extends FRegistry
 
     function __construct(\PDO $connection)
     {
-        parent::__construct($connection, AppConsts::CC_ENTITY);
+        parent::__construct($connection, AppConsts::CC_ENTITY, "id_entity");
 
         $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", false);
-        $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", true);
+        $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", false);
         $this->code = new FItem(FItem::DATA_TYPE_STRING, "code", "Código", true);
         $this->alias = new FItem(FItem::DATA_TYPE_STRING, "alias", "Alias", true);
-        $this->prefix = new FItem(FItem::DATA_TYPE_STRING, "prefix", "Prefijo", true);
-        $this->surname = new FItem(FItem::DATA_TYPE_STRING, "surname", "Apellidos", true);
-        $this->forename = new FItem(FItem::DATA_TYPE_STRING, "forename", "Nombres", true);
+        $this->prefix = new FItem(FItem::DATA_TYPE_STRING, "prefix", "Prefijo", false);
+        $this->surname = new FItem(FItem::DATA_TYPE_STRING, "surname", "Apellidos", false);
+        $this->forename = new FItem(FItem::DATA_TYPE_STRING, "forename", "Nombres", false);
         $this->fiscal_id = new FItem(FItem::DATA_TYPE_STRING, "fiscal_id", "ID fiscal", true);
         $this->is_person = new FItem(FItem::DATA_TYPE_BOOL, "is_person", "Es persona", true);
         $this->is_credit = new FItem(FItem::DATA_TYPE_BOOL, "is_credit", "Tiene crédito", true);
-        $this->credit_days = new FItem(FItem::DATA_TYPE_INT, "credit_days", "Días crédito", true);
-        $this->billing_prefs = new FItem(FItem::DATA_TYPE_STRING, "billing_prefs", "Preferencias facturación", true);
-        $this->notes = new FItem(FItem::DATA_TYPE_STRING, "notes", "Notas", true);
+        $this->credit_days = new FItem(FItem::DATA_TYPE_INT, "credit_days", "Días crédito", false);
+        $this->billing_prefs = new FItem(FItem::DATA_TYPE_STRING, "billing_prefs", "Preferencias facturación", false);
+        $this->web_page = new FItem(FItem::DATA_TYPE_STRING, "web_page", "Página web", false);
+        $this->notes = new FItem(FItem::DATA_TYPE_STRING, "notes", "Notas", false);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", true);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", true);
         $this->fk_entity_class = new FItem(FItem::DATA_TYPE_INT, "fk_entity_class", "Clase entidad", true);
@@ -81,6 +85,7 @@ class ModEntity extends FRegistry
         $this->items["is_credit"] = $this->is_credit;
         $this->items["credit_days"] = $this->credit_days;
         $this->items["billing_prefs"] = $this->billing_prefs;
+        $this->items["web_page"] = $this->web_page;
         $this->items["notes"] = $this->notes;
         $this->items["is_system"] = $this->is_system;
         $this->items["is_deleted"] = $this->is_deleted;
@@ -96,14 +101,15 @@ class ModEntity extends FRegistry
         $this->items["ts_user_ins"] = $this->ts_user_ins;
         $this->items["ts_user_upd"] = $this->ts_user_upd;
 
-        $this->name->setRangeLength(1, 201);
+        $this->name->setRangeLength(0, 201);
         $this->code->setRangeLength(1, 25);
         $this->alias->setRangeLength(1, 100);
         $this->prefix->setRangeLength(0, 25);
-        $this->surname->setRangeLength(1, 100);
-        $this->forename->setRangeLength(1, 100);
+        $this->surname->setRangeLength(0, 100);
+        $this->forename->setRangeLength(0, 100);
         $this->fiscal_id->setRangeLength(1, 25);
         $this->billing_prefs->setRangeLength(0, 100);
+        $this->web_page->setRangeLength(0, 100);
         $this->notes->setRangeLength(0, 500);
 
         $this->childEntityTypes = array();
@@ -122,6 +128,24 @@ class ModEntity extends FRegistry
 
     public function validate()
     {
+        if ($this->is_person->getValue()) {
+            // is person:
+            $this->name->setMandatory(false);
+            $this->surname->setMandatory(true);
+            $this->forename->setMandatory(true);
+        }
+        else {
+            // is organization:
+            $this->name->setMandatory(true);
+            $this->surname->setMandatory(false);
+            $this->forename->setMandatory(false);
+        }
+
+        $isCustomer = $this->fk_entity_class->getValue() == ModUtils::ENTITY_CLASS_CUST;
+        $this->nk_market_segment->setMandatory($isCustomer);
+        $this->nk_report_delivery_opt->setMandatory($isCustomer);
+
+        // validte data:
         parent::validate();
 
         foreach ($this->childEntityTypes as $entityType) {
@@ -130,6 +154,13 @@ class ModEntity extends FRegistry
 
         foreach ($this->childAddresses as $address) {
             $address->validate();
+        }
+
+        // final processing of data:
+
+        if ($this->is_person->getValue()) {
+            // is person:
+            $this->name->setValue($this->surname->getValue() . ' ' . $this->forename->getValue());
         }
     }
 
@@ -140,7 +171,7 @@ class ModEntity extends FRegistry
         $sql = "SELECT * FROM cc_entity WHERE id_entity = $id;";
         $statement = $this->connection->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->registryId = $row["id_entity"];
+            $this->id = $row["id_entity"];
 
             $this->id_entity->setValue($row["id_entity"]);
             $this->name->setValue($row["name"]);
@@ -154,6 +185,7 @@ class ModEntity extends FRegistry
             $this->is_credit->setValue($row["is_credit"]);
             $this->credit_days->setValue($row["credit_days"]);
             $this->billing_prefs->setValue($row["billing_prefs"]);
+            $this->web_page->setValue($row["web_page"]);
             $this->notes->setValue($row["notes"]);
             $this->is_system->setValue($row["is_system"]);
             $this->is_deleted->setValue($row["is_deleted"]);
@@ -176,7 +208,7 @@ class ModEntity extends FRegistry
             $connection = FGuiUtils::createConnection();
 
             // read child entity entity types:
-            $sql = "SELECT id_entity, id_entity_type FROM cc_entity_entity_type WHERE id_entity = $this->registryId ORDER BY id_entity, id_entity_type;";
+            $sql = "SELECT id_entity, id_entity_type FROM cc_entity_entity_type WHERE id_entity = $this->id ORDER BY id_entity, id_entity_type;";
             $statement = $this->connection->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                 $ids = array();
@@ -189,7 +221,7 @@ class ModEntity extends FRegistry
             }
 
             // read child entity addresses:
-            $sql = "SELECT id_entity_address FROM cc_entity_address WHERE fk_entity = $this->registryId ORDER BY id_entity_address;";
+            $sql = "SELECT id_entity_address FROM cc_entity_address WHERE fk_entity = $this->id ORDER BY id_entity_address;";
             $statement = $this->connection->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                 $address = new ModEntityAddress($connection);
@@ -209,7 +241,7 @@ class ModEntity extends FRegistry
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $this->connection->prepare("INSERT INTO oc_test (" .
+            $statement = $this->connection->prepare("INSERT INTO cc_entity (" .
                 "id_entity, " .
                 "name, " .
                 "code, " .
@@ -222,6 +254,7 @@ class ModEntity extends FRegistry
                 "is_credit, " .
                 "credit_days, " .
                 "billing_prefs, " .
+                "web_page, " .
                 "notes, " .
                 "is_system, " .
                 "is_deleted, " .
@@ -249,6 +282,7 @@ class ModEntity extends FRegistry
                 ":is_credit, " .
                 ":credit_days, " .
                 ":billing_prefs, " .
+                ":web_page, " .
                 ":notes, " .
                 ":is_system, " .
                 ":is_deleted, " .
@@ -265,7 +299,7 @@ class ModEntity extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $this->connection->prepare("UPDATE oc_test SET " .
+            $statement = $this->connection->prepare("UPDATE cc_entity SET " .
                 "name = :name, " .
                 "code = :code, " .
                 "alias = :alias, " .
@@ -277,6 +311,7 @@ class ModEntity extends FRegistry
                 "is_credit = :is_credit, " .
                 "credit_days = :credit_days, " .
                 "billing_prefs = :billing_prefs, " .
+                "web_page = :web_page, " .
                 "notes = :notes, " .
                 "is_system = :is_system, " .
                 "is_deleted = :is_deleted, " .
@@ -291,7 +326,7 @@ class ModEntity extends FRegistry
                 "fk_user_upd = :fk_user, " .
                 //"ts_user_ins = :ts_user_ins, " .
                 "ts_user_upd = NOW() " .
-                "WHERE id_test = :id;");
+                "WHERE id_entity = :id;");
         }
 
         //$id_entity = $this->id_entity->getValue();
@@ -306,6 +341,7 @@ class ModEntity extends FRegistry
         $is_credit = $this->is_credit->getValue();
         $credit_days = $this->credit_days->getValue();
         $billing_prefs = $this->billing_prefs->getValue();
+        $web_page = $this->web_page->getValue();
         $notes = $this->notes->getValue();
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();
@@ -335,16 +371,47 @@ class ModEntity extends FRegistry
         $statement->bindParam(":is_credit", $is_credit, \PDO::PARAM_BOOL);
         $statement->bindParam(":credit_days", $credit_days);
         $statement->bindParam(":billing_prefs", $billing_prefs);
+        $statement->bindParam(":web_page", $web_page);
         $statement->bindParam(":notes", $notes);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
         $statement->bindParam(":fk_entity_class", $fk_entity_class);
-        $statement->bindParam(":nk_market_segment", $nk_market_segment);
-        $statement->bindParam(":nk_entity_parent", $nk_entity_parent);
-        $statement->bindParam(":nk_entity_billing", $nk_entity_billing);
-        $statement->bindParam(":nk_entity_agent", $nk_entity_agent);
-        $statement->bindParam(":nk_user_agent", $nk_user_agent);
-        $statement->bindParam(":nk_report_delivery_opt", $nk_report_delivery_opt);
+        if (empty($nk_market_segment)) {
+            $statement->bindValue(":nk_market_segment", null, \PDO::PARAM_NULL);
+        }
+        else {
+            $statement->bindParam(":nk_market_segment", $nk_market_segment);
+        }
+        if (empty($nk_entity_parent)) {
+            $statement->bindValue(":nk_entity_parent", null, \PDO::PARAM_NULL);
+        }
+        else {
+            $statement->bindParam(":nk_entity_parent", $nk_entity_parent);
+        }
+        if (empty($nk_entity_billing)) {
+            $statement->bindValue(":nk_entity_billing", null, \PDO::PARAM_NULL);
+        }
+        else {
+            $statement->bindParam(":nk_entity_billing", $nk_entity_billing);
+        }
+        if (empty($nk_entity_agent)) {
+            $statement->bindValue(":nk_entity_agent", null, \PDO::PARAM_NULL);
+        }
+        else {
+            $statement->bindParam(":nk_entity_agent", $nk_entity_agent);
+        }
+        if (empty($nk_user_agent)) {
+            $statement->bindValue(":nk_user_agent", null, \PDO::PARAM_NULL);
+        }
+        else {
+            $statement->bindParam(":nk_user_agent", $nk_user_agent);
+        }
+        if (empty($nk_report_delivery_opt)) {
+            $statement->bindValue(":nk_report_delivery_opt", null, \PDO::PARAM_NULL);
+        }
+        else {
+            $statement->bindParam(":nk_report_delivery_opt", $nk_report_delivery_opt);
+        }
         //$statement->bindParam(":fk_user_ins", $fk_user_ins);
         //$statement->bindParam(":fk_user_upd", $fk_user_upd);
         //$statement->bindParam(":ts_user_ins", $ts_user_ins);
@@ -353,24 +420,24 @@ class ModEntity extends FRegistry
         $statement->bindParam(":fk_user", $fk_user);
 
         if (!$this->isRegistryNew) {
-            $statement->bindParam(":id", $this->registryId);
+            $statement->bindParam(":id", $this->id);
         }
 
         $statement->execute();
 
         $this->isRegistryModified = false;
         if ($this->isRegistryNew) {
-            $this->registryId = $this->connection->lastInsertId();
+            $this->id = intval($this->connection->lastInsertId());
             $this->isRegistryNew = false;
         }
 
         // save child entity entity types:
-        $this->connection->exec("DELETE FROM cc_entity_entity_type WHERE id_entity = $this->registryId;");  // pure relations
+        $this->connection->exec("DELETE FROM cc_entity_entity_type WHERE id_entity = $this->id;");  // pure relations
         foreach ($this->childEntityTypes as $entityType) {
             $ids = array();
-            $ids["id_entity"] = $this->registryId;
+            $ids["id_entity"] = $this->id;
 
-            $entityType->setRelationIds($ids);
+            $entityType->setIds($ids);
             $entityType->forceRegistryNew();    // pure relation
             $entityType->save($session);
         }
@@ -378,7 +445,7 @@ class ModEntity extends FRegistry
         // save child entity addresses:
         foreach ($this->childAddresses as $address) {
             $data = array();
-            $data["fk_entity"] = $this->registryId;
+            $data["fk_entity"] = $this->id;
 
             $address->setData($data);
             $address->save($session);

@@ -11,8 +11,8 @@ class ModTestProcessOpt extends FRelation
 {
     protected $id_test;
     protected $id_entity;
-    protected $process_min;
-    protected $process_max;
+    protected $process_days_min;
+    protected $process_days_max;
     protected $cost;
     protected $is_default;
     protected $is_system;
@@ -26,10 +26,10 @@ class ModTestProcessOpt extends FRelation
     {
         parent::__construct($connection, AppConsts::OC_TEST_PROCESS_OPT);
 
-        $this->id_test = new FItem(FItem::DATA_TYPE_INT, "id_test", "ID ensayo", true);
-        $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", true);
-        $this->process_min = new FItem(FItem::DATA_TYPE_INT, "process_min", "Días mínimos proceso", true);
-        $this->process_max = new FItem(FItem::DATA_TYPE_INT, "process_max", "Días máximos proceso", true);
+        $this->id_test = new FItem(FItem::DATA_TYPE_INT, "id_test", "ID ensayo", false);
+        $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", false);
+        $this->process_days_min = new FItem(FItem::DATA_TYPE_INT, "process_days_min", "Días mínimos proceso", true);
+        $this->process_days_max = new FItem(FItem::DATA_TYPE_INT, "process_days_max", "Días máximos proceso", true);
         $this->cost = new FItem(FItem::DATA_TYPE_FLOAT, "cost", "Costo", false);
         $this->is_default = new FItem(FItem::DATA_TYPE_BOOL, "is_default", "Predeterminado", true);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", true);
@@ -41,8 +41,8 @@ class ModTestProcessOpt extends FRelation
 
         $this->items["id_test"] = $this->id_test;
         $this->items["id_entity"] = $this->id_entity;
-        $this->items["process_min"] = $this->process_min;
-        $this->items["process_max"] = $this->process_max;
+        $this->items["process_days_min"] = $this->process_days_min;
+        $this->items["process_days_max"] = $this->process_days_max;
         $this->items["cost"] = $this->cost;
         $this->items["is_default"] = $this->is_default;
         $this->items["is_system"] = $this->is_system;
@@ -53,26 +53,26 @@ class ModTestProcessOpt extends FRelation
         $this->items["ts_user_upd"] = $this->ts_user_upd;
 
         // create relation IDs:
-        $this->relationIds["id_test"] = 0;
-        $this->relationIds["id_entity"] = 0;
+        $this->ids["id_test"] = 0;
+        $this->ids["id_entity"] = 0;
     }
 
     public function retrieve(FUserSession $session, array $ids, int $mode)
     {
         $this->initialize();
-        $this->setRelationIds($ids);
+        $this->setIds($ids);
 
         // copy relation IDs to simplify query:
-        $id_test = $this->relationIds["id_test"];
-        $id_entity = $this->relationIds["id_entity"];
+        $id_test = $this->ids["id_test"];
+        $id_entity = $this->ids["id_entity"];
 
         $sql = "SELECT * FROM oc_test_process_opt WHERE id_test = $id_test AND id_entity = $id_entity;";
         $statement = $this->connection->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->id_test->setValue($row["id_test"]);
             $this->id_entity->setValue($row["id_entity"]);
-            $this->process_min->setValue($row["process_min"]);
-            $this->process_max->setValue($row["process_max"]);
+            $this->process_days_min->setValue($row["process_days_min"]);
+            $this->process_days_max->setValue($row["process_days_max"]);
             $this->cost->setValue($row["cost"]);
             $this->is_default->setValue($row["is_default"]);
             $this->is_system->setValue($row["is_system"]);
@@ -101,8 +101,8 @@ class ModTestProcessOpt extends FRelation
             $statement = $this->connection->prepare("INSERT INTO oc_test_process_opt (" .
                 "id_test, " .
                 "id_entity, " .
-                "process_min, " .
-                "process_max, " .
+                "process_days_min, " .
+                "process_days_max, " .
                 "cost, " .
                 "is_default, " .
                 "is_system, " .
@@ -114,8 +114,8 @@ class ModTestProcessOpt extends FRelation
                 "VALUES (" .
                 ":id_test, " .
                 ":id_entity, " .
-                ":process_min, " .
-                ":process_max, " .
+                ":process_days_min, " .
+                ":process_days_max, " .
                 ":cost, " .
                 ":is_default, " .
                 ":is_system, " .
@@ -127,8 +127,8 @@ class ModTestProcessOpt extends FRelation
         }
         else {
             $statement = $this->connection->prepare("UPDATE oc_test_process_opt SET " .
-                "process_min = :process_min, " .
-                "process_max = :process_max, " .
+                "process_days_min = :process_days_min, " .
+                "process_days_max = :process_days_max, " .
                 "cost = :cost, " .
                 "is_default = :is_default, " .
                 "is_system = :is_system, " .
@@ -142,8 +142,8 @@ class ModTestProcessOpt extends FRelation
 
         $id_test = $this->id_test->getValue();
         $id_entity = $this->id_entity->getValue();
-        $process_min = $this->process_min->getValue();
-        $process_max = $this->process_max->getValue();
+        $process_days_min = $this->process_days_min->getValue();
+        $process_days_max = $this->process_days_max->getValue();
         $cost = $this->cost->getValue();
         $is_default = $this->is_default->getValue();
         $is_system = $this->is_system->getValue();
@@ -157,8 +157,8 @@ class ModTestProcessOpt extends FRelation
 
         $statement->bindParam(":id_test", $id_test);
         $statement->bindParam(":id_entity", $id_entity);
-        $statement->bindParam(":process_min", $process_min);
-        $statement->bindParam(":process_max", $process_max);
+        $statement->bindParam(":process_days_min", $process_days_min);
+        $statement->bindParam(":process_days_max", $process_days_max);
         $statement->bindParam(":cost", $cost);
         $statement->bindParam(":is_default", $is_default, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);

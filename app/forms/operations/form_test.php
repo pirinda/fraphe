@@ -31,33 +31,36 @@ $errmsg = "";
 
 switch ($_SERVER["REQUEST_METHOD"]) {
     case "GET":
-        if (!empty($_GET["id"])) {
-            $registry->read($userSession, $_GET["id"], FRegistry::MODE_WRITE);
+        if (!empty($_GET[FRegistry::ID])) {
+            $registry->read($userSession, intval($_GET[FRegistry::ID]), FRegistry::MODE_WRITE);
         }
         break;
 
     case "POST":
         $data = array();
+        $childData = array();
+
+        if (!empty($_POST[FRegistry::ID])) {
+            $data["id_test"] = intval($_POST[FRegistry::ID]);
+            $childData["id_test"] = $data["id_test"];
+        }
+
         $data["name"] = $_POST["name"];
         $data["code"] = $_POST["code"];
         $data["sample_quantity"] = $_POST["sample_quantity"];
         $data["sample_directs"] = $_POST["sample_directs"];
+        //$data["is_system"] = $_POST["is_system"];
+        //$data["is_deleted"] = $_POST["is_deleted"];
         $data["fk_process_area"] = intval($_POST["fk_process_area"]);
         $data["fk_sample_category"] = intval($_POST["fk_sample_category"]);
         $data["fk_testing_method"] = intval($_POST["fk_testing_method"]);
         $data["fk_test_acredit_attrib"] = intval($_POST["fk_test_acredit_attrib"]);
 
-        $childData = array();
         $childData["id_entity"] = 1;    // current company
-        $childData["process_min"] = intval($_POST["po_process_min"]);
-        $childData["process_max"] = intval($_POST["po_process_max"]);
+        $childData["process_days_min"] = intval($_POST["po_process_days_min"]);
+        $childData["process_days_max"] = intval($_POST["po_process_days_max"]);
         $childData["cost"] = floatval($_POST["po_cost"]);
         $childData["is_default"] = boolval($_POST["po_is_default"]);
-
-        if (!empty($_POST["id"])) {
-            $data["id"] = intval($_POST["id"]);
-            $childData["id_test"] = $data["id"];
-        }
 
         $childProcessOpt = new ModTestProcessOpt($connection);
         $childProcessOpt->setData($childData);
@@ -94,7 +97,7 @@ echo '<form method="post" action="' . FUtils::sanitizeInput($_SERVER["PHP_SELF"]
 echo '<div class="form_group">';
 echo '<label for="fk_process_area">' . $registry->getItem("fk_process_area")->getName() . ': *</label>';
 echo '<select class="form-control" name="fk_process_area">';
-foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_PROCESS_AREA) as $option) {
+foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_PROCESS_AREA, $registry->getDatum("fk_process_area")) as $option) {
     echo $option;
 }
 echo '</select>';
@@ -147,13 +150,6 @@ echo '<label for="sample_directs">' . $registry->getItem("sample_directs")->getN
 echo '<textarea class="form-control" name="sample_directs" rows="3">' . $registry->getDatum("sample_directs") . '</textarea>';
 echo '</div>';
 
-if (!$registry->isRegistryNew()) {
-    echo '<div class="form_group collapse">';
-    echo '<label for="id">' . $registry->getItem("id_test")->getName() . ':</label>';
-    echo '<input type="text" class="form-control" name="id" value="' . $registry->getRegistryId() . '" readonly>';
-    echo '</div>';
-}
-
 // child test process options:
 
 $childProcessOpt;
@@ -169,13 +165,13 @@ else {
 }
 
 echo '<div class="form_group">';
-echo '<label for="po_process_min">' . $childProcessOpt->getItem("process_min")->getName() . ': *</label>';
-echo '<input type="text" class="form-control" name="po_process_min" value="' . $childProcessOpt->getDatum("process_min") . '">';
+echo '<label for="po_process_days_min">' . $childProcessOpt->getItem("process_days_min")->getName() . ': *</label>';
+echo '<input type="text" class="form-control" name="po_process_days_min" value="' . $childProcessOpt->getDatum("process_days_min") . '">';
 echo '</div>';
 
 echo '<div class="form_group">';
-echo '<label for="po_process_max">' . $childProcessOpt->getItem("process_max")->getName() . ': *</label>';
-echo '<input type="text" class="form-control" name="po_process_max" value="' . $childProcessOpt->getDatum("process_max") . '">';
+echo '<label for="po_process_days_max">' . $childProcessOpt->getItem("process_days_max")->getName() . ': *</label>';
+echo '<input type="text" class="form-control" name="po_process_days_max" value="' . $childProcessOpt->getDatum("process_days_max") . '">';
 echo '</div>';
 
 echo '<div class="form_group">';
@@ -186,6 +182,14 @@ echo '</div>';
 echo '<div class="checkbox">';
 echo '<label><input type="checkbox" name="po_is_default" value="1"' . ($childProcessOpt->getDatum("is_default") ? " checked" : "") . '>' . $childProcessOpt->getItem("is_default")->getName() . '</label>';
 echo '</div>';
+
+// registry ID:
+if (!$registry->isRegistryNew()) {
+    echo '<div class="form_group">';
+    echo '<label for="' . FRegistry::ID . '">' . $registry->getItem("id_test")->getName() . ':</label>';
+    echo '<input type="text" class="form-control" name="' . FRegistry::ID . '" value="' . $registry->getId() . '" readonly>';
+    echo '</div>';
+}
 
 echo '<br><button type="submit" class="btn btn-primary">Guardar</button>';
 echo '&nbsp;<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_test.php" class="btn btn-danger" role="button">Cancelar</a>';
