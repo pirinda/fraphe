@@ -17,6 +17,7 @@ class ModContact extends FRegistry
     protected $mail;
     protected $phone;
     protected $mobile;
+    protected $is_report;
     protected $is_system;
     protected $is_deleted;
     protected $fk_entity;
@@ -40,6 +41,7 @@ class ModContact extends FRegistry
         $this->mail = new FItem(FItem::DATA_TYPE_STRING, "mail", "Mail", true);
         $this->phone = new FItem(FItem::DATA_TYPE_STRING, "phone", "Teléfono", true);
         $this->mobile = new FItem(FItem::DATA_TYPE_STRING, "mobile", "Móvil", true);
+        $this->is_report = new FItem(FItem::DATA_TYPE_BOOL, "is_report", "Contacto informe resultados", true);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", true);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", true);
         $this->fk_entity = new FItem(FItem::DATA_TYPE_INT, "fk_entity", "Entidad", true);
@@ -59,6 +61,7 @@ class ModContact extends FRegistry
         $this->items["mail"] = $this->mail;
         $this->items["phone"] = $this->phone;
         $this->items["mobile"] = $this->mobile;
+        $this->items["is_report"] = $this->is_report;
         $this->items["is_system"] = $this->is_system;
         $this->items["is_deleted"] = $this->is_deleted;
         $this->items["fk_entity"] = $this->fk_entity;
@@ -97,6 +100,7 @@ class ModContact extends FRegistry
             $this->mail->setValue($row["mail"]);
             $this->phone->setValue($row["phone"]);
             $this->mobile->setValue($row["mobile"]);
+            $this->is_report->setValue($row["is_report"]);
             $this->is_system->setValue($row["is_system"]);
             $this->is_deleted->setValue($row["is_deleted"]);
             $this->fk_entity->setValue($row["fk_entity"]);
@@ -132,6 +136,7 @@ class ModContact extends FRegistry
                 "mail, " .
                 "phone, " .
                 "mobile, " .
+                "is_report, " .
                 "is_system, " .
                 "is_deleted, " .
                 "fk_entity, " .
@@ -151,6 +156,7 @@ class ModContact extends FRegistry
                 ":mail, " .
                 ":phone, " .
                 ":mobile, " .
+                ":is_report, " .
                 ":is_system, " .
                 ":is_deleted, " .
                 ":fk_entity, " .
@@ -171,6 +177,7 @@ class ModContact extends FRegistry
                 "mail = :mail, " .
                 "phone = :phone, " .
                 "mobile = :mobile, " .
+                "is_report = :is_report, " .
                 "is_system = :is_system, " .
                 "is_deleted = :is_deleted, " .
                 "fk_entity = :fk_entity, " .
@@ -192,6 +199,7 @@ class ModContact extends FRegistry
         $mail = $this->mail->getValue();
         $phone = $this->phone->getValue();
         $mobile = $this->mobile->getValue();
+        $is_report = $this->is_report->getValue();
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();
         $fk_entity = $this->fk_entity->getValue();
@@ -213,6 +221,7 @@ class ModContact extends FRegistry
         $statement->bindParam(":mail", $mail);
         $statement->bindParam(":phone", $phone);
         $statement->bindParam(":mobile", $mobile);
+        $statement->bindParam(":is_report", $is_report, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
         $statement->bindParam(":fk_entity", $fk_entity);

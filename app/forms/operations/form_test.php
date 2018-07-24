@@ -94,7 +94,7 @@ if (!empty($errmsg)) {
 
 echo '<form method="post" action="' . FUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '">';
 
-echo '<div class="form_group">';
+echo '<div class="form-group">';
 echo '<label for="fk_process_area">' . $registry->getItem("fk_process_area")->getName() . ': *</label>';
 echo '<select class="form-control" name="fk_process_area">';
 foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_PROCESS_AREA, $registry->getDatum("fk_process_area")) as $option) {
@@ -103,17 +103,17 @@ foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_PROCESS_AREA, $re
 echo '</select>';
 echo '</div>';
 
-echo '<div class="form_group">';
+echo '<div class="form-group">';
 echo '<label for="code">' . $registry->getItem("code")->getName() . ': *</label>';
 echo '<input type="text" class="form-control" name="code" value="' . $registry->getDatum("code") . '">';
 echo '</div>';
 
-echo '<div class="form_group">';
+echo '<div class="form-group">';
 echo '<label for="name">' . $registry->getItem("name")->getName() . ': *</label>';
 echo '<input type="text" class="form-control" name="name" value="' . $registry->getDatum("name") . '">';
 echo '</div>';
 
-echo '<div class="form_group">';
+echo '<div class="form-group">';
 echo '<label for="fk_sample_category">' . $registry->getItem("fk_sample_category")->getName() . ': *</label>';
 echo '<select class="form-control" name="fk_sample_category">';
 foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_SAMPLE_CATEGORY, $registry->getDatum("fk_sample_category")) as $option) {
@@ -122,7 +122,7 @@ foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_SAMPLE_CATEGORY, 
 echo '</select>';
 echo '</div>';
 
-echo '<div class="form_group">';
+echo '<div class="form-group">';
 echo '<label for="fk_testing_method">' . $registry->getItem("fk_testing_method")->getName() . ': *</label>';
 echo '<select class="form-control" name="fk_testing_method">';
 foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_TESTING_METHOD, $registry->getDatum("fk_testing_method")) as $option) {
@@ -131,7 +131,7 @@ foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_TESTING_METHOD, $
 echo '</select>';
 echo '</div>';
 
-echo '<div class="form_group">';
+echo '<div class="form-group">';
 echo '<label for="fk_test_acredit_attrib">' . $registry->getItem("fk_test_acredit_attrib")->getName() . ': *</label>';
 echo '<select class="form-control" name="fk_test_acredit_attrib">';
 foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_TEST_ACREDIT_ATTRIB, $registry->getDatum("fk_test_acredit_attrib")) as $option) {
@@ -140,12 +140,12 @@ foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_TEST_ACREDIT_ATTR
 echo '</select>';
 echo '</div>';
 
-echo '<div class="form_group">';
+echo '<div class="form-group">';
 echo '<label for="sample_quantity">' . $registry->getItem("sample_quantity")->getName() . ': *</label>';
 echo '<input type="text" class="form-control" name="sample_quantity" value="' . $registry->getDatum("sample_quantity") . '">';
 echo '</div>';
 
-echo '<div class="form_group">';
+echo '<div class="form-group">';
 echo '<label for="sample_directs">' . $registry->getItem("sample_directs")->getName() . ': *</label>';
 echo '<textarea class="form-control" name="sample_directs" rows="3">' . $registry->getDatum("sample_directs") . '</textarea>';
 echo '</div>';
@@ -164,17 +164,17 @@ else {
     $childProcessOpt = $registry->getChildProcessOpts()[0];
 }
 
-echo '<div class="form_group">';
+echo '<div class="form-group">';
 echo '<label for="po_process_days_min">' . $childProcessOpt->getItem("process_days_min")->getName() . ': *</label>';
 echo '<input type="text" class="form-control" name="po_process_days_min" value="' . $childProcessOpt->getDatum("process_days_min") . '">';
 echo '</div>';
 
-echo '<div class="form_group">';
+echo '<div class="form-group">';
 echo '<label for="po_process_days_max">' . $childProcessOpt->getItem("process_days_max")->getName() . ': *</label>';
 echo '<input type="text" class="form-control" name="po_process_days_max" value="' . $childProcessOpt->getDatum("process_days_max") . '">';
 echo '</div>';
 
-echo '<div class="form_group">';
+echo '<div class="form-group">';
 echo '<label for="po_cost">' . $childProcessOpt->getItem("cost")->getName() . ':</label>';
 echo '<input type="text" class="form-control" name="po_cost" value="' . $childProcessOpt->getDatum("cost") . '">';
 echo '</div>';
@@ -185,7 +185,7 @@ echo '</div>';
 
 // registry ID:
 if (!$registry->isRegistryNew()) {
-    echo '<div class="form_group">';
+    echo '<div class="form-group">';
     echo '<label for="' . FRegistry::ID . '">' . $registry->getItem("id_test")->getName() . ':</label>';
     echo '<input type="text" class="form-control" name="' . FRegistry::ID . '" value="' . $registry->getId() . '" readonly>';
     echo '</div>';

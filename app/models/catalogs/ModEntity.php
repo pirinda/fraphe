@@ -24,6 +24,7 @@ class ModEntity extends FRegistry
     protected $billing_prefs;
     protected $web_page;
     protected $notes;
+    protected $is_report_images;
     protected $is_system;
     protected $is_deleted;
     protected $fk_entity_class;
@@ -59,6 +60,7 @@ class ModEntity extends FRegistry
         $this->billing_prefs = new FItem(FItem::DATA_TYPE_STRING, "billing_prefs", "Preferencias facturación", false);
         $this->web_page = new FItem(FItem::DATA_TYPE_STRING, "web_page", "Página web", false);
         $this->notes = new FItem(FItem::DATA_TYPE_STRING, "notes", "Notas", false);
+        $this->is_report_images = new FItem(FItem::DATA_TYPE_BOOL, "is_report_images", "Imágenes informe resultados", true);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", true);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", true);
         $this->fk_entity_class = new FItem(FItem::DATA_TYPE_INT, "fk_entity_class", "Clase entidad", true);
@@ -87,6 +89,7 @@ class ModEntity extends FRegistry
         $this->items["billing_prefs"] = $this->billing_prefs;
         $this->items["web_page"] = $this->web_page;
         $this->items["notes"] = $this->notes;
+        $this->items["is_report_images"] = $this->is_report_images;
         $this->items["is_system"] = $this->is_system;
         $this->items["is_deleted"] = $this->is_deleted;
         $this->items["fk_entity_class"] = $this->fk_entity_class;
@@ -187,6 +190,7 @@ class ModEntity extends FRegistry
             $this->billing_prefs->setValue($row["billing_prefs"]);
             $this->web_page->setValue($row["web_page"]);
             $this->notes->setValue($row["notes"]);
+            $this->is_report_images->setValue($row["is_report_images"]);
             $this->is_system->setValue($row["is_system"]);
             $this->is_deleted->setValue($row["is_deleted"]);
             $this->fk_entity_class->setValue($row["fk_entity_class"]);
@@ -256,6 +260,7 @@ class ModEntity extends FRegistry
                 "billing_prefs, " .
                 "web_page, " .
                 "notes, " .
+                "is_report_images, " .
                 "is_system, " .
                 "is_deleted, " .
                 "fk_entity_class, " .
@@ -284,6 +289,7 @@ class ModEntity extends FRegistry
                 ":billing_prefs, " .
                 ":web_page, " .
                 ":notes, " .
+                ":is_report_images, " .
                 ":is_system, " .
                 ":is_deleted, " .
                 ":fk_entity_class, " .
@@ -313,6 +319,7 @@ class ModEntity extends FRegistry
                 "billing_prefs = :billing_prefs, " .
                 "web_page = :web_page, " .
                 "notes = :notes, " .
+                "is_report_images = :is_report_images, " .
                 "is_system = :is_system, " .
                 "is_deleted = :is_deleted, " .
                 "fk_entity_class = :fk_entity_class, " .
@@ -343,6 +350,7 @@ class ModEntity extends FRegistry
         $billing_prefs = $this->billing_prefs->getValue();
         $web_page = $this->web_page->getValue();
         $notes = $this->notes->getValue();
+        $is_report_images = $this->is_report_images->getValue();
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();
         $fk_entity_class = $this->fk_entity_class->getValue();
@@ -373,6 +381,7 @@ class ModEntity extends FRegistry
         $statement->bindParam(":billing_prefs", $billing_prefs);
         $statement->bindParam(":web_page", $web_page);
         $statement->bindParam(":notes", $notes);
+        $statement->bindParam(":is_report_images", $is_report_images, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
         $statement->bindParam(":fk_entity_class", $fk_entity_class);

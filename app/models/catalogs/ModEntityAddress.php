@@ -19,8 +19,11 @@ class ModEntityAddress extends FRegistry
     protected $state_region;
     protected $country;
     protected $location;
+    protected $business_hr;
     protected $notes;
     protected $is_main;
+    protected $is_recept;
+    protected $is_process;
     protected $is_system;
     protected $is_deleted;
     protected $fk_entity;
@@ -46,8 +49,11 @@ class ModEntityAddress extends FRegistry
         $this->state_region = new FItem(FItem::DATA_TYPE_STRING, "state_region", "Estado", true);
         $this->country = new FItem(FItem::DATA_TYPE_STRING, "country", "País", true);
         $this->location = new FItem(FItem::DATA_TYPE_STRING, "location", "Ubicación", true);
+        $this->business_hr = new FItem(FItem::DATA_TYPE_STRING, "business_hr", "Horario de atención", true);
         $this->notes = new FItem(FItem::DATA_TYPE_STRING, "notes", "Notas", true);
         $this->is_main = new FItem(FItem::DATA_TYPE_BOOL, "is_main", "Principal", true);
+        $this->is_recept = new FItem(FItem::DATA_TYPE_BOOL, "is_recept", "Sucursal de recepción de muestras", true);
+        $this->is_process = new FItem(FItem::DATA_TYPE_BOOL, "is_process", "Sucursal de proceso de muestras", true);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", true);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", true);
         $this->fk_entity = new FItem(FItem::DATA_TYPE_INT, "fk_entity", "Entidad", true);
@@ -67,8 +73,11 @@ class ModEntityAddress extends FRegistry
         $this->items["state_region"] = $this->state_region;
         $this->items["country"] = $this->country;
         $this->items["location"] = $this->location;
+        $this->items["business_hr"] = $this->business_hr;
         $this->items["notes"] = $this->notes;
         $this->items["is_main"] = $this->is_main;
+        $this->items["is_recept"] = $this->is_recept;
+        $this->items["is_process"] = $this->is_process;
         $this->items["is_system"] = $this->is_system;
         $this->items["is_deleted"] = $this->is_deleted;
         $this->items["fk_entity"] = $this->fk_entity;
@@ -87,6 +96,7 @@ class ModEntityAddress extends FRegistry
         $this->state_region->setRangeLength(1, 50);
         $this->country->setRangeLength(1, 3);
         $this->location->setRangeLength(0, 25);
+        $this->business_hr->setRangeLength(0, 100);
         $this->notes->setRangeLength(0, 500);
 
         $this->childContacts = array();
@@ -126,8 +136,11 @@ class ModEntityAddress extends FRegistry
             $this->state_region->setValue($row["state_region"]);
             $this->country->setValue($row["country"]);
             $this->location->setValue($row["location"]);
+            $this->business_hr->setValue($row["business_hr"]);
             $this->notes->setValue($row["notes"]);
             $this->is_main->setValue($row["is_main"]);
+            $this->is_recept->setValue($row["is_recept"]);
+            $this->is_process->setValue($row["is_process"]);
             $this->is_system->setValue($row["is_system"]);
             $this->is_deleted->setValue($row["is_deleted"]);
             $this->fk_entity->setValue($row["fk_entity"]);
@@ -175,8 +188,11 @@ class ModEntityAddress extends FRegistry
                 "state_region, " .
                 "country, " .
                 "location, " .
+                "business_hr, " .
                 "notes, " .
                 "is_main, " .
+                "is_recept, " .
+                "is_process, " .
                 "is_system, " .
                 "is_deleted, " .
                 "fk_entity, " .
@@ -196,8 +212,11 @@ class ModEntityAddress extends FRegistry
                 ":state_region, " .
                 ":country, " .
                 ":location, " .
+                ":business_hr, " .
                 ":notes, " .
                 ":is_main, " .
+                ":is_recept, " .
+                ":is_process, " .
                 ":is_system, " .
                 ":is_deleted, " .
                 ":fk_entity, " .
@@ -218,8 +237,11 @@ class ModEntityAddress extends FRegistry
                 "state_region = :state_region, " .
                 "country = :country, " .
                 "location = :location, " .
+                "business_hr = :business_hr, " .
                 "notes = :notes, " .
                 "is_main = :is_main, " .
+                "is_recept = :is_recept, " .
+                "is_process = :is_process, " .
                 "is_system = :is_system, " .
                 "is_deleted = :is_deleted, " .
                 "fk_entity = :fk_entity, " .
@@ -241,8 +263,11 @@ class ModEntityAddress extends FRegistry
         $state_region = $this->state_region->getValue();
         $country = $this->country->getValue();
         $location = $this->location->getValue();
+        $business_hr = $this->business_hr->getValue();
         $notes = $this->notes->getValue();
         $is_main = $this->is_main->getValue();
+        $is_recept = $this->is_recept->getValue();
+        $is_process = $this->is_process->getValue();
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();
         $fk_entity = $this->fk_entity->getValue();
@@ -264,8 +289,11 @@ class ModEntityAddress extends FRegistry
         $statement->bindParam(":state_region", $state_region);
         $statement->bindParam(":country", $country);
         $statement->bindParam(":location", $location);
+        $statement->bindParam(":business_hr", $business_hr);
         $statement->bindParam(":notes", $notes);
         $statement->bindParam(":is_main", $is_main, \PDO::PARAM_BOOL);
+        $statement->bindParam(":is_recept", $is_recept, \PDO::PARAM_BOOL);
+        $statement->bindParam(":is_process", $is_process, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
         $statement->bindParam(":fk_entity", $fk_entity);
