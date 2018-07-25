@@ -21,8 +21,8 @@ echo FAppNavbar::compose("catalogs");
 
 echo '<div class="container" style="margin-top:50px">';
 echo '<h3>' . ModUtils::getEntityClassPlural(intval($_GET["class"])) . '</h3>';
-echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/catalogs/form_entity.php?class=' . $_GET["class"] . '&nature=1" class="btn btn-primary" role="button">Crear ' .  strtolower(ModUtils::getEntityNatureShort(ModUtils::ENTITY_NATURE_PER)) . '</a>&nbsp;';
-echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/catalogs/form_entity.php?class=' . $_GET["class"] . '&nature=2" class="btn btn-primary" role="button">Crear ' .  strtolower(ModUtils::getEntityNatureShort(ModUtils::ENTITY_NATURE_ORG)) . '</a>';
+echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/catalogs/form_entity.php?class=' . $_GET["class"] . '&nature=1" class="btn btn-primary btn-sm" role="button" data-toggle="tooltip" data-placement="bottom" title="' . ModUtils::getEntityNature(ModUtils::ENTITY_NATURE_PER) . '">Crear ' .  ModUtils::getEntityNatureAcronym(ModUtils::ENTITY_NATURE_PER) . '</a>&nbsp;';
+echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/catalogs/form_entity.php?class=' . $_GET["class"] . '&nature=2" class="btn btn-primary btn-sm" role="button" data-toggle="tooltip" data-placement="bottom" title="' . ModUtils::getEntityNature(ModUtils::ENTITY_NATURE_ORG) . '">Crear ' .  ModUtils::getEntityNatureAcronym(ModUtils::ENTITY_NATURE_ORG) . '</a>';
 
 $sql = <<<SQL
 SELECT c.name AS c_name, c.code AS c_code, c.id_entity AS c_id,
@@ -59,7 +59,7 @@ foreach ($connection->query($sql) as $row) {
     echo '<td class="small">' . $row['c_ts_user_ins'] . '</td>';
     echo '<td class="small">' . $row['uu_name'] . '</td>';
     echo '<td class="small">' . $row['c_ts_user_upd'] . '</td>';
-    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/catalogs/form_entity.php?class=' . $_GET["class"] . '&id=' . $row['c_id'] . '" class="btn btn-success btn-sm" role="button"><span class="glyphicon glyphicon-edit"></span></a></td>';
+    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/catalogs/form_entity.php?class=' . $_GET["class"] . '&id=' . $row['c_id'] . '" class="btn btn-success btn-xs" role="button" data-toggle="tooltip" data-placement="right" title="Modificar"><span class="glyphicon glyphicon-edit"></span></a></td>';
     echo '</tr>';
 }
 
@@ -69,5 +69,6 @@ echo '</table>';
 echo '</div>';
 
 echo FApp::composeFooter();
+echo '<script>$(document).ready(function(){$(\'[data-toggle="tooltip"]\').tooltip();});</script>';
 echo '</body>';
 echo '</html>';
