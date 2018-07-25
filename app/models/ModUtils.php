@@ -86,4 +86,22 @@ abstract class ModUtils
 
         return $entity;
     }
+
+    public static function getEntityNatureAcronym(int $nature): string
+    {
+        $entity = "";
+
+        switch ($nature) {
+            case self::ENTITY_NATURE_PER:
+                $entity = "PF";
+                break;
+            case self::ENTITY_NATURE_ORG:
+                $entity = "PM";
+                break;
+            default:
+                $entity = "?";
+        }
+
+        return $entity;
+    }
 }

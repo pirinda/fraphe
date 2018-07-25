@@ -113,7 +113,9 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 }
 
 echo '<div class="container" style="margin-top:50px">';
-echo '<h3>' . ModUtils::getEntityClassSingular($entityClass) . ' (' . strtolower(ModUtils::getEntityNature($entityNature)) . ')</h3>';
+echo '<div class="page-header">';
+echo '<h1>' . ModUtils::getEntityClassSingular($entityClass) . ' ' . ModUtils::getEntityNatureAcronym($entityNature) . '</h1>';
+echo '</div>';
 
 if (!empty($errmsg)) {
     echo '<div class="alert alert-danger alert-dismissible">';
@@ -128,14 +130,21 @@ echo '<form class="form-horizontal" method="post" action="' . FUtils::sanitizeIn
 
 // preserve entity class and nature in post:
 echo '<div class="form-group collapse">';
-echo '<input type="text" class="form-control" name="class" value="' . $entityClass . '" readonly>';
-echo '<input type="text" class="form-control" name="nature" value="' . $entityNature . '" readonly>';
+echo '<input type="text" class="form-control input-sm" name="class" value="' . $entityClass . '" readonly>';
+echo '<input type="text" class="form-control input-sm" name="nature" value="' . $entityNature . '" readonly>';
 echo '</div>';
 
 echo '<div class="form-group">';
-echo '<label class="control-label col-sm-2" for="code">' . $registry->getItem("code")->getName() . ': *</label>';
+echo '<label class="control-label col-sm-2 input-sm" for="code">' . $registry->getItem("code")->getName() . ': *</label>';
 echo '<div class="col-sm-2">';
-echo '<input type="text" class="form-control" name="code" value="' . $registry->getDatum("code") . '">';
+echo '<input type="text" class="form-control input-sm" name="code" value="' . $registry->getDatum("code") . '">';
+echo '</div>';
+echo '</div>';
+
+echo '<div class="form-group">';
+echo '<label class="control-label col-sm-2 input-sm" for="fiscal_id">' . $registry->getItem("fiscal_id")->getName() . ': *</label>';
+echo '<div class="col-sm-2">';
+echo '<input type="text" class="form-control input-sm" name="fiscal_id" value="' . $registry->getDatum("fiscal_id") . '">';
 echo '</div>';
 echo '</div>';
 
@@ -143,23 +152,23 @@ if ($entityNature == ModUtils::ENTITY_NATURE_PER) {
     // person:
 
     echo '<div class="form-group">';
-    echo '<label class="control-label col-sm-2" for="surname">' . $registry->getItem("surname")->getName() . ': *</label>';
+    echo '<label class="control-label col-sm-2 input-sm" for="surname">' . $registry->getItem("surname")->getName() . ': *</label>';
     echo '<div class="col-sm-10">';
-    echo '<input type="text" class="form-control" name="surname" value="' . $registry->getDatum("surname") . '">';
+    echo '<input type="text" class="form-control input-sm" name="surname" value="' . $registry->getDatum("surname") . '">';
     echo '</div>';
     echo '</div>';
 
     echo '<div class="form-group">';
-    echo '<label class="control-label col-sm-2" for="forename">' . $registry->getItem("forename")->getName() . ': *</label>';
+    echo '<label class="control-label col-sm-2 input-sm" for="forename">' . $registry->getItem("forename")->getName() . ': *</label>';
     echo '<div class="col-sm-10">';
-    echo '<input type="text" class="form-control" name="forename" value="' . $registry->getDatum("forename") . '">';
+    echo '<input type="text" class="form-control input-sm" name="forename" value="' . $registry->getDatum("forename") . '">';
     echo '</div>';
     echo '</div>';
 
     echo '<div class="form-group">';
-    echo '<label class="control-label col-sm-2" for="prefix">' . $registry->getItem("prefix")->getName() . ':</label>';
+    echo '<label class="control-label col-sm-2 input-sm" for="prefix">' . $registry->getItem("prefix")->getName() . ':</label>';
     echo '<div class="col-sm-2">';
-    echo '<input type="text" class="form-control" name="prefix" value="' . $registry->getDatum("prefix") . '">';
+    echo '<input type="text" class="form-control input-sm" name="prefix" value="' . $registry->getDatum("prefix") . '">';
     echo '</div>';
     echo '</div>';
 }
@@ -167,60 +176,53 @@ else {
     // organization:
 
     echo '<div class="form-group">';
-    echo '<label class="control-label col-sm-2" for="name">' . $registry->getItem("name")->getName() . ': *</label>';
+    echo '<label class="control-label col-sm-2 input-sm" for="name">' . $registry->getItem("name")->getName() . ': *</label>';
     echo '<div class="col-sm-10">';
-    echo '<input type="text" class="form-control" name="name" value="' . $registry->getDatum("name") . '">';
+    echo '<input type="text" class="form-control input-sm" name="name" value="' . $registry->getDatum("name") . '">';
     echo '</div>';
     echo '</div>';
 }
 
 echo '<div class="form-group">';
-echo '<label class="control-label col-sm-2" for="alias">' . $registry->getItem("alias")->getName() . ': *</label>';
+echo '<label class="control-label col-sm-2 input-sm" for="alias">' . $registry->getItem("alias")->getName() . ': *</label>';
 echo '<div class="col-sm-10">';
-echo '<input type="text" class="form-control" name="alias" value="' . $registry->getDatum("alias") . '">';
+echo '<input type="text" class="form-control input-sm" name="alias" value="' . $registry->getDatum("alias") . '">';
 echo '</div>';
 echo '</div>';
 
 echo '<div class="form-group">';
-echo '<label class="control-label col-sm-2" for="fiscal_id">' . $registry->getItem("fiscal_id")->getName() . ': *</label>';
-echo '<div class="col-sm-2">';
-echo '<input type="text" class="form-control" name="fiscal_id" value="' . $registry->getDatum("fiscal_id") . '">';
-echo '</div>';
-echo '</div>';
-
-echo '<div class="form-group">';
-echo '<div class="col-sm-offset-2 col-sm-10">';
-echo '<div class="checkbox">';
+echo '<div class="col-sm-offset-2 col-sm-2">';
+echo '<div class="checkbox input-sm">';
 echo '<label><input type="checkbox" name="is_credit" value="1"' . ($registry->getDatum("is_credit") ? " checked" : "") . '>' . $registry->getItem("is_credit")->getName() . '</label>';
 echo '</div>';
 echo '</div>';
-echo '</div>';
+//echo '</div>';
 
-echo '<div class="form-group">';
-echo '<label class="control-label col-sm-2" for="credit_days">' . $registry->getItem("credit_days")->getName() . ':</label>';
+//echo '<div class="form-group">';
+echo '<label class="control-label col-sm-2 input-sm" for="credit_days">' . $registry->getItem("credit_days")->getName() . ':</label>';
 echo '<div class="col-sm-2">';
-echo '<input type="text" class="form-control" name="credit_days" value="' . $registry->getDatum("credit_days") . '">';
+echo '<input type="text" class="form-control input-sm" name="credit_days" value="' . $registry->getDatum("credit_days") . '">';
 echo '</div>';
 echo '</div>';
 
 echo '<div class="form-group">';
-echo '<label class="control-label col-sm-2" for="web_page">' . $registry->getItem("web_page")->getName() . ':</label>';
+echo '<label class="control-label col-sm-2 input-sm" for="web_page">' . $registry->getItem("web_page")->getName() . ':</label>';
 echo '<div class="col-sm-10">';
-echo '<input type="text" class="form-control" name="web_page" value="' . $registry->getDatum("web_page") . '">';
+echo '<input type="text" class="form-control input-sm" name="web_page" value="' . $registry->getDatum("web_page") . '">';
 echo '</div>';
 echo '</div>';
 
 echo '<div class="form-group">';
-echo '<label class="control-label col-sm-2" for="notes">' . $registry->getItem("notes")->getName() . ':</label>';
+echo '<label class="control-label col-sm-2 input-sm" for="notes">' . $registry->getItem("notes")->getName() . ':</label>';
 echo '<div class="col-sm-10">';
-echo '<textarea class="form-control" name="notes" rows="3">' . $registry->getDatum("notes") . '</textarea>';
+echo '<textarea class="form-control input-sm" name="notes" rows="1">' . $registry->getDatum("notes") . '</textarea>';
 echo '</div>';
 echo '</div>';
 
 echo '<div class="form-group">';
-echo '<label class="control-label col-sm-2" for="nk_market_segment">' . $registry->getItem("nk_market_segment")->getName() . ': *</label>';
+echo '<label class="control-label col-sm-2 input-sm" for="nk_market_segment">' . $registry->getItem("nk_market_segment")->getName() . ': *</label>';
 echo '<div class="col-sm-10">';
-echo '<select class="form-control" name="nk_market_segment">';
+echo '<select class="form-control input-sm" name="nk_market_segment">';
 foreach (AppUtils::getSelectOptions($connection, AppConsts::CC_MARKET_SEGMENT, $registry->getDatum("nk_market_segment")) as $option) {
     echo $option;
 }
@@ -229,9 +231,9 @@ echo '</div>';
 echo '</div>';
 
 echo '<div class="form-group">';
-echo '<label class="control-label col-sm-2" for="nk_report_delivery_opt">' . $registry->getItem("nk_report_delivery_opt")->getName() . ': *</label>';
+echo '<label class="control-label col-sm-2 input-sm" for="nk_report_delivery_opt">' . $registry->getItem("nk_report_delivery_opt")->getName() . ': *</label>';
 echo '<div class="col-sm-10">';
-echo '<select class="form-control" name="nk_report_delivery_opt">';
+echo '<select class="form-control input-sm" name="nk_report_delivery_opt">';
 foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_REPORT_DELIVERY_OPT, $registry->getDatum("nk_report_delivery_opt")) as $option) {
     echo $option;
 }
@@ -241,9 +243,9 @@ echo '</div>';
 
 if (!$registry->isRegistryNew()) {
     echo '<div class="form-group">';
-    echo '<label class="control-label col-sm-2" for="' . FRegistry::ID . '">' . $registry->getItem("id_entity")->getName() . ':</label>';
+    echo '<label class="control-label col-sm-2 input-sm" for="' . FRegistry::ID . '">' . $registry->getItem("id_entity")->getName() . ':</label>';
     echo '<div class="col-sm-2">';
-    echo '<input type="text" class="form-control" name="' . FRegistry::ID . '" value="' . $registry->getId() . '" readonly>';
+    echo '<input type="text" class="form-control input-sm" name="' . FRegistry::ID . '" value="' . $registry->getId() . '" readonly>';
     echo '</div>';
     echo '</div>';
 }
@@ -277,8 +279,8 @@ echo '<label><input type="checkbox" name="po_is_default" value="1"' . ($childPro
 echo '</div>';
 */
 
-echo '<br><button type="submit" class="btn btn-primary">Guardar</button>';
-echo '&nbsp;<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/catalogs/view_entity.php?class=' . $entityClass . '" class="btn btn-danger" role="button">Cancelar</a>';
+echo '<br><button type="submit" class="btn btn-primary btn-sm">Guardar</button>';
+echo '&nbsp;<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/catalogs/view_entity.php?class=' . $entityClass . '" class="btn btn-danger btn-sm" role="button">Cancelar</a>';
 
 echo '</form>';
 echo '</div>';
