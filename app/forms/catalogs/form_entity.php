@@ -132,6 +132,14 @@ echo '<input type="text" class="form-control input-sm" name="class" value="' . $
 echo '<input type="text" class="form-control input-sm" name="nature" value="' . $entityNature . '" readonly>';
 echo '</div>';
 
+// main section:
+
+echo '<div class="row">';
+
+// main section at the right:
+
+echo '<div class="col-sm-6">';
+
 echo '<div class="form-group">';
 echo '<label class="control-label col-sm-2 input-sm" for="code">' . $registry->getItem("code")->getName() . ': *</label>';
 echo '<div class="col-sm-2">';
@@ -247,6 +255,15 @@ if (!$registry->isRegistryNew()) {
     echo '</div>';
     echo '</div>';
 }
+
+echo '</div>';
+
+// main section at the left:
+
+echo '<div class="col-sm-6">';
+echo '</div>';
+echo '</div>';
+
 /*
 // child test process options:
 

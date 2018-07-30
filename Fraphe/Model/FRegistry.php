@@ -50,6 +50,7 @@ abstract class FRegistry
     }
 
     /* Validates registry data.
+     * Must be called at the begining of method save().
      * Returns: nothing.
      * Throws: Exception if something fails.
      */

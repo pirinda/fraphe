@@ -58,9 +58,9 @@ class ModEntity extends FRegistry
         $this->is_credit = new FItem(FItem::DATA_TYPE_BOOL, "is_credit", "Tiene crédito", true);
         $this->credit_days = new FItem(FItem::DATA_TYPE_INT, "credit_days", "Días crédito", false);
         $this->billing_prefs = new FItem(FItem::DATA_TYPE_STRING, "billing_prefs", "Preferencias facturación", false);
-        $this->web_page = new FItem(FItem::DATA_TYPE_STRING, "web_page", "Página web", false);
+        $this->web_page = new FItem(FItem::DATA_TYPE_STRING, "web_page", "Sitio web", false);
         $this->notes = new FItem(FItem::DATA_TYPE_STRING, "notes", "Notas", false);
-        $this->is_report_images = new FItem(FItem::DATA_TYPE_BOOL, "is_report_images", "Imágenes informe resultados", true);
+        $this->is_report_images = new FItem(FItem::DATA_TYPE_BOOL, "is_report_images", "Imágenes IR", true);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", true);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", true);
         $this->fk_entity_class = new FItem(FItem::DATA_TYPE_INT, "fk_entity_class", "Clase entidad", true);
@@ -69,7 +69,7 @@ class ModEntity extends FRegistry
         $this->nk_entity_billing = new FItem(FItem::DATA_TYPE_INT, "nk_entity_billing", "Entidad facturación", false);
         $this->nk_entity_agent = new FItem(FItem::DATA_TYPE_INT, "nk_entity_agent", "Comisionista", false);
         $this->nk_user_agent = new FItem(FItem::DATA_TYPE_INT, "nk_user_agent", "Agente comercial", false);
-        $this->nk_report_delivery_opt = new FItem(FItem::DATA_TYPE_INT, "nk_report_delivery_opt", "Opción entrega informes resultados", false);
+        $this->nk_report_delivery_opt = new FItem(FItem::DATA_TYPE_INT, "nk_report_delivery_opt", "Opción entrega IR", false);
         $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", false);
         $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", false);
         $this->ts_user_ins = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_ins", "Creado", false);
