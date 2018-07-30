@@ -32,25 +32,25 @@ class ModContact extends FRegistry
     {
         parent::__construct(AppConsts::CC_CONTACT, "id_contact");
 
-        $this->id_contact = new FItem(FItem::DATA_TYPE_INT, "id_contact", "ID contacto", false);
-        $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", true);
-        $this->prefix = new FItem(FItem::DATA_TYPE_STRING, "prefix", "Prefijo", true);
-        $this->surname = new FItem(FItem::DATA_TYPE_STRING, "surname", "Apellidos", true);
-        $this->forename = new FItem(FItem::DATA_TYPE_STRING, "forename", "Nombres", true);
-        $this->job = new FItem(FItem::DATA_TYPE_STRING, "job", "Puesto", true);
-        $this->mail = new FItem(FItem::DATA_TYPE_STRING, "mail", "Mail", true);
-        $this->phone = new FItem(FItem::DATA_TYPE_STRING, "phone", "Teléfono", true);
-        $this->mobile = new FItem(FItem::DATA_TYPE_STRING, "mobile", "Móvil", true);
-        $this->is_report = new FItem(FItem::DATA_TYPE_BOOL, "is_report", "Contacto informe resultados", true);
-        $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", true);
-        $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", true);
-        $this->fk_entity = new FItem(FItem::DATA_TYPE_INT, "fk_entity", "Entidad", true);
-        $this->fk_entity_address = new FItem(FItem::DATA_TYPE_INT, "fk_entity_address", "Domicilio", true);
-        $this->fk_contact_type = new FItem(FItem::DATA_TYPE_INT, "fk_contact_type", "Tipo contacto", true);
-        $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", false);
-        $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", false);
-        $this->ts_user_ins = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_ins", "Creado", false);
-        $this->ts_user_upd = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_upd", "Modificado", false);
+        $this->id_contact = new FItem(FItem::DATA_TYPE_INT, "id_contact", "ID contacto", "", false);
+        $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", "", true);
+        $this->prefix = new FItem(FItem::DATA_TYPE_STRING, "prefix", "Prefijo", "Sr., Lic., Ing.", true);
+        $this->surname = new FItem(FItem::DATA_TYPE_STRING, "surname", "Apellidos", "", true);
+        $this->forename = new FItem(FItem::DATA_TYPE_STRING, "forename", "Nombres", "", true);
+        $this->job = new FItem(FItem::DATA_TYPE_STRING, "job", "Puesto", "", true);
+        $this->mail = new FItem(FItem::DATA_TYPE_STRING, "mail", "Mail", "", true);
+        $this->phone = new FItem(FItem::DATA_TYPE_STRING, "phone", "Teléfono", "", true);
+        $this->mobile = new FItem(FItem::DATA_TYPE_STRING, "mobile", "Móvil", "", true);
+        $this->is_report = new FItem(FItem::DATA_TYPE_BOOL, "is_report", "Contacto IR", "", true);
+        $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", true);
+        $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", true);
+        $this->fk_entity = new FItem(FItem::DATA_TYPE_INT, "fk_entity", "Entidad", "", true);
+        $this->fk_entity_address = new FItem(FItem::DATA_TYPE_INT, "fk_entity_address", "Domicilio", "", true);
+        $this->fk_contact_type = new FItem(FItem::DATA_TYPE_INT, "fk_contact_type", "Tipo contacto", "", true);
+        $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", "", false);
+        $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", "", false);
+        $this->ts_user_ins = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_ins", "Creado", "", false);
+        $this->ts_user_upd = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_upd", "Modificado", "", false);
 
         $this->items["id_contact"] = $this->id_contact;
         $this->items["name"] = $this->name;

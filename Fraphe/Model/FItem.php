@@ -12,29 +12,39 @@ class FItem
     public const DATA_TYPE_TIME = 13;
     public const DATA_TYPE_TIMESTAMP = 15;
 
+    public const INPUT_TEXT = 11;
+    public const INPUT_NUMBER = 21;
+    public const INPUT_RADIO = 31;
+    public const INPUT_CHECKBOX = 32;
+    public const INPUT_DATE = 41;
+    public const INPUT_DATETIME = 42;
+    public const INPUT_TIME = 43;
+    public const SELECT = 51;
+    public const TEXTAREA = 61;
+
     protected $dataType;
     protected $key;
     protected $name;
+    protected $hint;
     protected $value;
     protected $default;
     protected $canBeNull;
     protected $canBeEmpty;
-    protected $description;
     protected $valueMin;
     protected $valueMax;
     protected $lengthMin;
     protected $lengthMax;
 
-    function __construct(int $dataType, string $key, string $name, bool $mandatory)
+    function __construct(int $dataType, string $key, string $name, string $hint, bool $mandatory)
     {
         $this->dataType = $dataType;
         $this->key = $key;
         $this->name = $name;
+        $this->hint = $hint;
         $this->value = self::produceDefault($dataType);
         $this->default = $this->value;
         $this->canBeNull = !$mandatory;
         $this->canBeEmpty = !$mandatory;
-        $this->description = "";
     }
 
     public static function produceDefault(int $dataType)
@@ -110,6 +120,11 @@ class FItem
         return $this->name;
     }
 
+    public function getHint(): string
+    {
+        return $this->hint;
+    }
+
     public function getValue()
     {
         return $this->value;
@@ -128,11 +143,6 @@ class FItem
     public function canBeEmpty(): bool
     {
         return $this->canBeEmpty;
-    }
-
-    public function getDescription(): string
-    {
-        return $this->description;
     }
 
     public function getValueMin()
@@ -248,5 +258,57 @@ class FItem
                     throw new \Exception("Tipo de dato desconocido.");
             }
         }
+    }
+
+    public function composeHtmlFormGroup(int $type, int $lengthLabel, int $lengthInput): string
+    {
+        $html = '';
+        $required = ($this->canBeEmpty ? '' : ' required');
+
+        switch ($type) {
+            case self::INPUT_TEXT:
+                $placeholder = ' placeholder="' . $this->name . (empty($this->hint) ? '' : ' (' . $this->hint . ')') . '"';
+                $maxLength = ' maxlength="' . $this->lengthMax . '"';
+
+                $html .= '<div class="form-group">';
+                $html .= '<div class="col-sm-' . $lengthLabel . '">';
+                $html .= '<label class="control-label" for="' . $this->key . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
+                $html .= '</div>';
+                $html .= '<div class="col-sm-' . $lengthInput . '">';
+                $html .= '<input type="text" class="form-control input-sm" name="' . $this->key . '" value="' . $this->value . '"' . $required . $placeholder . $maxLength . '>';
+                $html .= '</div>';
+                $html .= '</div>';
+                break;
+
+            case self::INPUT_NUMBER:
+                break;
+
+            case self::INPUT_RADIO:
+                break;
+
+            case self::INPUT_CHECKBOX:
+                break;
+
+            case self::INPUT_DATE:
+                break;
+
+            case self::INPUT_DATETIME:
+                break;
+
+            case self::INPUT_TIME:
+                break;
+
+            case self::SELECT:
+                break;
+
+            case self::TEXTAREA:
+                break;
+
+            default:
+        }
+
+
+
+        return $html;
     }
 }

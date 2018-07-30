@@ -16,8 +16,8 @@ class ModEntityEntityType extends FRelation
     {
         parent::__construct(AppConsts::CC_ENTITY_ENTITY_TYPE);
 
-        $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", true);
-        $this->id_entity_type = new FItem(FItem::DATA_TYPE_INT, "id_entity_type", "ID tipo entidad", true);
+        $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", "", false);
+        $this->id_entity_type = new FItem(FItem::DATA_TYPE_INT, "id_entity_type", "ID tipo entidad", "", false);
 
         $this->items["id_entity"] = $this->id_entity;
         $this->items["id_entity_type"] = $this->id_entity_type;
