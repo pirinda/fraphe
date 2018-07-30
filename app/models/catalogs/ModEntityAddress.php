@@ -34,9 +34,9 @@ class ModEntityAddress extends FRegistry
 
     protected $childContacts;
 
-    function __construct(\PDO $connection)
+    function __construct()
     {
-        parent::__construct($connection, AppConsts::CC_ENTITY_ADDRESS, "id_entity_address");
+        parent::__construct(AppConsts::CC_ENTITY_ADDRESS, "id_entity_address");
 
         $this->id_entity_address = new FItem(FItem::DATA_TYPE_INT, "id_entity_address", "ID domicilio", false);
         $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", true);
@@ -107,21 +107,21 @@ class ModEntityAddress extends FRegistry
         return $this->childContacts;
     }
 
-    public function validate()
+    public function validate(FUserSession $userSession)
     {
-        parent::validate();
+        parent::validate($userSession);
 
         foreach ($this->childContacts as $contact) {
-            $contact->validate();
+            $contact->validate($userSession);
         }
     }
 
-    public function read(FUserSession $session, int $id, int $mode)
+    public function read(FUserSession $userSession, int $id, int $mode)
     {
         $this->initialize();
 
         $sql = "SELECT * FROM cc_entity_address WHERE id_entity_address = $id;";
-        $statement = $this->connection->query($sql);
+        $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->id = $row["id_entity_address"];
 
@@ -152,15 +152,15 @@ class ModEntityAddress extends FRegistry
             $this->isRegistryNew = false;
             $this->mode = $mode;
 
-            // create connection for reading children:
-            $connection = FGuiUtils::createConnection();
+            // create PDO connection for reading children:
+            $pdo = FGuiUtils::createPdo();
 
             // read child contacts:
             $sql = "SELECT id_contact FROM cc_contact WHERE fk_entity_address = $this->id ORDER BY id_contact;";
-            $statement = $this->connection->query($sql);
+            $statement = $pdo->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $contact = new ModContact($connection);
-                $contact->read($session, $row["id_contact"], $mode);
+                $contact = new ModContact();
+                $contact->read($userSession, $row["id_contact"], $mode);
                 $this->childContacts[] = $contact;
             }
         }
@@ -169,14 +169,14 @@ class ModEntityAddress extends FRegistry
         }
     }
 
-    public function save(FUserSession $session)
+    public function save(FUserSession $userSession)
     {
-        $this->validate();
+        $this->validate($userSession);
 
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $this->connection->prepare("INSERT INTO cc_entity_address (" .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO cc_entity_address (" .
                 "id_entity_address, " .
                 "name, " .
                 "street, " .
@@ -226,7 +226,7 @@ class ModEntityAddress extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $this->connection->prepare("UPDATE cc_entity_address SET " .
+            $statement = $userSession->getPdo()->prepare("UPDATE cc_entity_address SET " .
                 "name = :name, " .
                 "street = :street, " .
                 "district = :district, " .
@@ -276,7 +276,7 @@ class ModEntityAddress extends FRegistry
         //$ts_user_ins = $this->ts_user_ins->getValue();
         //$ts_user_upd = $this->ts_user_upd->getValue();
 
-        $fk_user = $session->getCurUser()->getId();
+        $fk_user = $userSession->getCurUser()->getId();
 
         //$statement->bindParam(":id_entity_address", $id_entity_address);
         $statement->bindParam(":name", $name);
@@ -312,7 +312,7 @@ class ModEntityAddress extends FRegistry
 
         $this->isRegistryModified = false;
         if ($this->isRegistryNew) {
-            $this->id = intval($this->connection->lastInsertId());
+            $this->id = intval($userSession->getPdo()->lastInsertId());
             $this->isRegistryNew = false;
         }
 
@@ -326,16 +326,16 @@ class ModEntityAddress extends FRegistry
             $contact->setData($data);
 
             // save child:
-            $contact->save($session);
+            $contact->save($userSession);
         }
     }
 
-    public function delete(FUserSession $session)
+    public function delete(FUserSession $userSession)
     {
 
     }
 
-    public function undelete(FUserSession $session)
+    public function undelete(FUserSession $userSession)
     {
 
     }

@@ -129,18 +129,18 @@ abstract class FGuiUtils
 
     /*
     */
-    public static function composeConnectionDsn(): string
+    public static function composePdoDsn(): string
     {
         return "mysql:host=" . $_SESSION[FAppConsts::DB_HOST] . ";port=" . $_SESSION[FAppConsts::DB_PORT] . ";dbname=" . $_SESSION[FAppConsts::DB_NAME] . ";charset=UTF8";
     }
 
     /*
     */
-    public static function createConnection(): \PDO
+    public static function createPdo(): \PDO
     {
-        $connection = new \PDO(self::composeConnectionDsn(), $_SESSION[FAppConsts::DB_USER_NAME], $_SESSION[FAppConsts::DB_USER_PSWD]);
-        $connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        return $connection;
+        $pdo = new \PDO(self::composePdoDsn(), $_SESSION[FAppConsts::DB_USER_NAME], $_SESSION[FAppConsts::DB_USER_PSWD]);
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        return $pdo;
     }
 
     /*
@@ -148,6 +148,6 @@ abstract class FGuiUtils
     public static function createUserSession(): FUserSession
     {
         $user = new FUser($_SESSION[FAppConsts::USER_ID], $_SESSION[FAppConsts::USER_NAME]);
-        return new FUserSession($user, $_SESSION[FAppConsts::USER_LOGIN_TS]);
+        return new FUserSession($user, $_SESSION[FAppConsts::USER_LOGIN_TS], self::createPdo());
     }
 }

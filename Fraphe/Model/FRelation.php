@@ -9,11 +9,11 @@ abstract class FRelation extends FRegistry
 
     /* Creates new base registry. Each field of registry must be contained in member array $items. Relation IDs are a subset of this registry items.
      */
-    public function __construct(\PDO $connection, int $registryType)
+    public function __construct(int $registryType)
     {
         $this->ids = array();
 
-        parent::__construct($connection, $registryType, "");
+        parent::__construct($registryType, "");
     }
 
     /* Initializes registry data.
@@ -33,26 +33,14 @@ abstract class FRelation extends FRegistry
      * Returns: nothing.
      * Throws: Exception if something fails.
      */
-    public function validate()
+    public function validate(FUserSession $userSession)
     {
-        parent::validate();
+        parent::validate($userSession);
 
         foreach ($this->ids as $key => $id) {
             if (!is_int($id)) {
                 throw new \Exception(__METHOD__ . ": El ID '$key' debe ser número entero.");
             }
-        }
-    }
-
-    /* Validates registry data on save.
-     * Returns: nothing.
-     * Throws: Exception if something fails.
-     */
-    protected function validateOnSave()
-    {
-        $this->validate();
-
-        foreach ($this->ids as $key => $id) {
             if ($id == 0) {
                 throw new \Exception(__METHOD__ . ": El ID '$key' debe ser diferente de cero.");
             }
@@ -139,24 +127,24 @@ abstract class FRelation extends FRegistry
         throw new \Exception(__METHOD__ . ": La relación no tiene ID, sino un conjunto de IDs.");
     }
 
-    public function read(FUserSession $session, int $id, int $mode)
+    public function read(FUserSession $userSession, int $id, int $mode)
     {
         throw new \Exception(__METHOD__ . ": Método no disponible para relaciones.");
     }
 
     /* Similar to base method read(), but for relations.
-     * Param $session: user session.
+     * Param $userSession: user session.
      * Param $ids: associative array of relation IDs in the key=id format.
      * Param $mode: read mode. Options declared in class Fraphe\Model\FRegistry.
      * Returns: nothing.
      * Throws: Exception if something fails.
      */
-    abstract public function retrieve(FUserSession $session, array $ids, int $mode);
+    abstract public function retrieve(FUserSession $userSession, array $ids, int $mode);
 
     /* Checks if registry is new.
      * Returns: number of ocurrences found of registry.
      */
-    public function checkRegistryNew(FUserSession $session, string $table): int
+    public function checkRegistryNew(FUserSession $userSession, string $table): int
     {
         $sql = "SELECT COUNT(*) AS _count FROM $table WHERE ";
         $where = "";
@@ -166,7 +154,7 @@ abstract class FRelation extends FRegistry
         $sql .= $where;
 
         $count = 0;
-        $statement = $this->connection->query($sql);
+        $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $count = $row["_count"];
         }
@@ -176,5 +164,4 @@ abstract class FRelation extends FRegistry
 
         return $count;
     }
-
 }

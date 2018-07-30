@@ -42,9 +42,9 @@ class ModEntity extends FRegistry
     protected $childEntityTypes;
     protected $childAddresses;
 
-    function __construct(\PDO $connection)
+    function __construct()
     {
-        parent::__construct($connection, AppConsts::CC_ENTITY, "id_entity");
+        parent::__construct(AppConsts::CC_ENTITY, "id_entity");
 
         $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", false);
         $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", false);
@@ -129,7 +129,7 @@ class ModEntity extends FRegistry
         return $this->childAddresses;
     }
 
-    public function validate()
+    public function validate(FUserSession $userSession)
     {
         if ($this->is_person->getValue()) {
             // is person:
@@ -149,14 +149,14 @@ class ModEntity extends FRegistry
         $this->nk_report_delivery_opt->setMandatory($isCustomer);
 
         // validte data:
-        parent::validate();
+        parent::validate($userSession);
 
         foreach ($this->childEntityTypes as $entityType) {
-            $entityType->validate();
+            $entityType->validate($userSession);
         }
 
         foreach ($this->childAddresses as $address) {
-            $address->validate();
+            $address->validate($userSession);
         }
 
         // final processing of data:
@@ -167,12 +167,12 @@ class ModEntity extends FRegistry
         }
     }
 
-    public function read(FUserSession $session, int $id, int $mode)
+    public function read(FUserSession $userSession, int $id, int $mode)
     {
         $this->initialize();
 
         $sql = "SELECT * FROM cc_entity WHERE id_entity = $id;";
-        $statement = $this->connection->query($sql);
+        $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->id = $row["id_entity"];
 
@@ -208,28 +208,28 @@ class ModEntity extends FRegistry
             $this->isRegistryNew = false;
             $this->mode = $mode;
 
-            // create connection for reading children:
-            $connection = FGuiUtils::createConnection();
+            // create PDO connection for reading children:
+            $pdo = FGuiUtils::createPdo();
 
             // read child entity entity types:
             $sql = "SELECT id_entity, id_entity_type FROM cc_entity_entity_type WHERE id_entity = $this->id ORDER BY id_entity, id_entity_type;";
-            $statement = $this->connection->query($sql);
+            $statement = $pdo->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                 $ids = array();
                 $ids["id_entity"] = $row["id_entity"];
                 $ids["id_entity_type"] = $row["id_entity_type"];
 
-                $entityType = new ModEntityEntityType($connection);
-                $entityType->retrieve($session, $ids, $mode);
+                $entityType = new ModEntityEntityType();
+                $entityType->retrieve($userSession, $ids, $mode);
                 $this->childEntityTypes[] = $entityType;
             }
 
             // read child entity addresses:
             $sql = "SELECT id_entity_address FROM cc_entity_address WHERE fk_entity = $this->id ORDER BY id_entity_address;";
-            $statement = $this->connection->query($sql);
+            $statement = $pdo->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $address = new ModEntityAddress($connection);
-                $address->read($session, $row["id_entity_address"], $mode);
+                $address = new ModEntityAddress();
+                $address->read($userSession, $row["id_entity_address"], $mode);
                 $this->childAddresses[] = $address;
             }
         }
@@ -238,14 +238,14 @@ class ModEntity extends FRegistry
         }
     }
 
-    public function save(FUserSession $session)
+    public function save(FUserSession $userSession)
     {
-        $this->validate();
+        $this->validate($userSession);
 
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $this->connection->prepare("INSERT INTO cc_entity (" .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO cc_entity (" .
                 "id_entity, " .
                 "name, " .
                 "code, " .
@@ -305,7 +305,7 @@ class ModEntity extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $this->connection->prepare("UPDATE cc_entity SET " .
+            $statement = $userSession->getPdo()->prepare("UPDATE cc_entity SET " .
                 "name = :name, " .
                 "code = :code, " .
                 "alias = :alias, " .
@@ -365,7 +365,7 @@ class ModEntity extends FRegistry
         //$ts_user_ins = $this->ts_user_ins->getValue();
         //$ts_user_upd = $this->ts_user_upd->getValue();
 
-        $fk_user = $session->getCurUser()->getId();
+        $fk_user = $userSession->getCurUser()->getId();
 
         //$statement->bindParam(":id_entity", $id_entity);
         $statement->bindParam(":name", $name);
@@ -436,19 +436,19 @@ class ModEntity extends FRegistry
 
         $this->isRegistryModified = false;
         if ($this->isRegistryNew) {
-            $this->id = intval($this->connection->lastInsertId());
+            $this->id = intval($userSession->getPdo()->lastInsertId());
             $this->isRegistryNew = false;
         }
 
         // save child entity entity types:
-        $this->connection->exec("DELETE FROM cc_entity_entity_type WHERE id_entity = $this->id;");  // pure relations
+        $userSession->getPdo()->exec("DELETE FROM cc_entity_entity_type WHERE id_entity = $this->id;");  // pure relations
         foreach ($this->childEntityTypes as $entityType) {
             $ids = array();
             $ids["id_entity"] = $this->id;
 
             $entityType->setIds($ids);
             $entityType->forceRegistryNew();    // pure relation
-            $entityType->save($session);
+            $entityType->save($userSession);
         }
 
         // save child entity addresses:
@@ -457,16 +457,16 @@ class ModEntity extends FRegistry
             $data["fk_entity"] = $this->id;
 
             $address->setData($data);
-            $address->save($session);
+            $address->save($userSession);
         }
     }
 
-    public function delete(FUserSession $session)
+    public function delete(FUserSession $userSession)
     {
 
     }
 
-    public function undelete(FUserSession $session)
+    public function undelete(FUserSession $userSession)
     {
 
     }

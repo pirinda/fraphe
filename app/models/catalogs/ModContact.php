@@ -28,9 +28,9 @@ class ModContact extends FRegistry
     protected $ts_user_ins;
     protected $ts_user_upd;
 
-    function __construct(\PDO $connection)
+    function __construct()
     {
-        parent::__construct($connection, AppConsts::CC_CONTACT, "id_contact");
+        parent::__construct(AppConsts::CC_CONTACT, "id_contact");
 
         $this->id_contact = new FItem(FItem::DATA_TYPE_INT, "id_contact", "ID contacto", false);
         $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", true);
@@ -82,12 +82,12 @@ class ModContact extends FRegistry
         $this->mobile->setRangeLength(0, 100);
     }
 
-    public function read(FUserSession $session, int $id, int $mode)
+    public function read(FUserSession $userSession, int $id, int $mode)
     {
         $this->initialize();
 
         $sql = "SELECT * FROM cc_contact WHERE id_contact = $id;";
-        $statement = $this->connection->query($sql);
+        $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->id = $row["id_contact"];
 
@@ -119,14 +119,14 @@ class ModContact extends FRegistry
         }
     }
 
-    public function save(FUserSession $session)
+    public function save(FUserSession $userSession)
     {
-        $this->validate();
+        $this->validate($userSession);
 
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $this->connection->prepare("INSERT INTO oc_test (" .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO oc_test (" .
                 "id_contact, " .
                 "name, " .
                 "prefix, " .
@@ -168,7 +168,7 @@ class ModContact extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $this->connection->prepare("UPDATE oc_test SET " .
+            $statement = $userSession->getPdo()->prepare("UPDATE oc_test SET " .
                 "name = :name, " .
                 "prefix = :prefix, " .
                 "surname = :surname, " .
@@ -210,7 +210,7 @@ class ModContact extends FRegistry
         //$ts_user_ins = $this->ts_user_ins->getValue();
         //$ts_user_upd = $this->ts_user_upd->getValue();
 
-        $fk_user = $session->getCurUser()->getId();
+        $fk_user = $userSession->getCurUser()->getId();
 
         //$statement->bindParam(":id_contact", $id_contact);
         $statement->bindParam(":name", $name);
@@ -242,17 +242,17 @@ class ModContact extends FRegistry
 
         $this->isRegistryModified = false;
         if ($this->isRegistryNew) {
-            $this->id = intval($this->connection->lastInsertId());
+            $this->id = intval($userSession->getPdo()->lastInsertId());
             $this->isRegistryNew = false;
         }
     }
 
-    public function delete(FUserSession $session)
+    public function delete(FUserSession $userSession)
     {
 
     }
 
-    public function undelete(FUserSession $session)
+    public function undelete(FUserSession $userSession)
     {
 
     }

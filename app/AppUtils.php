@@ -1,9 +1,11 @@
 <?php
 namespace app;
 
+use Fraphe\App\FUserSession;
+
 abstract class AppUtils
 {
-    public static function getSelectOptions(\PDO $connection, int $catalog, $selectedValue = 0): array
+    public static function getSelectOptions(FUserSession $userSession, int $catalog, $selectedValue = 0): array
     {
         $sql;
         $options = array();
@@ -42,7 +44,7 @@ abstract class AppUtils
         $options[] = '<option value="0"' . ($selectedValue == 0 ? " selected" : "") . '>- seleccionar -</option>';
 
         if (isset($sql)) {
-            foreach ($connection->query($sql) as $row) {
+            foreach ($userSession->getPdo()->query($sql) as $row) {
                 $options[] = '<option value="' . $row['_val'] . '"' . (!empty($selectedValue) && $selectedValue == $row['_val'] ? " selected" : "") . '>' . $row['_opt'] . '</option>';
             }
         }

@@ -30,9 +30,9 @@ $password = "msroot";
 $dbname = "test1";
 
 try {
-    $connection = new PDO("mysql:host=$servername;dbname=$dbname;charset=UTF8", $username, $password);
-    $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $stmt = $connection->prepare("SELECT name, id_market_segment FROM cc_market_segment");
+    $pdo = new PDO("mysql:host=$servername;dbname=$dbname;charset=UTF8", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $stmt = $pdo->prepare("SELECT name, id_market_segment FROM cc_market_segment");
     $stmt->execute();
 
     // set the resulting array to associative
@@ -45,7 +45,7 @@ try {
 catch(PDOException $e) {
     echo "Error: " . $e->getMessage();
 }
-$connection = null;
+$pdo = null;
 echo "</table>";
 ?>
 

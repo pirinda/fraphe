@@ -50,8 +50,8 @@ echo '</tr>';
 echo '</thead>';
 echo '<tbody>';
 
-$connection = FGuiUtils::createConnection();
-foreach ($connection->query($sql) as $row) {
+$pdo = FGuiUtils::createPdo();
+foreach ($pdo->query($sql) as $row) {
     echo '<tr>';
     echo '<td>' . $row['c_name'] . '</td>';
     echo '<td>' . $row['c_code'] . '</td>';
@@ -69,6 +69,6 @@ echo '</table>';
 echo '</div>';
 
 echo FApp::composeFooter();
-echo '<script>$(document).ready(function(){$(\'[data-toggle="tooltip"]\').tooltip();});</script>';
+echo '<script>$(document).ready(function(){$(\'[data-toggle="tooltip"]\').tooltip();});</script>';  // enable Bootstrap tooltips
 echo '</body>';
 echo '</html>';

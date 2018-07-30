@@ -22,9 +22,9 @@ class ModTestProcessOpt extends FRelation
     protected $ts_user_ins;
     protected $ts_user_upd;
 
-    function __construct(\PDO $connection)
+    function __construct()
     {
-        parent::__construct($connection, AppConsts::OC_TEST_PROCESS_OPT);
+        parent::__construct(AppConsts::OC_TEST_PROCESS_OPT);
 
         $this->id_test = new FItem(FItem::DATA_TYPE_INT, "id_test", "ID ensayo", false);
         $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", false);
@@ -57,7 +57,7 @@ class ModTestProcessOpt extends FRelation
         $this->ids["id_entity"] = 0;
     }
 
-    public function retrieve(FUserSession $session, array $ids, int $mode)
+    public function retrieve(FUserSession $userSession, array $ids, int $mode)
     {
         $this->initialize();
         $this->setIds($ids);
@@ -67,7 +67,7 @@ class ModTestProcessOpt extends FRelation
         $id_entity = $this->ids["id_entity"];
 
         $sql = "SELECT * FROM oc_test_process_opt WHERE id_test = $id_test AND id_entity = $id_entity;";
-        $statement = $this->connection->query($sql);
+        $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->id_test->setValue($row["id_test"]);
             $this->id_entity->setValue($row["id_entity"]);
@@ -90,15 +90,15 @@ class ModTestProcessOpt extends FRelation
         }
     }
 
-    public function save(FUserSession $session)
+    public function save(FUserSession $userSession)
     {
-        $this->validateOnSave();
+        $this->validate($userSession);
 
         $statement;
-        $this->isRegistryNew = $this->checkRegistryNew($session, "oc_test_process_opt") == 0;
+        $this->isRegistryNew = $this->checkRegistryNew($userSession, "oc_test_process_opt") == 0;
 
         if ($this->isRegistryNew) {
-            $statement = $this->connection->prepare("INSERT INTO oc_test_process_opt (" .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO oc_test_process_opt (" .
                 "id_test, " .
                 "id_entity, " .
                 "process_days_min, " .
@@ -126,7 +126,7 @@ class ModTestProcessOpt extends FRelation
                 "NOW());");
         }
         else {
-            $statement = $this->connection->prepare("UPDATE oc_test_process_opt SET " .
+            $statement = $userSession->getPdo()->prepare("UPDATE oc_test_process_opt SET " .
                 "process_days_min = :process_days_min, " .
                 "process_days_max = :process_days_max, " .
                 "cost = :cost, " .
@@ -153,7 +153,7 @@ class ModTestProcessOpt extends FRelation
         //$ts_user_ins = $this->ts_user_ins->getValue();
         //$ts_user_upd = $this->ts_user_upd->getValue();
 
-        $fk_user = $session->getCurUser()->getId();
+        $fk_user = $userSession->getCurUser()->getId();
 
         $statement->bindParam(":id_test", $id_test);
         $statement->bindParam(":id_entity", $id_entity);
@@ -178,12 +178,12 @@ class ModTestProcessOpt extends FRelation
         }
     }
 
-    public function delete(FUserSession $session)
+    public function delete(FUserSession $userSession)
     {
 
     }
 
-    public function undelete(FUserSession $session)
+    public function undelete(FUserSession $userSession)
     {
 
     }

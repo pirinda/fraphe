@@ -49,20 +49,20 @@ session_start();
               ?>
               <h2>Session from $_SESSION Global Variable</h2>
               <?php
-              echo "Retrieving \$session from \$_SESSION:<br>";
+              echo "Retrieving \$userSession from \$_SESSION:<br>";
               if (!isset($_SESSION['session'])) {
-                  echo "\$session not set!<br>";
+                  echo "\$userSession not set!<br>";
               } else {
-                  $session = $_SESSION['session'];
-                  echo "<p>Local language: [", $session->getLocLang(), "]</p>";
-                  echo "<p>Local country: [", $session->getLocCountry(), "]</p>";
-                  echo "<p>Local currency: [", $session->getLocCurrency(), "]</p>";
-                  echo "<p>Local time zone: [", $session->getLocTimeZone(), "]</p>";
+                  $userSession = $_SESSION['session'];
+                  echo "<p>Local language: [", $userSession->getLocLang(), "]</p>";
+                  echo "<p>Local country: [", $userSession->getLocCountry(), "]</p>";
+                  echo "<p>Local currency: [", $userSession->getLocCurrency(), "]</p>";
+                  echo "<p>Local time zone: [", $userSession->getLocTimeZone(), "]</p>";
 
-                  echo "<p>Current user ID: [", $session->getCurUser()->getId(), "]</p>";
-                  echo "<p>Current user name: [", $session->getCurUser()->getName(), "]</p>";
+                  echo "<p>Current user ID: [", $userSession->getCurUser()->getId(), "]</p>";
+                  echo "<p>Current user name: [", $userSession->getCurUser()->getName(), "]</p>";
 
-                  echo "<p>Dumping \$session: ", var_dump($_SESSION['session']), "</p>";
+                  echo "<p>Dumping \$userSession: ", var_dump($_SESSION['session']), "</p>";
               }
               ?>
           </p>

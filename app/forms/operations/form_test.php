@@ -25,8 +25,7 @@ echo '<body>';
 echo FAppNavbar::compose("catalogs");
 
 $userSession = FGuiUtils::createUserSession();
-$connection = FGuiUtils::createConnection();
-$registry = new ModTest($connection);
+$registry = new ModTest();
 $errmsg = "";
 
 switch ($_SERVER["REQUEST_METHOD"]) {
@@ -62,13 +61,12 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         $childData["cost"] = floatval($_POST["po_cost"]);
         $childData["is_default"] = boolval($_POST["po_is_default"]);
 
-        $childProcessOpt = new ModTestProcessOpt($connection);
+        $childProcessOpt = new ModTestProcessOpt();
         $childProcessOpt->setData($childData);
         $registry->addChildProcessOpt($childProcessOpt);
 
         try {
             $registry->setData($data);
-            $registry->validate();
             $registry->save($userSession);
             header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/operations/view_test.php");
         }
@@ -97,7 +95,7 @@ echo '<form method="post" action="' . FUtils::sanitizeInput($_SERVER["PHP_SELF"]
 echo '<div class="form-group">';
 echo '<label for="fk_process_area">' . $registry->getItem("fk_process_area")->getName() . ': *</label>';
 echo '<select class="form-control" name="fk_process_area">';
-foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_PROCESS_AREA, $registry->getDatum("fk_process_area")) as $option) {
+foreach (AppUtils::getSelectOptions($userSession, AppConsts::OC_PROCESS_AREA, $registry->getDatum("fk_process_area")) as $option) {
     echo $option;
 }
 echo '</select>';
@@ -116,7 +114,7 @@ echo '</div>';
 echo '<div class="form-group">';
 echo '<label for="fk_sample_category">' . $registry->getItem("fk_sample_category")->getName() . ': *</label>';
 echo '<select class="form-control" name="fk_sample_category">';
-foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_SAMPLE_CATEGORY, $registry->getDatum("fk_sample_category")) as $option) {
+foreach (AppUtils::getSelectOptions($userSession, AppConsts::OC_SAMPLE_CATEGORY, $registry->getDatum("fk_sample_category")) as $option) {
     echo $option;
 }
 echo '</select>';
@@ -125,7 +123,7 @@ echo '</div>';
 echo '<div class="form-group">';
 echo '<label for="fk_testing_method">' . $registry->getItem("fk_testing_method")->getName() . ': *</label>';
 echo '<select class="form-control" name="fk_testing_method">';
-foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_TESTING_METHOD, $registry->getDatum("fk_testing_method")) as $option) {
+foreach (AppUtils::getSelectOptions($userSession, AppConsts::OC_TESTING_METHOD, $registry->getDatum("fk_testing_method")) as $option) {
     echo $option;
 }
 echo '</select>';
@@ -134,7 +132,7 @@ echo '</div>';
 echo '<div class="form-group">';
 echo '<label for="fk_test_acredit_attrib">' . $registry->getItem("fk_test_acredit_attrib")->getName() . ': *</label>';
 echo '<select class="form-control" name="fk_test_acredit_attrib">';
-foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_TEST_ACREDIT_ATTRIB, $registry->getDatum("fk_test_acredit_attrib")) as $option) {
+foreach (AppUtils::getSelectOptions($userSession, AppConsts::OC_TEST_ACREDIT_ATTRIB, $registry->getDatum("fk_test_acredit_attrib")) as $option) {
     echo $option;
 }
 echo '</select>';
@@ -155,7 +153,7 @@ echo '</div>';
 $childProcessOpt;
 
 if (empty($registry->getChildProcessOpts())) {
-    $childProcessOpt = new ModTestProcessOpt($connection);
+    $childProcessOpt = new ModTestProcessOpt();
     $data = array();
     $data["is_default"] = true;
     $childProcessOpt->setData($data);

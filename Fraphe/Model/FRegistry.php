@@ -11,7 +11,6 @@ abstract class FRegistry
     public const ERR_MSG_REGISTRY_NOT_FOUND = "El registro no fue encontrado.";
     public const ERR_MSG_REGISTRY_NON_UPDATABLE = "El registro no se puede modificar.";
 
-    protected $connection;
     protected $registryType;
     protected $idName;
     protected $items;   // associative array of FItem objects
@@ -24,9 +23,8 @@ abstract class FRegistry
 
     /* Creates new base registry. Each field of registry must be contained in member array $items.
      */
-    public function __construct(\PDO $connection, int $registryType, string $idName)
+    public function __construct(int $registryType, string $idName)
     {
-        $this->connection = $connection;
         $this->registryType = $registryType;
         $this->idName = $idName;
         $this->items = array();
@@ -55,7 +53,7 @@ abstract class FRegistry
      * Returns: nothing.
      * Throws: Exception if something fails.
      */
-    public function validate()
+    public function validate(FUserSession $userSession)
     {
         foreach ($this->items as $item) {
             $item->validate();
@@ -199,26 +197,26 @@ abstract class FRegistry
 
     }
 
-    abstract public function read(FUserSession $session, int $id, int $mode);
+    abstract public function read(FUserSession $userSession, int $id, int $mode);
 
     public function canSave(): bool
     {
         return true;
     }
 
-    abstract public function save(FUserSession $session);
+    abstract public function save(FUserSession $userSession);
 
     public function canDelete(): bool
     {
         return true;
     }
 
-    abstract public function delete(FUserSession $session);
+    abstract public function delete(FUserSession $userSession);
 
     public function canUndelete(): bool
     {
         return true;
     }
 
-    abstract public function undelete(FUserSession $session);
+    abstract public function undelete(FUserSession $userSession);
 }

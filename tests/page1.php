@@ -32,10 +32,10 @@ session_start();
           $_SESSION['user'] = $user;
 
           $date = mktime(0, 0, 0, date("m"), date("d"), date("Y"));
-          $session = new FUserSession($date, $user);
-          echo "<p>Session current-date as timestamp: [", $session->getCurDate(), "]</p>";
-          echo "<p>Session current-date formatted: [", date("Y/m/d h:i:s a", $session->getCurDate()), "]</p>";
-          $_SESSION['session'] = $session;
+          $userSession = new FUserSession($date, $user);
+          echo "<p>Session current-date as timestamp: [", $userSession->getCurDate(), "]</p>";
+          echo "<p>Session current-date formatted: [", date("Y/m/d h:i:s a", $userSession->getCurDate()), "]</p>";
+          $_SESSION['session'] = $userSession;
           ?>
           <p>
           <?php

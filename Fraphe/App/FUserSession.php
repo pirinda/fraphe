@@ -9,8 +9,9 @@ class FUserSession
     private $locTimeZone;
     private $curUser;
     private $curUserLoginTs;
+    private $pdo;
 
-    public function __construct(FUser $curUser, \DateTime $curUserLoginTs)
+    public function __construct(FUser $curUser, \DateTime $curUserLoginTs, \PDO $pdo)
     {
         $this->locLang = "es";
         $this->locCountry = "MEX";
@@ -18,6 +19,7 @@ class FUserSession
         $this->locTimeZone = "America/Mexico_City";
         $this->curUser = $curUser;
         $this->curUserLoginTs = $curUserLoginTs;
+        $this->pdo = $pdo;
     }
 
     public function getLocLang(): string
@@ -48,5 +50,10 @@ class FUserSession
     public function getCurUserLoginTs(): \DateTime
     {
         return $this->curUserLoginTs;
+    }
+
+    public function getPdo(): \PDO
+    {
+        return $this->pdo;
     }
 }

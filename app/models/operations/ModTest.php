@@ -27,9 +27,9 @@ class ModTest extends FRegistry
 
     protected $childProcessOpts;
 
-    function __construct(\PDO $connection)
+    function __construct()
     {
-        parent::__construct($connection, AppConsts::OC_TEST, "id_test");
+        parent::__construct(AppConsts::OC_TEST, "id_test");
 
         $this->id_test = new FItem(FItem::DATA_TYPE_INT, "id_test", "ID ensayo", false);
         $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", true);
@@ -81,21 +81,21 @@ class ModTest extends FRegistry
         return $this->childProcessOpts[] = $processOpt;
     }
 
-    public function validate()
+    public function validate(FUserSession $userSession)
     {
-        parent::validate();
+        parent::validate($userSession);
 
         foreach ($this->childProcessOpts as $processOpt) {
-            $processOpt->validate();
+            $processOpt->validate($userSession);
         }
     }
 
-    public function read(FUserSession $session, int $id, int $mode)
+    public function read(FUserSession $userSession, int $id, int $mode)
     {
         $this->initialize();
 
         $sql = "SELECT * FROM oc_test WHERE id_test = $id;";
-        $statement = $this->connection->query($sql);
+        $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->id = intval($row["id_test"]);
 
@@ -118,19 +118,19 @@ class ModTest extends FRegistry
             $this->isRegistryNew = false;
             $this->mode = $mode;
 
-            // create connection for reading children:
-            $connection = FGuiUtils::createConnection();
+            // create PDO connection for reading children:
+            $pdo = FGuiUtils::createPdo();
 
             // read child process options:
             $sql = "SELECT id_test, id_entity FROM oc_test_process_opt WHERE id_test = $this->id ORDER BY id_test, id_entity;";
-            $statement = $this->connection->query($sql);
+            $statement = $pdo->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                 $ids = array();
                 $ids["id_test"] = intval($row["id_test"]);
                 $ids["id_entity"] = intval($row["id_entity"]);
 
-                $processOpt = new ModTestProcessOpt($connection);
-                $processOpt->retrieve($session, $ids, $mode);
+                $processOpt = new ModTestProcessOpt();
+                $processOpt->retrieve($userSession, $ids, $mode);
                 $this->childProcessOpts[] = $processOpt;
             }
         }
@@ -139,14 +139,14 @@ class ModTest extends FRegistry
         }
     }
 
-    public function save(FUserSession $session)
+    public function save(FUserSession $userSession)
     {
-        $this->validate();
+        $this->validate($userSession);
 
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $this->connection->prepare("INSERT INTO oc_test (" .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO oc_test (" .
                 "id_test, " .
                 "name, " .
                 "code, " .
@@ -180,7 +180,7 @@ class ModTest extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $this->connection->prepare("UPDATE oc_test SET " .
+            $statement = $userSession->getPdo()->prepare("UPDATE oc_test SET " .
                 "name = :name, " .
                 "code = :code, " .
                 "sample_quantity = :sample_quantity, " .
@@ -214,7 +214,7 @@ class ModTest extends FRegistry
         //$ts_user_ins = $this->ts_user_ins->getValue();
         //$ts_user_upd = $this->ts_user_upd->getValue();
 
-        $fk_user = $session->getCurUser()->getId();
+        $fk_user = $userSession->getCurUser()->getId();
 
         //$statement->bindParam(":id_test", $id_test);
         $statement->bindParam(":name", $name);
@@ -242,7 +242,7 @@ class ModTest extends FRegistry
 
         $this->isRegistryModified = false;
         if ($this->isRegistryNew) {
-            $this->id = intval($this->connection->lastInsertId());
+            $this->id = intval($userSession->getPdo()->lastInsertId());
             $this->isRegistryNew = false;
         }
 
@@ -252,16 +252,16 @@ class ModTest extends FRegistry
             $ids["id_test"] = $this->id;
 
             $processOpt->setIds($ids);
-            $processOpt->save($session);
+            $processOpt->save($userSession);
         }
     }
 
-    public function delete(FUserSession $session)
+    public function delete(FUserSession $userSession)
     {
 
     }
 
-    public function undelete(FUserSession $session)
+    public function undelete(FUserSession $userSession)
     {
 
     }

@@ -44,8 +44,8 @@ echo '</tr>';
 echo '</thead>';
 echo '<tbody>';
 
-$connection = FGuiUtils::createConnection();
-foreach ($connection->query($sql) as $row) {
+$pdo = FGuiUtils::createPdo();
+foreach ($pdo->query($sql) as $row) {
     echo '<tr>';
     echo '<td>' . $row['c_code'] . '</td>';
     echo '<td class="small">' . $row['ui_name'] . '</td>';

@@ -28,8 +28,7 @@ echo '<body>';
 echo FAppNavbar::compose("catalogs");
 
 $userSession = FGuiUtils::createUserSession();
-$connection = FGuiUtils::createConnection();
-$registry = new ModEntity($connection);
+$registry = new ModEntity();
 $errmsg = "";
 $entityClass = ModUtils::ENTITY_CLASS_CUST;     // 1=company; 2=customer; 3=provider
 $entityNature = ModUtils::ENTITY_NATURE_PER;    // 1=person; 2=organization
@@ -100,7 +99,6 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
         try {
             $registry->setData($data);
-            $registry->validate();
             $registry->save($userSession);
             header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/catalogs/view_entity.php?class=$entityClass");
         }
@@ -223,7 +221,7 @@ echo '<div class="form-group">';
 echo '<label class="control-label col-sm-2 input-sm" for="nk_market_segment">' . $registry->getItem("nk_market_segment")->getName() . ': *</label>';
 echo '<div class="col-sm-10">';
 echo '<select class="form-control input-sm" name="nk_market_segment">';
-foreach (AppUtils::getSelectOptions($connection, AppConsts::CC_MARKET_SEGMENT, $registry->getDatum("nk_market_segment")) as $option) {
+foreach (AppUtils::getSelectOptions($userSession, AppConsts::CC_MARKET_SEGMENT, $registry->getDatum("nk_market_segment")) as $option) {
     echo $option;
 }
 echo '</select>';
@@ -234,7 +232,7 @@ echo '<div class="form-group">';
 echo '<label class="control-label col-sm-2 input-sm" for="nk_report_delivery_opt">' . $registry->getItem("nk_report_delivery_opt")->getName() . ': *</label>';
 echo '<div class="col-sm-10">';
 echo '<select class="form-control input-sm" name="nk_report_delivery_opt">';
-foreach (AppUtils::getSelectOptions($connection, AppConsts::OC_REPORT_DELIVERY_OPT, $registry->getDatum("nk_report_delivery_opt")) as $option) {
+foreach (AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $registry->getDatum("nk_report_delivery_opt")) as $option) {
     echo $option;
 }
 echo '</select>';
@@ -255,7 +253,7 @@ if (!$registry->isRegistryNew()) {
 $childProcessOpt;
 
 if (empty($registry->getChildProcessOpts())) {
-    $childProcessOpt = new ModTestProcessOpt($connection);
+    $childProcessOpt = new ModTestProcessOpt();
     $data = array();
     $data["is_default"] = true;
     $childProcessOpt->setData($data);
