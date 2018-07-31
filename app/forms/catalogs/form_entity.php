@@ -81,9 +81,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         //$data["billing_prefs"] = $_POST["billing_prefs"];
         $data["web_page"] = $_POST["web_page"];
         $data["notes"] = $_POST["notes"];
-        if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
-            $data["apply_report_images"] = $_POST["apply_report_images"];
-        }
+        $data["apply_report_images"] = empty($_POST["apply_report_images"]) ? false : intval($_POST["apply_report_images"]) == 1;
         //$data["is_system"] = $_POST["is_system"];
         //$data["is_deleted"] = $_POST["is_deleted"];
         $data["fk_entity_class"] = $entityClass;
@@ -99,7 +97,11 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         }
 
         try {
+            echo '<hr><h3>Antes</h3>';
+            var_dump($registry);
+            echo '<hr><h3>Después</h3>';
             $registry->setData($data);
+            var_dump($registry);
             $registry->save($userSession);
             header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/catalogs/view_entity.php?class=$entityClass");
         }
@@ -143,22 +145,23 @@ echo '<div class="row">';
 
 echo '<div class="col-sm-6">';
 
-echo $registry->getItem("code")->composeHtmlFormGroup(FItem::INPUT_TEXT, 4, 4);
-echo $registry->getItem("fiscal_id")->composeHtmlFormGroup(FItem::INPUT_TEXT, 4, 6);
+echo $registry->getItem("code")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4);
+echo $registry->getItem("fiscal_id")->composeHtmlInput(FItem::INPUT_TEXT, 4, 6);
 
 if ($entityNature == ModUtils::ENTITY_NATURE_PER) {
     // person:
-    echo $registry->getItem("surname")->composeHtmlFormGroup(FItem::INPUT_TEXT, 4, 8);
-    echo $registry->getItem("forename")->composeHtmlFormGroup(FItem::INPUT_TEXT, 4, 8);
-    echo $registry->getItem("prefix")->composeHtmlFormGroup(FItem::INPUT_TEXT, 4, 4);
+    echo $registry->getItem("surname")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
+    echo $registry->getItem("forename")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
+    echo $registry->getItem("prefix")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4);
 }
 else {
     // organization:
-    echo $registry->getItem("name")->composeHtmlFormGroup(FItem::INPUT_TEXT, 4, 8);
+    echo $registry->getItem("name")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
 }
 
-echo $registry->getItem("alias")->composeHtmlFormGroup(FItem::INPUT_TEXT, 4, 8);
-
+echo $registry->getItem("alias")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
+echo $registry->getItem("apply_credit")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 8);
+/*
 echo '<div class="form-group">';
 echo '<div class="col-sm-4">';
 echo '<div class="checkbox">';
@@ -166,62 +169,23 @@ echo '<label><input type="checkbox" name="apply_credit" value="1"' . ($registry-
 echo '</div>';
 echo '</div>';
 echo '</div>';
+*/
+echo $registry->getItem("credit_days")->composeHtmlInput(FItem::INPUT_NUMBER, 4, 4);
+echo $registry->getItem("web_page")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
+echo $registry->getItem("notes")->composeHtmlTextArea(4, 8, 1);
 
-echo '<div class="form-group">';
-echo '<div class="col-sm-4">';
-echo '<label class="control-label" for="credit_days">' . $registry->getItem("credit_days")->getName() . ':</label>';
-echo '</div>';
-echo '<div class="col-sm-4">';
-echo '<input type="text" class="form-control input-sm" name="credit_days" value="' . $registry->getDatum("credit_days") . '">';
-echo '</div>';
-echo '</div>';
+$options = AppUtils::getSelectOptions($userSession, AppConsts::CC_MARKET_SEGMENT, $registry->getDatum("nk_market_segment"));
+echo $registry->getItem("nk_market_segment")->composeHtmlSelect($options, 4, 8);
 
-echo $registry->getItem("web_page")->composeHtmlFormGroup(FItem::INPUT_TEXT, 4, 8);
+$options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $registry->getDatum("nk_report_delivery_opt"));
+echo $registry->getItem("nk_report_delivery_opt")->composeHtmlSelect($options, 4, 8);
 
-echo '<div class="form-group">';
-echo '<div class="col-sm-4">';
-echo '<label class="control-label" for="notes">' . $registry->getItem("notes")->getName() . ':</label>';
-echo '</div>';
-echo '<div class="col-sm-8">';
-echo '<textarea class="form-control input-sm" name="notes" rows="1">' . $registry->getDatum("notes") . '</textarea>';
-echo '</div>';
-echo '</div>';
-
-echo '<div class="form-group">';
-echo '<div class="col-sm-4">';
-echo '<label class="control-label" for="nk_market_segment">' . $registry->getItem("nk_market_segment")->getName() . ': *</label>';
-echo '</div>';
-echo '<div class="col-sm-8">';
-echo '<select class="form-control input-sm" name="nk_market_segment">';
-foreach (AppUtils::getSelectOptions($userSession, AppConsts::CC_MARKET_SEGMENT, $registry->getDatum("nk_market_segment")) as $option) {
-    echo $option;
+if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
+    echo $registry->getItem("apply_report_images")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 8);
 }
-echo '</select>';
-echo '</div>';
-echo '</div>';
-
-echo '<div class="form-group">';
-echo '<div class="col-sm-4">';
-echo '<label class="control-label" for="nk_report_delivery_opt">' . $registry->getItem("nk_report_delivery_opt")->getName() . ': *</label>';
-echo '</div>';
-echo '<div class="col-sm-8">';
-echo '<select class="form-control input-sm" name="nk_report_delivery_opt">';
-foreach (AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $registry->getDatum("nk_report_delivery_opt")) as $option) {
-    echo $option;
-}
-echo '</select>';
-echo '</div>';
-echo '</div>';
 
 if (!$registry->isRegistryNew()) {
-    echo '<div class="form-group">';
-    echo '<div class="col-sm-4">';
-    echo '<label class="control-label" for="' . FRegistry::ID . '">' . $registry->getItem("id_entity")->getName() . ':</label>';
-    echo '</div>';
-    echo '<div class="col-sm-4">';
-    echo '<input type="text" class="form-control input-sm" name="' . FRegistry::ID . '" value="' . $registry->getId() . '" readonly>';
-    echo '</div>';
-    echo '</div>';
+    echo $registry->getItem("id_entity")->composeHtmlInput(FItem::INPUT_NUMBER, 4, 4);
 }
 
 echo '</div>';

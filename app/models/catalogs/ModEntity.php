@@ -46,23 +46,23 @@ class ModEntity extends FRegistry
     {
         parent::__construct(AppConsts::CC_ENTITY, "id_entity");
 
-        $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", "", false);
+        $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", "", false, true);
         $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", "", true);
         $this->code = new FItem(FItem::DATA_TYPE_STRING, "code", "Código", "", true);
-        $this->alias = new FItem(FItem::DATA_TYPE_STRING, "alias", "Alias", "nombre comercial", true);
-        $this->prefix = new FItem(FItem::DATA_TYPE_STRING, "prefix", "Prefijo", "Sr., Lic., Ing.", true);
-        $this->surname = new FItem(FItem::DATA_TYPE_STRING, "surname", "Apellidos", "", true);
-        $this->forename = new FItem(FItem::DATA_TYPE_STRING, "forename", "Nombres", "", true);
+        $this->alias = new FItem(FItem::DATA_TYPE_STRING, "alias", "Alias", "nombre comercial", false);
+        $this->prefix = new FItem(FItem::DATA_TYPE_STRING, "prefix", "Prefijo", "Sr., Lic., Ing.", false);
+        $this->surname = new FItem(FItem::DATA_TYPE_STRING, "surname", "Apellidos", "", false);
+        $this->forename = new FItem(FItem::DATA_TYPE_STRING, "forename", "Nombres", "", false);
         $this->fiscal_id = new FItem(FItem::DATA_TYPE_STRING, "fiscal_id", "ID fiscal", "RFC", true);
-        $this->is_person = new FItem(FItem::DATA_TYPE_BOOL, "is_person", "Es persona", "", true);
-        $this->apply_credit = new FItem(FItem::DATA_TYPE_BOOL, "apply_credit", "Aplica crédito", "", true);
+        $this->is_person = new FItem(FItem::DATA_TYPE_BOOL, "is_person", "Es persona", "", false);
+        $this->apply_credit = new FItem(FItem::DATA_TYPE_BOOL, "apply_credit", "Aplica crédito", "", false);
         $this->credit_days = new FItem(FItem::DATA_TYPE_INT, "credit_days", "Días crédito", "", false);
-        $this->billing_prefs = new FItem(FItem::DATA_TYPE_STRING, "billing_prefs", "Preferencias facturación", "", true);
-        $this->web_page = new FItem(FItem::DATA_TYPE_STRING, "web_page", "Sitio web", "", true);
-        $this->notes = new FItem(FItem::DATA_TYPE_STRING, "notes", "Notas", "", true);
-        $this->apply_report_images = new FItem(FItem::DATA_TYPE_BOOL, "apply_report_images", "Aplican imágenes IR", "", true);
-        $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", true);
-        $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", true);
+        $this->billing_prefs = new FItem(FItem::DATA_TYPE_STRING, "billing_prefs", "Preferencias facturación", "", false);
+        $this->web_page = new FItem(FItem::DATA_TYPE_STRING, "web_page", "Sitio web", "", false);
+        $this->notes = new FItem(FItem::DATA_TYPE_STRING, "notes", "Notas", "", false);
+        $this->apply_report_images = new FItem(FItem::DATA_TYPE_BOOL, "apply_report_images", "Aplican imágenes IR", "", false);
+        $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
+        $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
         $this->fk_entity_class = new FItem(FItem::DATA_TYPE_INT, "fk_entity_class", "Clase entidad", "", true);
         $this->nk_market_segment = new FItem(FItem::DATA_TYPE_INT, "nk_market_segment", "Segmento mercado", "", false);
         $this->nk_entity_parent = new FItem(FItem::DATA_TYPE_INT, "nk_entity_parent", "Entidad padre", "", false);
@@ -104,9 +104,9 @@ class ModEntity extends FRegistry
         $this->items["ts_user_ins"] = $this->ts_user_ins;
         $this->items["ts_user_upd"] = $this->ts_user_upd;
 
-        $this->name->setRangeLength(0, 201);
+        $this->name->setRangeLength(1, 201);
         $this->code->setRangeLength(1, 25);
-        $this->alias->setRangeLength(1, 100);
+        $this->alias->setRangeLength(0, 100);
         $this->prefix->setRangeLength(0, 25);
         $this->surname->setRangeLength(0, 100);
         $this->forename->setRangeLength(0, 100);

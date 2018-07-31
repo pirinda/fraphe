@@ -30,12 +30,13 @@ class FItem
     protected $default;
     protected $canBeNull;
     protected $canBeEmpty;
+    protected $isPk;
     protected $valueMin;
     protected $valueMax;
     protected $lengthMin;
     protected $lengthMax;
 
-    function __construct(int $dataType, string $key, string $name, string $hint, bool $mandatory)
+    function __construct(int $dataType, string $key, string $name, string $hint, bool $mandatory, bool $isPk = false)
     {
         $this->dataType = $dataType;
         $this->key = $key;
@@ -45,6 +46,7 @@ class FItem
         $this->default = $this->value;
         $this->canBeNull = !$mandatory;
         $this->canBeEmpty = !$mandatory;
+        $this->isPk = $isPk;
     }
 
     public static function produceDefault(int $dataType)
@@ -143,6 +145,11 @@ class FItem
     public function canBeEmpty(): bool
     {
         return $this->canBeEmpty;
+    }
+
+    public function isPk(): bool
+    {
+        return $this->isPk;
     }
 
     public function getValueMin()
@@ -260,7 +267,7 @@ class FItem
         }
     }
 
-    public function composeHtmlFormGroup(int $type, int $lengthLabel, int $lengthInput): string
+    public function composeHtmlInput(int $type, int $lengthLabel, int $lengthInput): string
     {
         $html = '';
         $required = ($this->canBeEmpty ? '' : ' required');
@@ -272,7 +279,7 @@ class FItem
 
                 $html .= '<div class="form-group">';
                 $html .= '<div class="col-sm-' . $lengthLabel . '">';
-                $html .= '<label class="control-label" for="' . $this->key . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
+                $html .= '<label class="control-label small" for="' . $this->key . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
                 $html .= '</div>';
                 $html .= '<div class="col-sm-' . $lengthInput . '">';
                 $html .= '<input type="text" class="form-control input-sm" name="' . $this->key . '" value="' . $this->value . '"' . $required . $placeholder . $maxLength . '>';
@@ -281,12 +288,32 @@ class FItem
                 break;
 
             case self::INPUT_NUMBER:
+                $readonly = ($this->isPk ? ' readonly' : '');
+                $placeholder = ' placeholder="' . $this->name . (empty($this->hint) ? '' : ' (' . $this->hint . ')') . '"';
+                $min = ' min="' . $this->valueMin . '"';
+                $max = $this->valueMin == $this->valueMax ? '' : ' max="' . $this->valueMax . '"';
+
+                $html .= '<div class="form-group">';
+                $html .= '<div class="col-sm-' . $lengthLabel . '">';
+                $html .= '<label class="control-label small" for="' . ($this->isPk ? FRegistry::ID : $this->key) . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
+                $html .= '</div>';
+                $html .= '<div class="col-sm-' . $lengthInput . '">';
+                $html .= '<input type="number" class="form-control input-sm" name="' . ($this->isPk ? FRegistry::ID : $this->key) . '" value="' . $this->value . '"' . $required . $readonly . $placeholder . $min . $max . '>';
+                $html .= '</div>';
+                $html .= '</div>';
                 break;
 
             case self::INPUT_RADIO:
                 break;
 
             case self::INPUT_CHECKBOX:
+                $html .= '<div class="form-group">';
+                $html .= '<div class="col-sm-offset-' . $lengthLabel . ' col-sm-' . $lengthInput . '">';
+                $html .= '<div class="checkbox">';
+                $html .= '<label class="small"><input type="checkbox" name="' . $this->key . '" value="1"' . ($this->value ? " checked" : "") . '>' . $this->name . '</label>';
+                $html .= '</div>';
+                $html .= '</div>';
+                $html .= '</div>';
                 break;
 
             case self::INPUT_DATE:
@@ -307,7 +334,46 @@ class FItem
             default:
         }
 
+        return $html;
+    }
 
+    public function composeHtmlTextArea(int $lengthLabel, int $lengthInput, int $rows): string
+    {
+        $html = '';
+        $required = ($this->canBeEmpty ? '' : ' required');
+
+        $placeholder = ' placeholder="' . $this->name . (empty($this->hint) ? '' : ' (' . $this->hint . ')') . '"';
+        $maxLength = ' maxlength="' . $this->lengthMax . '"';
+
+        $html .= '<div class="form-group">';
+        $html .= '<div class="col-sm-' . $lengthLabel . '">';
+        $html .= '<label class="control-label small" for="' . $this->key . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
+        $html .= '</div>';
+        $html .= '<div class="col-sm-' . $lengthInput . '">';
+        $html .= '<textarea class="form-control input-sm" name="' . $this->key . '" rows="' . $rows . '"' . $required . $placeholder . $maxLength . '>' . $this->value . '</textarea>';
+        $html .= '</div>';
+        $html .= '</div>';
+
+        return $html;
+    }
+
+    public function composeHtmlSelect(array $options, int $lengthLabel, int $lengthInput): string
+    {
+        $html = '';
+        $required = ($this->canBeEmpty ? '' : ' required');
+
+        $html .= '<div class="form-group">';
+        $html .= '<div class="col-sm-' . $lengthLabel . '">';
+        $html .= '<label class="control-label small" for="' . $this->key . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
+        $html .= '</div>';
+        $html .= '<div class="col-sm-' . $lengthInput . '">';
+        $html .= '<select class="form-control input-sm" name="' . $this->key . '">';
+        foreach ($options as $option) {
+            $html .= $option;
+        }
+        $html .= '</select>';
+        $html .= '</div>';
+        $html .= '</div>';
 
         return $html;
     }
