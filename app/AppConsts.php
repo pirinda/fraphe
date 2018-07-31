@@ -114,4 +114,60 @@ abstract class AppConsts
         self::O_JOB_TEST => "o_job_test",
         self::O_JOB_STATUS_LOG => "o_job_status_log",
     );
+
+    public static $tableIds = array(
+        self::CC_CONFIG_SETTING => "id_config_setting",
+        self::CC_COMPANY => "id_company",
+        self::CC_COMPANY_BRANCH => "id_company_branch",
+        self::CC_USER_TYPE => "id_user_type",
+        self::CC_USER_ROLE => "id_user_role",
+        self::CC_USER_ATTRIB => "id_user_attrib",
+        self::CC_USER_JOB => "id_user_job",
+        self::CC_USER => "id_user",
+        //
+        //
+        self::CC_MARKET_SEGMENT => "id_market_segment",
+        self::CC_ENTITY_CLASS => "id_entity_class",
+        self::CC_ENTITY_TYPE => "id_entity_type",
+        self::CC_ENTITY => "id_entity",
+        //
+        self::CC_ENTITY_ADDRESS => "id_entity_address",
+        self::CC_CONTACT_TYPE => "id_contact_type",
+        self::CC_CONTACT => "id_contact",
+
+        self::OC_PROCESS_AREA => "id_process_area",
+        self::OC_SAMPLE_CLASS => "id_sample_class",
+        self::OC_SAMPLE_TYPE => "id_sample_type",
+        self::OC_SAMPLE_STATUS => "id_sample_status",
+        self::OC_SAMPLING_EQUIPT_TYPE => "id_sampling_equipt_type",
+        self::OC_SAMPLING_EQUIPT => "id_sampling_equipt",
+        self::OC_SAMPLING_METHOD => "id_sampling_method",
+        self::OC_TESTING_METHOD => "id_testing_method",
+        self::OC_TEST_ACREDIT_ATTRIB => "id_test_acredit_attrib",
+        self::OC_TEST => "id_test",
+        //
+        self::OC_TEST_PROFILE => "id_test_profile",
+        //
+        self::OC_TEST_PACKAGE => "id_test_package",
+        //
+        //
+        self::OC_CONTAINER_TYPE => "id_container_type",
+        self::OC_CONTAINER_UNIT => "id_container_unit",
+        self::OC_REPORT_DELIVERY_OPT => "id_report_delivery_opt",
+        self::OC_REPORT_REISSUE_REASON => "id_report_reissue_reason",
+        self::OC_RESULT_UNIT => "id_result_unit",
+        self::OC_RESULT_UNIT_VALUE => "id_result_unit_value",
+        self::OC_RESULT_PERMISS_LIMIT => "id_result_permiss_limit",
+        self::OC_SAMPLING_NOTE => "id_sampling_note",
+        self::OC_TESTING_NOTE => "id_testing_note",
+        self::OC_JOB_STATUS => "id_job_status",
+        
+        self::O_SAMPLE => "id_sample",
+        //
+        self::O_SAMPLE_STATUS_LOG => "id_sample_status_log",
+        self::O_RECEPT => "id_recept",
+        self::O_JOB => "id_job",
+        //
+        self::O_JOB_STATUS_LOG => "id_job_status_log",
+    );
 }

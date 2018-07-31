@@ -77,7 +77,7 @@ abstract class FGuiUtils
                                                                             break;
 
                                                                         default:
-                                                                            throw new Exception("Unknown " . SGuiModule::JSON_MOD . "/" . SGuiModule::JSON_MENU . "/" . SGuiModule::JSON_SUBMENU . " attribute '$submenuAttKey'!");
+                                                                            throw new \Exception("Unknown " . SGuiModule::JSON_MOD . "/" . SGuiModule::JSON_MENU . "/" . SGuiModule::JSON_SUBMENU . " attribute '$submenuAttKey'!");
                                                                     }
                                                                 }
 
@@ -88,7 +88,7 @@ abstract class FGuiUtils
                                                     break;
 
                                                 default:
-                                                    throw new Exception("Unknown " . SGuiModule::JSON_MOD . "/" . SGuiModule::JSON_MENU . " attribute '$menuAttKey'!");
+                                                    throw new \Exception("Unknown " . SGuiModule::JSON_MOD . "/" . SGuiModule::JSON_MENU . " attribute '$menuAttKey'!");
                                             }
                                         }
 
@@ -99,7 +99,7 @@ abstract class FGuiUtils
                             break;
 
                         default:
-                            throw new Exception("Unknown " . SGuiModule::JSON_MOD . " attribute '$moduleAttKey'!");
+                            throw new \Exception("Unknown " . SGuiModule::JSON_MOD . " attribute '$moduleAttKey'!");
                     }
                 }
 

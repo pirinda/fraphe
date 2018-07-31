@@ -36,7 +36,7 @@ class ModEntityAddress extends FRegistry
 
     function __construct()
     {
-        parent::__construct(AppConsts::CC_ENTITY_ADDRESS, "id_entity_address");
+        parent::__construct(AppConsts::CC_ENTITY_ADDRESS, AppConsts::$tableIds[AppConsts::CC_ENTITY_ADDRESS]);
 
         $this->id_entity_address = new FItem(FItem::DATA_TYPE_INT, "id_entity_address", "ID domicilio", "", false);
         $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", "", true);
@@ -123,7 +123,7 @@ class ModEntityAddress extends FRegistry
         $sql = "SELECT * FROM cc_entity_address WHERE id_entity_address = $id;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->id = $row["id_entity_address"];
+            $this->id = intval($row["id_entity_address"]);
 
             $this->id_entity_address->setValue($row["id_entity_address"]);
             $this->name->setValue($row["name"]);

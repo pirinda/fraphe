@@ -16,6 +16,7 @@ use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
 use app\AppUtils;
+use app\models\ModConsts;
 use app\models\ModUtils;
 use app\models\catalogs\ModEntity;
 use app\models\catalogs\ModEntityEntityType;
@@ -31,34 +32,59 @@ echo FAppNavbar::compose("catalogs");
 $userSession = FGuiUtils::createUserSession();
 $registry = new ModEntity();
 $errmsg = "";
-$entityClass = ModUtils::ENTITY_CLASS_CUST;     // 1=company; 2=customer; 3=provider
-$entityNature = ModUtils::ENTITY_NATURE_PER;    // 1=person; 2=organization
+$entityClass = 0;   // ModUtils::ENTITY_CLASS_...: 1=company; 2=customer; 3=provider
+$entityNature = 0;  // ModUtils::ENTITY_NATURE_...: 1=person; 2=organization
+$entityTypes;
 
 switch ($_SERVER["REQUEST_METHOD"]) {
     case "GET":
-        if (!empty($_GET[FRegistry::ID])) {
-            $registry->read($userSession, intval($_GET[FRegistry::ID]), FRegistry::MODE_WRITE);
-            $entityNature = $registry->getDatum("is_person") ? ModUtils::ENTITY_NATURE_PER : ModUtils::ENTITY_NATURE_ORG;
-        }
+        // retrieve entity class and nature (if provided):
+
         if (!empty($_GET["class"])) {
             $entityClass = intval($_GET["class"]);
+            $entityTypes = ModEntity::createEntityTypes($entityClass);
         }
         if (!empty($_GET["nature"])) {
             $entityNature = intval($_GET["nature"]);
         }
+
+        // retrieve registry:
+
+        if (!empty($_GET[FRegistry::ID])) {
+            // registry modification:
+            $registry->read($userSession, intval($_GET[FRegistry::ID]), FRegistry::MODE_WRITE);
+            $entityClass = $registry->getDatum("fk_entity_class");
+            $entityNature = $registry->getDatum("is_person") ? ModUtils::ENTITY_NATURE_PER : ModUtils::ENTITY_NATURE_ORG;
+            if (!isset($entityTypes)) {
+                $entityTypes = ModEntity::createEntityTypes($entityClass);
+            }
+        }
+        else {
+            // registry creation:
+            $data = array();
+            $data["fk_entity_class"] = $entityClass;
+            $data["is_person"] = $entityNature == ModUtils::ENTITY_NATURE_PER;
+            $registry->setData($data);  // tailor registry
+        }
         break;
 
     case "POST":
+        // retrieve entity class and nature (must be provided):
+
+        if (!empty($_POST["class"])) {
+            $entityClass = intval($_POST["class"]);
+            $entityTypes = ModEntity::createEntityTypes($entityClass);
+        }
+        if (!empty($_POST["nature"])) {
+            $entityNature = intval($_POST["nature"]);
+        }
+
+        // retrieve registry data:
+
         $data = array();
 
         if (!empty($_POST[FRegistry::ID])) {
             $data["id_entity"] = intval($_POST[FRegistry::ID]);
-        }
-        if (!empty($_POST["class"])) {
-            $entityClass = intval($_POST["class"]);
-        }
-        if (!empty($_POST["nature"])) {
-            $entityNature = intval($_POST["nature"]);
         }
 
         if ($entityNature == ModUtils::ENTITY_NATURE_ORG) {
@@ -86,22 +112,23 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         //$data["is_deleted"] = $_POST["is_deleted"];
         $data["fk_entity_class"] = $entityClass;
         if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
-            $data["nk_market_segment"] = intval($_POST["nk_market_segment"]);
-        }
-        //$data["nk_entity_parent"] = $_POST["nk_entity_parent"];
-        //$data["nk_entity_billing"] = $_POST["nk_entity_billing"];
-        if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
+            $data["nk_market_segment"] = $_POST["nk_market_segment"];
+            //$data["nk_entity_parent"] = $_POST["nk_entity_parent"];
+            //$data["nk_entity_billing"] = $_POST["nk_entity_billing"];
             //$data["nk_entity_agent"] = $_POST["nk_entity_agent"];
             //$data["nk_user_agent"] = $_POST["nk_user_agent"];
-            $data["nk_report_delivery_opt"] = intval($_POST["nk_report_delivery_opt"]);
+            $data["nk_report_delivery_opt"] = $_POST["nk_report_delivery_opt"];
+        }
+
+        $registry->clearChildEntityTypes();
+        foreach ($entityTypes as $entityType) {
+            if (!empty($_POST["entity_type_$entityType"]) && intval($_POST["entity_type_$entityType"]) == 1) {
+                $registry->addChildEntityType($entityType);
+            }
         }
 
         try {
-            echo '<hr><h3>Antes</h3>';
-            var_dump($registry);
-            echo '<hr><h3>Después</h3>';
             $registry->setData($data);
-            var_dump($registry);
             $registry->save($userSession);
             header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/catalogs/view_entity.php?class=$entityClass");
         }
@@ -144,6 +171,9 @@ echo '<div class="row">';
 // main section at the left:
 
 echo '<div class="col-sm-6">';
+echo '<div class="panel panel-default">';
+echo '<div class="panel-heading">Datos generales</div>';
+echo '<div class="panel-body">';
 
 echo $registry->getItem("code")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4);
 echo $registry->getItem("fiscal_id")->composeHtmlInput(FItem::INPUT_TEXT, 4, 6);
@@ -184,17 +214,40 @@ if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
     echo $registry->getItem("apply_report_images")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 8);
 }
 
+// render checkboxes of entity types in 4 rows of 3 columnes each:
+$index = 0;
+for ($row = 0; $row < 3; $row++) {
+    echo '<div class="row">';
+    for ($col = 0; $col < 3; $col++) {
+        echo '<div class="col-sm-4">';
+        echo '<label class="checkbox-inline small"><input type="checkbox" name="entity_type_' . $entityTypes[$index] . '" value="1"' . ($registry->isChildEntityType($entityTypes[$index]) ? ' checked' : '') . '>' .
+        AppUtils::getName($userSession, AppConsts::CC_ENTITY_TYPE, $entityTypes[$index]) . '</label>';
+        echo '</div>';
+        $index++;
+    }
+    echo '</div>';
+}
+
 if (!$registry->isRegistryNew()) {
+    echo '<br>';
     echo $registry->getItem("id_entity")->composeHtmlInput(FItem::INPUT_NUMBER, 4, 4);
 }
 
-echo '</div>';
+echo '</div>';  //echo '<div class="panel-body">';
+echo '</div>';  //echo '<div class="panel panel-default">';
+echo '</div>';  //echo '<div class="col-sm-6">';
 
 // main section at the right:
 
 echo '<div class="col-sm-6">';
-echo '</div>';
-echo '</div>';
+echo '<div class="panel panel-default">';
+echo '<div class="panel-heading">Domicilio</div>';
+echo '<div class="panel-body">';
+echo '</div>';  //echo '<div class="panel-body">';
+echo '</div>';  //echo '<div class="panel panel-default">';
+echo '</div>';  //echo '<div class="col-sm-6">';
+
+echo '</div>';  // echo '<div class="row">';
 
 /*
 // child test process options:
@@ -226,11 +279,12 @@ echo '<label><input type="checkbox" name="po_is_default" value="1"' . ($childPro
 echo '</div>';
 */
 
-echo '<br><button type="submit" class="btn btn-sm btn-primary">Guardar</button>';
-echo '&nbsp;<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/catalogs/view_entity.php?class=' . $entityClass . '" class="btn btn-sm btn-danger" role="button">Cancelar</a>';
+echo '<br>';
+echo '<button type="submit" class="btn btn-sm btn-primary">Guardar</button>&nbsp;';
+echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/catalogs/view_entity.php?class=' . $entityClass . '" class="btn btn-sm btn-danger" role="button">Cancelar</a>';
 
 echo '</form>';
-echo '</div>';
+echo '</div>';  // echo '<div class="container" style="margin-top:50px">';
 
 echo FApp::composeFooter();
 echo '</body>';

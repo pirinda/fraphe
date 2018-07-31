@@ -6,6 +6,7 @@ use Fraphe\App\FUserSession;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
+use app\models\ModConsts;
 use app\models\ModUtils;
 
 class ModEntity extends FRegistry
@@ -44,7 +45,7 @@ class ModEntity extends FRegistry
 
     function __construct()
     {
-        parent::__construct(AppConsts::CC_ENTITY, "id_entity");
+        parent::__construct(AppConsts::CC_ENTITY, AppConsts::$tableIds[AppConsts::CC_ENTITY]);
 
         $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", "", false, true);
         $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", "", true);
@@ -130,41 +131,87 @@ class ModEntity extends FRegistry
         return $this->childAddresses;
     }
 
-    public function validate(FUserSession $userSession)
+    public function clearChildEntityTypes()
     {
-        if ($this->is_person->getValue()) {
-            // is person:
-            $this->name->setMandatory(false);
-            $this->surname->setMandatory(true);
-            $this->forename->setMandatory(true);
-        }
-        else {
-            // is organization:
-            $this->name->setMandatory(true);
-            $this->surname->setMandatory(false);
-            $this->forename->setMandatory(false);
+        $this->childEntityTypes = array();
+    }
+
+    public function clearChildAddresses()
+    {
+        $this->childAddresses = array();
+    }
+
+    public function isChildEntityType(int $entityType): bool
+    {
+        $exists = false;
+
+        foreach ($this->childEntityTypes as $child) {
+            if ($child->getDatum("id_entity_type") == $entityType) {
+                $exists = true;
+                break;
+            }
         }
 
+        return $exists;
+    }
+
+    public function addChildEntityType(int $entityType): bool
+    {
+        $exists = $this->isChildEntityType($entityType);
+
+        if (!$exists) {
+            $data = array();
+            $data["id_entity"] = $this->id;
+            $data["id_entity_type"] = $entityType;
+            $child = new ModEntityEntityType();
+            $child->setData($data);
+            $this->childEntityTypes[] = $child;
+        }
+
+        return !$exists;
+    }
+
+    public function tailor()
+    {
+        // validate entity class and is-person flag:
+        $this->fk_entity_class->validate();
+        $this->is_person->validate();
+
+        // tailor foreign keys according to entity class:
         $isCustomer = $this->fk_entity_class->getValue() == ModUtils::ENTITY_CLASS_CUST;
         $this->nk_market_segment->setMandatory($isCustomer);
         $this->nk_report_delivery_opt->setMandatory($isCustomer);
 
-        // validte data:
+        // tailor surename and forename according to is-person flag:
+        $isPerson = $this->is_person->getValue();
+        $lengthMin = $isPerson ? 1 : 0;
+        $this->surname->setMandatory($isPerson);
+        $this->surname->setLengthMin($lengthMin);
+        $this->forename->setMandatory($isPerson);
+        $this->forename->setLengthMin($lengthMin);
+    }
+
+    public function validate(FUserSession $userSession)
+    {
+        // compute data:
+
+        if ($this->is_person->getValue()) {
+            $this->name->setValue(trim($this->surname->getValue() . ' ' . $this->forename->getValue()));
+        }
+
+        // validate registry:
+
         parent::validate($userSession);
 
         foreach ($this->childEntityTypes as $entityType) {
+            $ids = array();
+            $ids["id_entity"] = $this->isRegistryNew ? -1 : $this->id; // bypass validation
+            $entityType->setIds($ids);
             $entityType->validate($userSession);
         }
 
         foreach ($this->childAddresses as $address) {
             $address->validate($userSession);
-        }
-
-        // final processing of data:
-
-        if ($this->is_person->getValue()) {
-            // is person:
-            $this->name->setValue($this->surname->getValue() . ' ' . $this->forename->getValue());
         }
     }
 
@@ -175,7 +222,7 @@ class ModEntity extends FRegistry
         $sql = "SELECT * FROM cc_entity WHERE id_entity = $id;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->id = $row["id_entity"];
+            $this->id = intval($row["id_entity"]);
 
             $this->id_entity->setValue($row["id_entity"]);
             $this->name->setValue($row["name"]);
@@ -217,8 +264,8 @@ class ModEntity extends FRegistry
             $statement = $pdo->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                 $ids = array();
-                $ids["id_entity"] = $row["id_entity"];
-                $ids["id_entity_type"] = $row["id_entity_type"];
+                $ids["id_entity"] = intval($row["id_entity"]);
+                $ids["id_entity_type"] = intval($row["id_entity_type"]);
 
                 $entityType = new ModEntityEntityType();
                 $entityType->retrieve($userSession, $ids, $mode);
@@ -230,13 +277,15 @@ class ModEntity extends FRegistry
             $statement = $pdo->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                 $address = new ModEntityAddress();
-                $address->read($userSession, $row["id_entity_address"], $mode);
+                $address->read($userSession, intval($row["id_entity_address"]), $mode);
                 $this->childAddresses[] = $address;
             }
         }
         else {
             throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
         }
+
+        $this->tailor();    // tailor registry according to current data status and values
     }
 
     public function save(FUserSession $userSession)
@@ -470,5 +519,31 @@ class ModEntity extends FRegistry
     public function undelete(FUserSession $userSession)
     {
 
+    }
+
+    public static function createEntityTypes($entityClass): array
+    {
+        $types;
+
+        switch ($entityClass) {
+            case ModUtils::ENTITY_CLASS_CUST:
+                $types = array(
+                    ModConsts::CC_ENTITY_TYPE_CUST_CORP, ModConsts::CC_ENTITY_TYPE_CUST_ENT, ModConsts::CC_ENTITY_TYPE_CUST_HOSP,
+                    ModConsts::CC_ENTITY_TYPE_CUST_ASSUR, ModConsts::CC_ENTITY_TYPE_CUST_LAB, ModConsts::CC_ENTITY_TYPE_CUST_SPEC,
+                    ModConsts::CC_ENTITY_TYPE_CUST_SERV_FIN, ModConsts::CC_ENTITY_TYPE_CUST_SERV, ModConsts::CC_ENTITY_TYPE_CUST_CONS);
+                break;
+
+            case ModUtils::ENTITY_CLASS_PROV:
+                $types = array(
+                    ModConsts::CC_ENTITY_TYPE_PROV_CORP, ModConsts::CC_ENTITY_TYPE_PROV_ENT, ModConsts::CC_ENTITY_TYPE_PROV_HOSP,
+                    ModConsts::CC_ENTITY_TYPE_PROV_ASSUR, ModConsts::CC_ENTITY_TYPE_PROV_LAB, ModConsts::CC_ENTITY_TYPE_PROV_SPEC,
+                    ModConsts::CC_ENTITY_TYPE_PROV_SERV_FIN, ModConsts::CC_ENTITY_TYPE_PROV_SERV, ModConsts::CC_ENTITY_TYPE_PROV_CONS);
+                break;
+
+            default:
+                throw new \Exception(__METHOD__ . ": Opción desconocida.");
+        }
+
+        return $types;
     }
 }

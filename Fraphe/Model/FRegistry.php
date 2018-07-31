@@ -49,6 +49,15 @@ abstract class FRegistry
         }
     }
 
+    /* Tailors registry data items to full fill specific needs, according to its current state and values.
+     * Returns: nothing.
+     * Throws: Exception if expected data are not available.
+     */
+     public function tailor()
+     {
+
+     }
+
     /* Validates registry data.
      * Must be called at the begining of method save().
      * Returns: nothing.
@@ -109,6 +118,8 @@ abstract class FRegistry
         if (count($data) > 1) {
             $this->isRegistryModified = true;
         }
+
+        $this->tailor();    // tailor registry according to current data status and values
     }
 
     /* Gets registry data.

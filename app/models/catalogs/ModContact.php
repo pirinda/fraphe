@@ -30,7 +30,7 @@ class ModContact extends FRegistry
 
     function __construct()
     {
-        parent::__construct(AppConsts::CC_CONTACT, "id_contact");
+        parent::__construct(AppConsts::CC_CONTACT, AppConsts::$tableIds[AppConsts::CC_CONTACT]);
 
         $this->id_contact = new FItem(FItem::DATA_TYPE_INT, "id_contact", "ID contacto", "", false);
         $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", "", true);
@@ -89,7 +89,7 @@ class ModContact extends FRegistry
         $sql = "SELECT * FROM cc_contact WHERE id_contact = $id;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->id = $row["id_contact"];
+            $this->id = intval($row["id_contact"]);
 
             $this->id_contact->setValue($row["id_contact"]);
             $this->name->setValue($row["name"]);

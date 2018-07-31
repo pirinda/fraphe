@@ -1,14 +1,9 @@
 <?php
 namespace app\models;
 
-use Fraphe\App\FUserSession;
-use Fraphe\App\FGuiUtils;
-use Fraphe\Model\FItem;
-use Fraphe\Model\FRegistry;
-use app\AppConsts;
-
 abstract class ModUtils
 {
+    public const ENTITY_CLASS_COM = 1;      // company
     public const ENTITY_CLASS_CUST = 2;     // customer
     public const ENTITY_CLASS_PROV = 3;     // provider
 

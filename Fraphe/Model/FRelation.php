@@ -5,9 +5,9 @@ use Fraphe\App\FUserSession;
 
 abstract class FRelation extends FRegistry
 {
-    protected $ids; // associative array of int values
+    protected $ids; // associative array of relation IDs in the key=id format
 
-    /* Creates new base registry. Each field of registry must be contained in member array $items. Relation IDs are a subset of this registry items.
+    /* Creates new base registry. Each field of registry must be contained in member array $items. Relation IDs are a "subset" of this registry items.
      */
     public function __construct(int $registryType)
     {
@@ -89,7 +89,7 @@ abstract class FRelation extends FRegistry
         foreach ($ids as $key => $id) {
             $this->validateItemKey($key);
             if (!is_int($id)) {
-                throw new \Exception(__METHOD__ . ": El ID '$key' debe ser número entero: $id.");
+                throw new \Exception(__METHOD__ . ": El ID '$key' debe ser número entero: $id es '" . gettype($id) . "'.");
             }
         }
 
@@ -110,17 +110,6 @@ abstract class FRelation extends FRegistry
     public function getIds(): array
     {
         return $this->ids;
-    }
-
-    /* Gets relation ID.
-     * Param $key: key of required ID.
-     * Returns: required ID.
-     * Throws: Exception if something fails.
-     */
-    public function getRelationId($key): int
-    {
-        $this->validateItemKey($key);
-        return $this->ids[$key];
     }
 
     public function getId(): int

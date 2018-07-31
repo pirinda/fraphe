@@ -81,4 +81,14 @@ class ModEntityEntityType extends FRelation
             $this->isRegistryNew = false;
         }
     }
+    
+    public function delete(FUserSession $userSession)
+    {
+
+    }
+
+    public function undelete(FUserSession $userSession)
+    {
+
+    }
 }

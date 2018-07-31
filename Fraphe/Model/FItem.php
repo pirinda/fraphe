@@ -86,7 +86,53 @@ class FItem
 
     public function setValue($value)
     {
-        $this->value = $value;
+        switch ($this->dataType) {
+            case self::DATA_TYPE_BOOL:
+                $this->value = boolval($value);
+                break;
+
+            case self::DATA_TYPE_INT:
+                $this->value = intval($value);
+                break;
+
+            case self::DATA_TYPE_FLOAT:
+                $this->value = floatval($value);
+                break;
+
+            case self::DATA_TYPE_STRING:
+                $this->value = strval($value);
+                break;
+
+            case self::DATA_TYPE_DATE:
+            case self::DATA_TYPE_DATETIME:
+            case self::DATA_TYPE_TIME:
+            case self::DATA_TYPE_TIMESTAMP:
+                $this->value = $value;
+                break;
+
+            default:
+                throw new \Exception("Tipo de dato desconocido.");
+        }
+    }
+
+    public function setValueMin(int $value)
+    {
+        $this->valueMin = $value;
+    }
+
+    public function setValueMax(int $value)
+    {
+        $this->valueMax = $value;
+    }
+
+    public function setLengthMin(int $length)
+    {
+        $this->lengthMin = $length;
+    }
+
+    public function setLengthMax(int $length)
+    {
+        $this->lengthMax = $length;
     }
 
     public function setRangeValue(int $valueMin, int $valueMax)
@@ -246,7 +292,9 @@ class FItem
                 case self::DATA_TYPE_DATETIME:
                 case self::DATA_TYPE_TIME:
                 case self::DATA_TYPE_TIMESTAMP:
-                /*
+                    throw new \Exception("Tipo de dato no soportado aún.");
+                    break;  // useless
+                    /*
                     if (!is_a("DateTime")) {
                         throw new \Exception($this->composeItemName() . "debe ser fecha o fecha-hora.");
                     }
@@ -259,8 +307,7 @@ class FItem
                     else if (isset($this->valueMax) && is_int($valueMax) && $this->value > $this->valueMax) {
                         throw new \Exception($this->composeItemName() . "no puede ser posterior a " . $this->valueMax . ".");
                     }
-                    break;
-                */
+                    */
                 default:
                     throw new \Exception("Tipo de dato desconocido.");
             }
@@ -317,21 +364,13 @@ class FItem
                 break;
 
             case self::INPUT_DATE:
-                break;
-
             case self::INPUT_DATETIME:
-                break;
-
             case self::INPUT_TIME:
-                break;
-
-            case self::SELECT:
-                break;
-
-            case self::TEXTAREA:
-                break;
+                throw new \Exception("Tipo de elemento no soportado aún.");
+                break;  // useless
 
             default:
+                throw new \Exception("Tipo de element desconocido.");
         }
 
         return $html;
