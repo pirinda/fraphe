@@ -128,8 +128,14 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         }
 
         try {
+            echo '<h3>form_entity 1...</h3>';
+            var_dump($registry->getId());
             $registry->setData($data);
+            echo '<h3>form_entity 2...</h3>';
+            var_dump($registry->getId());
             $registry->save($userSession);
+            echo '<h3>form_entity 3...</h3>';
+            var_dump($registry->getId());
             header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/catalogs/view_entity.php?class=$entityClass");
         }
         catch (Exception $e) {

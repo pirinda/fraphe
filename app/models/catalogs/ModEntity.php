@@ -201,7 +201,13 @@ class ModEntity extends FRegistry
 
         // validate registry:
 
+        echo '<h3>' . __METHOD__ . ' 1...</h3>';
+        var_dump($this->id);
+
         parent::validate($userSession);
+
+        echo '<h3>' . __METHOD__ . ' 2...</h3>';
+        var_dump($this->id);
 
         foreach ($this->childEntityTypes as $entityType) {
             $ids = array();
