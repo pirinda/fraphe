@@ -155,16 +155,16 @@ class ModTestProcessOpt extends FRelation
 
         $fk_user = $userSession->getCurUser()->getId();
 
-        $statement->bindParam(":id_test", $id_test);
-        $statement->bindParam(":id_entity", $id_entity);
-        $statement->bindParam(":process_days_min", $process_days_min);
-        $statement->bindParam(":process_days_max", $process_days_max);
+        $statement->bindParam(":id_test", $id_test, \PDO::PARAM_INT);
+        $statement->bindParam(":id_entity", $id_entity, \PDO::PARAM_INT);
+        $statement->bindParam(":process_days_min", $process_days_min, \PDO::PARAM_INT);
+        $statement->bindParam(":process_days_max", $process_days_max, \PDO::PARAM_INT);
         $statement->bindParam(":cost", $cost);
         $statement->bindParam(":is_default", $is_default, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
-        //$statement->bindParam(":fk_user_ins", $fk_user_ins);
-        //$statement->bindParam(":fk_user_upd", $fk_user_upd);
+        //$statement->bindParam(":fk_user_ins", $fk_user_ins, \PDO::PARAM_INT);
+        //$statement->bindParam(":fk_user_upd", $fk_user_upd, \PDO::PARAM_INT);
         //$statement->bindParam(":ts_user_ins", $ts_user_ins);
         //$statement->bindParam(":ts_user_upd", $ts_user_upd);
 

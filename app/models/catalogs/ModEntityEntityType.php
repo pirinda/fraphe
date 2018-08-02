@@ -9,6 +9,8 @@ use app\AppConsts;
 
 class ModEntityEntityType extends FRelation
 {
+    public const PREFIX = "entity_type_";
+
     protected $id_entity;
     protected $id_entity_type;
 
@@ -16,8 +18,8 @@ class ModEntityEntityType extends FRelation
     {
         parent::__construct(AppConsts::CC_ENTITY_ENTITY_TYPE);
 
-        $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", "", false);
-        $this->id_entity_type = new FItem(FItem::DATA_TYPE_INT, "id_entity_type", "ID tipo entidad", "", false);
+        $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", "", false, true);
+        $this->id_entity_type = new FItem(FItem::DATA_TYPE_INT, "id_entity_type", "ID tipo entidad", "", false, true);
 
         $this->items["id_entity"] = $this->id_entity;
         $this->items["id_entity_type"] = $this->id_entity_type;
@@ -71,8 +73,8 @@ class ModEntityEntityType extends FRelation
         $id_entity = $this->ids["id_entity"];
         $id_entity_type = $this->ids["id_entity_type"];
 
-        $statement->bindParam(":id_entity", $id_entity);
-        $statement->bindParam(":id_entity_type", $id_entity_type);
+        $statement->bindParam(":id_entity", $id_entity, \PDO::PARAM_INT);
+        $statement->bindParam(":id_entity_type", $id_entity_type, \PDO::PARAM_INT);
 
         $statement->execute();
 
@@ -81,7 +83,7 @@ class ModEntityEntityType extends FRelation
             $this->isRegistryNew = false;
         }
     }
-    
+
     public function delete(FUserSession $userSession)
     {
 

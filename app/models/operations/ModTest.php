@@ -216,23 +216,23 @@ class ModTest extends FRegistry
 
         $fk_user = $userSession->getCurUser()->getId();
 
-        //$statement->bindParam(":id_test", $id_test);
+        //$statement->bindParam(":id_test", $id_test, \PDO::PARAM_INT);
         $statement->bindParam(":name", $name);
         $statement->bindParam(":code", $code);
         $statement->bindParam(":sample_quantity", $sample_quantity);
         $statement->bindParam(":sample_directs", $sample_directs);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
-        $statement->bindParam(":fk_process_area", $fk_process_area);
-        $statement->bindParam(":fk_sample_category", $fk_sample_category);
-        $statement->bindParam(":fk_testing_method", $fk_testing_method);
-        $statement->bindParam(":fk_test_acredit_attrib", $fk_test_acredit_attrib);
-        //$statement->bindParam(":fk_user_ins", $fk_user_ins);
-        //$statement->bindParam(":fk_user_upd", $fk_user_upd);
+        $statement->bindParam(":fk_process_area", $fk_process_area, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_sample_category", $fk_sample_category, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_testing_method", $fk_testing_method, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_test_acredit_attrib", $fk_test_acredit_attrib, \PDO::PARAM_INT);
+        //$statement->bindParam(":fk_user_ins", $fk_user_ins, \PDO::PARAM_INT);
+        //$statement->bindParam(":fk_user_upd", $fk_user_upd, \PDO::PARAM_INT);
         //$statement->bindParam(":ts_user_ins", $ts_user_ins);
         //$statement->bindParam(":ts_user_upd", $ts_user_upd);
 
-        $statement->bindParam(":fk_user", $fk_user);
+        $statement->bindParam(":fk_user", $fk_user, \PDO::PARAM_INT);
 
         if (!$this->isRegistryNew) {
             $statement->bindParam(":id", $this->id, \PDO::PARAM_INT);

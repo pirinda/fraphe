@@ -53,19 +53,10 @@ abstract class FRelation extends FRegistry
         $data = array();
 
         foreach ($this->ids as $key => $id) {
-            echo '<h3>' . __METHOD__ . ' 1...</h3>';
-            var_dump($key);
-            var_dump($id);
             $data[$key] = intval($id);
         }
 
-        echo '<h3>' . __METHOD__ . ' 2...</h3>';
-        var_dump($this->ids);
-
         $this->setData($data);
-
-        echo '<h3>' . __METHOD__ . ' 3...</h3>';
-        var_dump($this->ids);
     }
 
     protected function copyIdsFromItems()
@@ -94,17 +85,8 @@ abstract class FRelation extends FRegistry
      */
     public function setIds(array $ids)
     {
-        echo '<h3>' . __METHOD__ . ' 1...</h3>';
-        var_dump($ids);
-        echo '<h3>' . __METHOD__ . ' 2...</h3>';
-        var_dump($this->ids);
-
         // validate keys:
         foreach ($ids as $key => $id) {
-            echo '<h3>' . __METHOD__ . ' 3...</h3>';
-            var_dump($key);
-            var_dump($id);
-
             $this->validateItemKey($key);
             if (!is_int($id)) {
                 throw new \Exception(__METHOD__ . ": El ID '$key' debe ser número entero: $id es '" . gettype($id) . "'.");
@@ -114,11 +96,6 @@ abstract class FRelation extends FRegistry
         // set relation IDs:
         foreach ($ids as $key => $id) {
             $this->ids[$key] = $id;
-
-            echo '<h3>' . __METHOD__ . ' 4...</h3>';
-            var_dump($key);
-            var_dump($id);
-
             $this->isRegistryModified = true;
         }
 

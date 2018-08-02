@@ -117,8 +117,8 @@ class ModEntity extends FRegistry
         $this->web_page->setRangeLength(0, 100);
         $this->notes->setRangeLength(0, 500);
 
-        $this->childEntityTypes = array();
-        $this->childAddresses = array();
+        $this->clearChildEntityTypes();
+        $this->clearChildAddresses();
     }
 
     public function getChildEntityTypes(): array
@@ -201,13 +201,7 @@ class ModEntity extends FRegistry
 
         // validate registry:
 
-        echo '<h3>' . __METHOD__ . ' 1...</h3>';
-        var_dump($this->id);
-
         parent::validate($userSession);
-
-        echo '<h3>' . __METHOD__ . ' 2...</h3>';
-        var_dump($this->id);
 
         foreach ($this->childEntityTypes as $entityType) {
             $ids = array();
@@ -423,7 +417,7 @@ class ModEntity extends FRegistry
 
         $fk_user = $userSession->getCurUser()->getId();
 
-        //$statement->bindParam(":id_entity", $id_entity);
+        //$statement->bindParam(":id_entity", $id_entity, \PDO::PARAM_INT);
         $statement->bindParam(":name", $name);
         $statement->bindParam(":code", $code);
         $statement->bindParam(":alias", $alias);
@@ -433,59 +427,59 @@ class ModEntity extends FRegistry
         $statement->bindParam(":fiscal_id", $fiscal_id);
         $statement->bindParam(":is_person", $is_person, \PDO::PARAM_BOOL);
         $statement->bindParam(":apply_credit", $apply_credit, \PDO::PARAM_BOOL);
-        $statement->bindParam(":credit_days", $credit_days);
+        $statement->bindParam(":credit_days", $credit_days, \PDO::PARAM_INT);
         $statement->bindParam(":billing_prefs", $billing_prefs);
         $statement->bindParam(":web_page", $web_page);
         $statement->bindParam(":notes", $notes);
         $statement->bindParam(":apply_report_images", $apply_report_images, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
-        $statement->bindParam(":fk_entity_class", $fk_entity_class);
+        $statement->bindParam(":fk_entity_class", $fk_entity_class, \PDO::PARAM_INT);
         if (empty($nk_market_segment)) {
             $statement->bindValue(":nk_market_segment", null, \PDO::PARAM_NULL);
         }
         else {
-            $statement->bindParam(":nk_market_segment", $nk_market_segment);
+            $statement->bindParam(":nk_market_segment", $nk_market_segment, \PDO::PARAM_INT);
         }
         if (empty($nk_entity_parent)) {
             $statement->bindValue(":nk_entity_parent", null, \PDO::PARAM_NULL);
         }
         else {
-            $statement->bindParam(":nk_entity_parent", $nk_entity_parent);
+            $statement->bindParam(":nk_entity_parent", $nk_entity_parent, \PDO::PARAM_INT);
         }
         if (empty($nk_entity_billing)) {
             $statement->bindValue(":nk_entity_billing", null, \PDO::PARAM_NULL);
         }
         else {
-            $statement->bindParam(":nk_entity_billing", $nk_entity_billing);
+            $statement->bindParam(":nk_entity_billing", $nk_entity_billing, \PDO::PARAM_INT);
         }
         if (empty($nk_entity_agent)) {
             $statement->bindValue(":nk_entity_agent", null, \PDO::PARAM_NULL);
         }
         else {
-            $statement->bindParam(":nk_entity_agent", $nk_entity_agent);
+            $statement->bindParam(":nk_entity_agent", $nk_entity_agent, \PDO::PARAM_INT);
         }
         if (empty($nk_user_agent)) {
             $statement->bindValue(":nk_user_agent", null, \PDO::PARAM_NULL);
         }
         else {
-            $statement->bindParam(":nk_user_agent", $nk_user_agent);
+            $statement->bindParam(":nk_user_agent", $nk_user_agent, \PDO::PARAM_INT);
         }
         if (empty($nk_report_delivery_opt)) {
             $statement->bindValue(":nk_report_delivery_opt", null, \PDO::PARAM_NULL);
         }
         else {
-            $statement->bindParam(":nk_report_delivery_opt", $nk_report_delivery_opt);
+            $statement->bindParam(":nk_report_delivery_opt", $nk_report_delivery_opt, \PDO::PARAM_INT);
         }
-        //$statement->bindParam(":fk_user_ins", $fk_user_ins);
-        //$statement->bindParam(":fk_user_upd", $fk_user_upd);
+        //$statement->bindParam(":fk_user_ins", $fk_user_ins, \PDO::PARAM_INT);
+        //$statement->bindParam(":fk_user_upd", $fk_user_upd, \PDO::PARAM_INT);
         //$statement->bindParam(":ts_user_ins", $ts_user_ins);
         //$statement->bindParam(":ts_user_upd", $ts_user_upd);
 
-        $statement->bindParam(":fk_user", $fk_user);
+        $statement->bindParam(":fk_user", $fk_user, \PDO::PARAM_INT);
 
         if (!$this->isRegistryNew) {
-            $statement->bindParam(":id", $this->id);
+            $statement->bindParam(":id", $this->id, \PDO::PARAM_INT);
         }
 
         $statement->execute();
@@ -503,7 +497,7 @@ class ModEntity extends FRegistry
             $ids["id_entity"] = $this->id;
 
             $entityType->setIds($ids);
-            $entityType->forceRegistryNew();    // pure relation
+            $entityType->forceRegistryNew();    // it is a pure relation
             $entityType->save($userSession);
         }
 

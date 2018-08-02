@@ -8,6 +8,8 @@ use app\AppConsts;
 
 class ModEntityAddress extends FRegistry
 {
+    public const PREFIX = "address_";
+
     protected $id_entity_address;
     protected $name;
     protected $street;
@@ -38,24 +40,24 @@ class ModEntityAddress extends FRegistry
     {
         parent::__construct(AppConsts::CC_ENTITY_ADDRESS, AppConsts::$tableIds[AppConsts::CC_ENTITY_ADDRESS]);
 
-        $this->id_entity_address = new FItem(FItem::DATA_TYPE_INT, "id_entity_address", "ID domicilio", "", false);
+        $this->id_entity_address = new FItem(FItem::DATA_TYPE_INT, "id_entity_address", "ID domicilio", "", false, true);
         $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", "", true);
-        $this->street = new FItem(FItem::DATA_TYPE_STRING, "street", "Calle y número", "", true);
-        $this->district = new FItem(FItem::DATA_TYPE_STRING, "district", "Colonia", "", true);
+        $this->street = new FItem(FItem::DATA_TYPE_STRING, "street", "Calle y número", "", false);
+        $this->district = new FItem(FItem::DATA_TYPE_STRING, "district", "Colonia", "", false);
         $this->postcode = new FItem(FItem::DATA_TYPE_STRING, "postcode", "Código postal", "", true);
-        $this->reference = new FItem(FItem::DATA_TYPE_STRING, "reference", "Referencia", "", true);
+        $this->reference = new FItem(FItem::DATA_TYPE_STRING, "reference", "Referencia", "", false);
         $this->city = new FItem(FItem::DATA_TYPE_STRING, "city", "Localidad", "", true);
         $this->county = new FItem(FItem::DATA_TYPE_STRING, "county", "Municipio", "", true);
         $this->state_region = new FItem(FItem::DATA_TYPE_STRING, "state_region", "Estado", "", true);
         $this->country = new FItem(FItem::DATA_TYPE_STRING, "country", "País", "", true);
-        $this->location = new FItem(FItem::DATA_TYPE_STRING, "location", "Ubicación", "latitud, longitud", true);
-        $this->business_hr = new FItem(FItem::DATA_TYPE_STRING, "business_hr", "Horario atención", "", true);
-        $this->notes = new FItem(FItem::DATA_TYPE_STRING, "notes", "Notas", "", true);
-        $this->is_main = new FItem(FItem::DATA_TYPE_BOOL, "is_main", "Sucursal principal", "", true);
-        $this->is_recept = new FItem(FItem::DATA_TYPE_BOOL, "is_recept", "Sucursal recepción muestras", "", true);
-        $this->is_process = new FItem(FItem::DATA_TYPE_BOOL, "is_process", "Sucursal proceso muestras", "", true);
-        $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", true);
-        $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", true);
+        $this->location = new FItem(FItem::DATA_TYPE_STRING, "location", "Ubicación", "latitud, longitud", false);
+        $this->business_hr = new FItem(FItem::DATA_TYPE_STRING, "business_hr", "Horario atención", "", false);
+        $this->notes = new FItem(FItem::DATA_TYPE_STRING, "notes", "Notas", "", false);
+        $this->is_main = new FItem(FItem::DATA_TYPE_BOOL, "is_main", "Sucursal principal", "", false);
+        $this->is_recept = new FItem(FItem::DATA_TYPE_BOOL, "is_recept", "Sucursal recepción muestras", "", false);
+        $this->is_process = new FItem(FItem::DATA_TYPE_BOOL, "is_process", "Sucursal proceso muestras", "", false);
+        $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
+        $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
         $this->fk_entity = new FItem(FItem::DATA_TYPE_INT, "fk_entity", "Entidad", "", true);
         $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", "", false);
         $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", "", false);
@@ -99,12 +101,31 @@ class ModEntityAddress extends FRegistry
         $this->business_hr->setRangeLength(0, 100);
         $this->notes->setRangeLength(0, 500);
 
-        $this->childContacts = array();
+        $this->clearChildContacts();
     }
 
     public function getChildContacts(): array
     {
         return $this->childContacts;
+    }
+
+    public function clearChildContacts(): array
+    {
+        $this->childContacts = array();
+    }
+
+    public function getChildContact($contactType): ModContact
+    {
+        $contact = null;
+
+        foreach ($this->childContacts as $child) {
+            if ($child->getDatum("fk_contactType") == $contactType) {
+                $contact = $child;
+                break;
+            }
+        }
+
+        return $contact;
     }
 
     public function validate(FUserSession $userSession)
@@ -160,7 +181,7 @@ class ModEntityAddress extends FRegistry
             $statement = $pdo->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                 $contact = new ModContact();
-                $contact->read($userSession, $row["id_contact"], $mode);
+                $contact->read($userSession, intval($row["id_contact"]), $mode);
                 $this->childContacts[] = $contact;
             }
         }
@@ -278,7 +299,7 @@ class ModEntityAddress extends FRegistry
 
         $fk_user = $userSession->getCurUser()->getId();
 
-        //$statement->bindParam(":id_entity_address", $id_entity_address);
+        //$statement->bindParam(":id_entity_address", $id_entity_address, \PDO::PARAM_INT);
         $statement->bindParam(":name", $name);
         $statement->bindParam(":street", $street);
         $statement->bindParam(":district", $district);
@@ -296,16 +317,16 @@ class ModEntityAddress extends FRegistry
         $statement->bindParam(":is_process", $is_process, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
-        $statement->bindParam(":fk_entity", $fk_entity);
-        //$statement->bindParam(":fk_user_ins", $fk_user_ins);
-        //$statement->bindParam(":fk_user_upd", $fk_user_upd);
+        $statement->bindParam(":fk_entity", $fk_entity, \PDO::PARAM_INT);
+        //$statement->bindParam(":fk_user_ins", $fk_user_ins, \PDO::PARAM_INT);
+        //$statement->bindParam(":fk_user_upd", $fk_user_upd, \PDO::PARAM_INT);
         //$statement->bindParam(":ts_user_ins", $ts_user_ins);
         //$statement->bindParam(":ts_user_upd", $ts_user_upd);
 
-        $statement->bindParam(":fk_user", $fk_user);
+        $statement->bindParam(":fk_user", $fk_user, \PDO::PARAM_INT);
 
         if (!$this->isRegistryNew) {
-            $statement->bindParam(":id", $this->id);
+            $statement->bindParam(":id", $this->id, \PDO::PARAM_INT);
         }
 
         $statement->execute();
@@ -338,5 +359,13 @@ class ModEntityAddress extends FRegistry
     public function undelete(FUserSession $userSession)
     {
 
+    }
+
+    public static function createContactTypes(): array
+    {
+        return array(
+            ModConsts::CC_CONTACT_TYPE_MAIN, ModConsts::CC_CONTACT_TYPE_TECH, ModConsts::CC_CONTACT_TYPE_RECEPT,
+            ModConsts::CC_CONTACT_TYPE_SAMPLING, ModConsts::CC_CONTACT_TYPE_PROCESS, ModConsts::CC_CONTACT_TYPE_RESULT,
+            ModConsts::CC_CONTACT_TYPE_QLT, ModConsts::CC_CONTACT_TYPE_MKT, ModConsts::CC_CONTACT_TYPE_BILL, ModConsts::CC_CONTACT_TYPE_COLL = 10);
     }
 }

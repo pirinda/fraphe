@@ -32,18 +32,18 @@ class ModContact extends FRegistry
     {
         parent::__construct(AppConsts::CC_CONTACT, AppConsts::$tableIds[AppConsts::CC_CONTACT]);
 
-        $this->id_contact = new FItem(FItem::DATA_TYPE_INT, "id_contact", "ID contacto", "", false);
+        $this->id_contact = new FItem(FItem::DATA_TYPE_INT, "id_contact", "ID contacto", "", false, true);
         $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", "", true);
-        $this->prefix = new FItem(FItem::DATA_TYPE_STRING, "prefix", "Prefijo", "Sr., Lic., Ing.", true);
+        $this->prefix = new FItem(FItem::DATA_TYPE_STRING, "prefix", "Prefijo", "Sr., Lic., Ing.", false);
         $this->surname = new FItem(FItem::DATA_TYPE_STRING, "surname", "Apellidos", "", true);
         $this->forename = new FItem(FItem::DATA_TYPE_STRING, "forename", "Nombres", "", true);
-        $this->job = new FItem(FItem::DATA_TYPE_STRING, "job", "Puesto", "", true);
-        $this->mail = new FItem(FItem::DATA_TYPE_STRING, "mail", "Mail", "", true);
-        $this->phone = new FItem(FItem::DATA_TYPE_STRING, "phone", "Teléfono", "", true);
-        $this->mobile = new FItem(FItem::DATA_TYPE_STRING, "mobile", "Móvil", "", true);
-        $this->is_report = new FItem(FItem::DATA_TYPE_BOOL, "is_report", "Contacto IR", "", true);
-        $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", true);
-        $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", true);
+        $this->job = new FItem(FItem::DATA_TYPE_STRING, "job", "Puesto", "", false);
+        $this->mail = new FItem(FItem::DATA_TYPE_STRING, "mail", "Mail", "", false);
+        $this->phone = new FItem(FItem::DATA_TYPE_STRING, "phone", "Teléfono", "", false);
+        $this->mobile = new FItem(FItem::DATA_TYPE_STRING, "mobile", "Móvil", "", false);
+        $this->is_report = new FItem(FItem::DATA_TYPE_BOOL, "is_report", "Contacto IR", "", false);
+        $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
+        $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
         $this->fk_entity = new FItem(FItem::DATA_TYPE_INT, "fk_entity", "Entidad", "", true);
         $this->fk_entity_address = new FItem(FItem::DATA_TYPE_INT, "fk_entity_address", "Domicilio", "", true);
         $this->fk_contact_type = new FItem(FItem::DATA_TYPE_INT, "fk_contact_type", "Tipo contacto", "", true);
@@ -212,7 +212,7 @@ class ModContact extends FRegistry
 
         $fk_user = $userSession->getCurUser()->getId();
 
-        //$statement->bindParam(":id_contact", $id_contact);
+        //$statement->bindParam(":id_contact", $id_contact, \PDO::PARAM_INT);
         $statement->bindParam(":name", $name);
         $statement->bindParam(":prefix", $prefix);
         $statement->bindParam(":surname", $surname);
@@ -224,18 +224,18 @@ class ModContact extends FRegistry
         $statement->bindParam(":is_report", $is_report, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
-        $statement->bindParam(":fk_entity", $fk_entity);
-        $statement->bindParam(":fk_entity_address", $fk_entity_address);
-        $statement->bindParam(":fk_contact_type", $fk_contact_type);
-        //$statement->bindParam(":fk_user_ins", $fk_user_ins);
-        //$statement->bindParam(":fk_user_upd", $fk_user_upd);
+        $statement->bindParam(":fk_entity", $fk_entity, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_entity_address", $fk_entity_address, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_contact_type", $fk_contact_type, \PDO::PARAM_INT);
+        //$statement->bindParam(":fk_user_ins", $fk_user_ins, \PDO::PARAM_INT);
+        //$statement->bindParam(":fk_user_upd", $fk_user_upd, \PDO::PARAM_INT);
         //$statement->bindParam(":ts_user_ins", $ts_user_ins);
         //$statement->bindParam(":ts_user_upd", $ts_user_upd);
 
-        $statement->bindParam(":fk_user", $fk_user);
+        $statement->bindParam(":fk_user", $fk_user, \PDO::PARAM_INT);
 
         if (!$this->isRegistryNew) {
-            $statement->bindParam(":id", $this->id);
+            $statement->bindParam(":id", $this->id, \PDO::PARAM_INT);
         }
 
         $statement->execute();

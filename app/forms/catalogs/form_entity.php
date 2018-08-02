@@ -30,11 +30,14 @@ echo '<body>';
 echo FAppNavbar::compose("catalogs");
 
 $userSession = FGuiUtils::createUserSession();
-$registry = new ModEntity();
-$errmsg = "";
+$entity = new ModEntity();
 $entityClass = 0;   // ModUtils::ENTITY_CLASS_...: 1=company; 2=customer; 3=provider
 $entityNature = 0;  // ModUtils::ENTITY_NATURE_...: 1=person; 2=organization
 $entityTypes;
+$entityAddress;
+$entityAddressCheckboxes = array("is_main", "is_recept", "is_process");
+$contactTypes = ModEntityAddress::createContactTypes();
+$errmsg = "";
 
 switch ($_SERVER["REQUEST_METHOD"]) {
     case "GET":
@@ -52,19 +55,29 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
         if (!empty($_GET[FRegistry::ID])) {
             // registry modification:
-            $registry->read($userSession, intval($_GET[FRegistry::ID]), FRegistry::MODE_WRITE);
-            $entityClass = $registry->getDatum("fk_entity_class");
-            $entityNature = $registry->getDatum("is_person") ? ModUtils::ENTITY_NATURE_PER : ModUtils::ENTITY_NATURE_ORG;
+
+            $entity->read($userSession, intval($_GET[FRegistry::ID]), FRegistry::MODE_WRITE);
+            $entityClass = $entity->getDatum("fk_entity_class");
+            $entityNature = $entity->getDatum("is_person") ? ModUtils::ENTITY_NATURE_PER : ModUtils::ENTITY_NATURE_ORG;
             if (!isset($entityTypes)) {
                 $entityTypes = ModEntity::createEntityTypes($entityClass);
+            }
+            if (count($entity->getChildAddresses()) > 0) {
+                $entityAddress = $entity->getChildAddresses()[0];
             }
         }
         else {
             // registry creation:
+
             $data = array();
             $data["fk_entity_class"] = $entityClass;
             $data["is_person"] = $entityNature == ModUtils::ENTITY_NATURE_PER;
-            $registry->setData($data);  // tailor registry
+            $entity->setData($data);  // tailor registry
+        }
+
+        if (!isset($entityAddress)) {
+            $entityAddress = new ModEntityAddress();
+            $entity->getChildAddresses()[] = $entityAddress;
         }
         break;
 
@@ -120,22 +133,16 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $data["nk_report_delivery_opt"] = $_POST["nk_report_delivery_opt"];
         }
 
-        $registry->clearChildEntityTypes();
+        $entity->clearChildEntityTypes();
         foreach ($entityTypes as $entityType) {
-            if (!empty($_POST["entity_type_$entityType"]) && intval($_POST["entity_type_$entityType"]) == 1) {
-                $registry->addChildEntityType($entityType);
+            if (!empty($_POST[ModEntityEntityType::PREFIX . $entityType]) && intval($_POST[ModEntityEntityType::PREFIX . $entityType]) == 1) {
+                $entity->addChildEntityType($entityType);
             }
         }
 
         try {
-            echo '<h3>form_entity 1...</h3>';
-            var_dump($registry->getId());
-            $registry->setData($data);
-            echo '<h3>form_entity 2...</h3>';
-            var_dump($registry->getId());
-            $registry->save($userSession);
-            echo '<h3>form_entity 3...</h3>';
-            var_dump($registry->getId());
+            $entity->setData($data);
+            $entity->save($userSession);
             header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/catalogs/view_entity.php?class=$entityClass");
         }
         catch (Exception $e) {
@@ -170,54 +177,49 @@ echo '<input type="hidden" name="class" value="' . $entityClass . '" readonly>';
 echo '<input type="hidden" name="nature" value="' . $entityNature . '" readonly>';
 echo '</div>';
 
+//------------------------------------------------------------------------------
 // main section:
+//------------------------------------------------------------------------------
 
 echo '<div class="row">';
 
+//------------------------------------------------------------------------------
 // main section at the left:
+//------------------------------------------------------------------------------
 
 echo '<div class="col-sm-6">';
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">Datos generales</div>';
 echo '<div class="panel-body">';
 
-echo $registry->getItem("code")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4);
-echo $registry->getItem("fiscal_id")->composeHtmlInput(FItem::INPUT_TEXT, 4, 6);
+echo $entity->getItem("code")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4);
+echo $entity->getItem("fiscal_id")->composeHtmlInput(FItem::INPUT_TEXT, 4, 6);
 
 if ($entityNature == ModUtils::ENTITY_NATURE_PER) {
     // person:
-    echo $registry->getItem("surname")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
-    echo $registry->getItem("forename")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
-    echo $registry->getItem("prefix")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4);
+    echo $entity->getItem("surname")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
+    echo $entity->getItem("forename")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
+    echo $entity->getItem("prefix")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4);
 }
 else {
     // organization:
-    echo $registry->getItem("name")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
+    echo $entity->getItem("name")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
 }
 
-echo $registry->getItem("alias")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
-echo $registry->getItem("apply_credit")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 8);
-/*
-echo '<div class="form-group">';
-echo '<div class="col-sm-4">';
-echo '<div class="checkbox">';
-echo '<label><input type="checkbox" name="apply_credit" value="1"' . ($registry->getDatum("apply_credit") ? " checked" : "") . '>' . $registry->getItem("apply_credit")->getName() . '</label>';
-echo '</div>';
-echo '</div>';
-echo '</div>';
-*/
-echo $registry->getItem("credit_days")->composeHtmlInput(FItem::INPUT_NUMBER, 4, 4);
-echo $registry->getItem("web_page")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
-echo $registry->getItem("notes")->composeHtmlTextArea(4, 8, 1);
+echo $entity->getItem("alias")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
+echo $entity->getItem("apply_credit")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 8);
+echo $entity->getItem("credit_days")->composeHtmlInput(FItem::INPUT_NUMBER, 4, 4);
+echo $entity->getItem("web_page")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
+echo $entity->getItem("notes")->composeHtmlTextArea(4, 8, 1);
 
-$options = AppUtils::getSelectOptions($userSession, AppConsts::CC_MARKET_SEGMENT, $registry->getDatum("nk_market_segment"));
-echo $registry->getItem("nk_market_segment")->composeHtmlSelect($options, 4, 8);
+$options = AppUtils::getSelectOptions($userSession, AppConsts::CC_MARKET_SEGMENT, $entity->getDatum("nk_market_segment"));
+echo $entity->getItem("nk_market_segment")->composeHtmlSelect($options, 4, 8);
 
-$options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $registry->getDatum("nk_report_delivery_opt"));
-echo $registry->getItem("nk_report_delivery_opt")->composeHtmlSelect($options, 4, 8);
+$options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $entity->getDatum("nk_report_delivery_opt"));
+echo $entity->getItem("nk_report_delivery_opt")->composeHtmlSelect($options, 4, 8);
 
 if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
-    echo $registry->getItem("apply_report_images")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 8);
+    echo $entity->getItem("apply_report_images")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 8);
 }
 
 // render checkboxes of entity types in 4 rows of 3 columnes each:
@@ -226,7 +228,7 @@ for ($row = 0; $row < 3; $row++) {
     echo '<div class="row">';
     for ($col = 0; $col < 3; $col++) {
         echo '<div class="col-sm-4">';
-        echo '<label class="checkbox-inline small"><input type="checkbox" name="entity_type_' . $entityTypes[$index] . '" value="1"' . ($registry->isChildEntityType($entityTypes[$index]) ? ' checked' : '') . '>' .
+        echo '<label class="checkbox-inline small"><input type="checkbox" name="entity_type_' . $entityTypes[$index] . '" value="1"' . ($entity->isChildEntityType($entityTypes[$index]) ? ' checked' : '') . '>' .
         AppUtils::getName($userSession, AppConsts::CC_ENTITY_TYPE, $entityTypes[$index]) . '</label>';
         echo '</div>';
         $index++;
@@ -234,56 +236,100 @@ for ($row = 0; $row < 3; $row++) {
     echo '</div>';
 }
 
-if (!$registry->isRegistryNew()) {
+if (!$entity->isRegistryNew()) {
     echo '<br>';
-    echo $registry->getItem("id_entity")->composeHtmlInput(FItem::INPUT_NUMBER, 4, 4);
+    echo $entity->getItem("id_entity")->composeHtmlInput(FItem::INPUT_NUMBER, 4, 4);
 }
 
 echo '</div>';  //echo '<div class="panel-body">';
 echo '</div>';  //echo '<div class="panel panel-default">';
 echo '</div>';  //echo '<div class="col-sm-6">';
 
+//------------------------------------------------------------------------------
 // main section at the right:
+//------------------------------------------------------------------------------
 
 echo '<div class="col-sm-6">';
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">Domicilio</div>';
 echo '<div class="panel-body">';
+
+echo $entityAddress->getItem("name")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4, ModEntityAddress::PREFIX);
+echo $entityAddress->getItem("street")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, ModEntityAddress::PREFIX);
+echo $entityAddress->getItem("district")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, ModEntityAddress::PREFIX);
+echo $entityAddress->getItem("postcode")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4, ModEntityAddress::PREFIX);
+echo $entityAddress->getItem("reference")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, ModEntityAddress::PREFIX);
+echo $entityAddress->getItem("city")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, ModEntityAddress::PREFIX);
+echo $entityAddress->getItem("county")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, ModEntityAddress::PREFIX);
+echo $entityAddress->getItem("state_region")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, ModEntityAddress::PREFIX);
+echo $entityAddress->getItem("country")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, ModEntityAddress::PREFIX);
+echo $entityAddress->getItem("location")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, ModEntityAddress::PREFIX);
+echo $entityAddress->getItem("business_hr")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, ModEntityAddress::PREFIX);
+echo $entityAddress->getItem("notes")->composeHtmlTextArea(4, 8, 1, ModEntityAddress::PREFIX);
+
+echo '<div class="row">';
+foreach ($entityAddressCheckboxes as $checkbox) {
+    echo '<div class="col-sm-4">';
+    echo '<label class="checkbox-inline small"><input type="checkbox" name="' . ModEntityEntityType::PREFIX . $checkbox . '" value="1"' . ($entityAddress->getItem($checkbox)->getValue() ? ' checked' : '') . '>' .
+    $entityAddress->getItem($checkbox)->getName() . '</label>';
+    echo '</div>';
+}
+echo '</div>';
+
+echo '<div class="panel-group" id="accordion">';
+echo '<div class="panel panel-default">
+echo '<div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapse1">
+        Collapsible Group 1</a>
+      </h4>
+    </div>
+    <div id="collapse1" class="panel-collapse collapse in">
+      <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+      minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+      commodo consequat.</div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">
+        Collapsible Group 2</a>
+      </h4>
+    </div>
+    <div id="collapse2" class="panel-collapse collapse">
+      <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+      minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+      commodo consequat.</div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">
+        Collapsible Group 3</a>
+      </h4>
+    </div>
+    <div id="collapse3" class="panel-collapse collapse">
+      <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+      minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+      commodo consequat.</div>
+    </div>
+  </div>
+</div>
+
 echo '</div>';  //echo '<div class="panel-body">';
 echo '</div>';  //echo '<div class="panel panel-default">';
 echo '</div>';  //echo '<div class="col-sm-6">';
 
 echo '</div>';  // echo '<div class="row">';
 
-/*
-// child test process options:
-
-$childProcessOpt;
-
-if (empty($registry->getChildProcessOpts())) {
-    $childProcessOpt = new ModTestProcessOpt();
-    $data = array();
-    $data["is_default"] = true;
-    $childProcessOpt->setData($data);
-}
-else {
-    $childProcessOpt = $registry->getChildProcessOpts()[0];
-}
-
-echo '<div class="form-group">';
-echo '<label class="control-label" for="po_process_days_max">' . $childProcessOpt->getItem("process_days_max")->getName() . ': *</label>';
-echo '<input type="text" class="form-control input-sm" name="po_process_days_max" value="' . $childProcessOpt->getDatum("process_days_max") . '">';
-echo '</div>';
-
-echo '<div class="form-group">';
-echo '<label class="control-label" for="po_cost">' . $childProcessOpt->getItem("cost")->getName() . ':</label>';
-echo '<input type="text" class="form-control input-sm" name="po_cost" value="' . $childProcessOpt->getDatum("cost") . '">';
-echo '</div>';
-
-echo '<div class="checkbox">';
-echo '<label><input type="checkbox" name="po_is_default" value="1"' . ($childProcessOpt->getDatum("is_default") ? " checked" : "") . '>' . $childProcessOpt->getItem("is_default")->getName() . '</label>';
-echo '</div>';
-*/
+//------------------------------------------------------------------------------
+// main section at the right:
+//------------------------------------------------------------------------------
 
 echo '<br>';
 echo '<button type="submit" class="btn btn-sm btn-primary">Guardar</button>&nbsp;';
