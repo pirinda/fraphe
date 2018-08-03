@@ -5,6 +5,7 @@ use Fraphe\App\FUserSession;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
+use app\models\ModConsts;
 
 class ModEntityAddress extends FRegistry
 {
@@ -109,9 +110,23 @@ class ModEntityAddress extends FRegistry
         return $this->childContacts;
     }
 
-    public function clearChildContacts(): array
+    public function clearChildContacts()
     {
         $this->childContacts = array();
+    }
+
+    public function isChildContact(int $contactType): bool
+    {
+        $exists = false;
+
+        foreach ($this->childContacts as $child) {
+            if ($child->getDatum("fk_contact_type") == $contactType) {
+                $exists = true;
+                break;
+            }
+        }
+
+        return $exists;
     }
 
     public function getChildContact($contactType): ModContact
@@ -366,6 +381,6 @@ class ModEntityAddress extends FRegistry
         return array(
             ModConsts::CC_CONTACT_TYPE_MAIN, ModConsts::CC_CONTACT_TYPE_TECH, ModConsts::CC_CONTACT_TYPE_RECEPT,
             ModConsts::CC_CONTACT_TYPE_SAMPLING, ModConsts::CC_CONTACT_TYPE_PROCESS, ModConsts::CC_CONTACT_TYPE_RESULT,
-            ModConsts::CC_CONTACT_TYPE_QLT, ModConsts::CC_CONTACT_TYPE_MKT, ModConsts::CC_CONTACT_TYPE_BILL, ModConsts::CC_CONTACT_TYPE_COLL = 10);
+            ModConsts::CC_CONTACT_TYPE_QLT, ModConsts::CC_CONTACT_TYPE_MKT, ModConsts::CC_CONTACT_TYPE_BILL, ModConsts::CC_CONTACT_TYPE_COLL);
     }
 }

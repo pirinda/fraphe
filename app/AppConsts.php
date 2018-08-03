@@ -23,10 +23,9 @@ abstract class AppConsts
     public const CC_CONTACT = 101056;
 
     public const OC_PROCESS_AREA = 201011;
-    public const OC_SAMPLE_CATEGORY = 201021;
-    public const OC_SAMPLE_CLASS = 201022;
-    public const OC_SAMPLE_TYPE = 201023;
-    public const OC_SAMPLE_STATUS = 201024;
+    public const OC_SAMPLE_CLASS = 201021;
+    public const OC_SAMPLE_TYPE = 201022;
+    public const OC_SAMPLE_STATUS = 201025;
     public const OC_SAMPLING_EQUIPT_TYPE = 201026;
     public const OC_SAMPLING_EQUIPT = 201027;
     public const OC_SAMPLING_METHOD = 201031;
@@ -79,7 +78,6 @@ abstract class AppConsts
         self::CC_CONTACT => "cc_contact",
 
         self::OC_PROCESS_AREA => "oc_process_area",
-        self::OC_SAMPLE_CATEGORY => "oc_sample_category",
         self::OC_SAMPLE_CLASS => "oc_sample_class",
         self::OC_SAMPLE_TYPE => "oc_sample_type",
         self::OC_SAMPLE_STATUS => "oc_sample_status",
@@ -125,7 +123,6 @@ abstract class AppConsts
         self::CC_USER_JOB => "id_user_job",
         self::CC_USER => "id_user",
         //
-        //
         self::CC_MARKET_SEGMENT => "id_market_segment",
         self::CC_ENTITY_CLASS => "id_entity_class",
         self::CC_ENTITY_TYPE => "id_entity_type",
@@ -150,7 +147,6 @@ abstract class AppConsts
         //
         self::OC_TEST_PACKAGE => "id_test_package",
         //
-        //
         self::OC_CONTAINER_TYPE => "id_container_type",
         self::OC_CONTAINER_UNIT => "id_container_unit",
         self::OC_REPORT_DELIVERY_OPT => "id_report_delivery_opt",
@@ -161,7 +157,7 @@ abstract class AppConsts
         self::OC_SAMPLING_NOTE => "id_sampling_note",
         self::OC_TESTING_NOTE => "id_testing_note",
         self::OC_JOB_STATUS => "id_job_status",
-        
+
         self::O_SAMPLE => "id_sample",
         //
         self::O_SAMPLE_STATUS_LOG => "id_sample_status_log",

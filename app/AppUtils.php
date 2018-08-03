@@ -16,8 +16,10 @@ abstract class AppUtils
         switch ($catalog) {
             // "name" sorted by ID + name:
             case AppConsts::CC_MARKET_SEGMENT:
+            case AppConsts::CC_ENTITY_CLASS:
+            case AppConsts::CC_ENTITY_TYPE:
+            case AppConsts::CC_CONTACT_TYPE:
             case AppConsts::OC_PROCESS_AREA:
-            case AppConsts::OC_SAMPLE_CATEGORY:
             case AppConsts::OC_SAMPLE_CLASS:
             case AppConsts::OC_SAMPLE_TYPE:
             case AppConsts::OC_REPORT_DELIVERY_OPT:

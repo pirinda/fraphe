@@ -36,6 +36,7 @@ $entityNature = 0;  // ModUtils::ENTITY_NATURE_...: 1=person; 2=organization
 $entityTypes;
 $entityAddress;
 $entityAddressCheckboxes = array("is_main", "is_recept", "is_process");
+$contact = new ModContact();    // dummy object
 $contactTypes = ModEntityAddress::createContactTypes();
 $errmsg = "";
 
@@ -77,6 +78,8 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
         if (!isset($entityAddress)) {
             $entityAddress = new ModEntityAddress();
+            $entityAddress->getItem("name")->setValue("Matriz");
+            $entityAddress->getItem("country")->setValue("MEX");
             $entity->getChildAddresses()[] = $entityAddress;
         }
         break;
@@ -169,25 +172,22 @@ if (!empty($errmsg)) {
 // Input Form for Entity
 ////////////////////////////////////////////////////////////////////////////////
 
-echo '<form class="form-horizontal" method="post" action="' . FUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '">';
+echo '<form class="form-horizontal" method="post" action="' . FUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '" onsubmit="return validateForm()">';
 
 // preserve entity class and nature in post:
-echo '<div class="form-group collapse">';
 echo '<input type="hidden" name="class" value="' . $entityClass . '" readonly>';
 echo '<input type="hidden" name="nature" value="' . $entityNature . '" readonly>';
-echo '</div>';
 
 //------------------------------------------------------------------------------
 // main section:
 //------------------------------------------------------------------------------
-
 echo '<div class="row">';
 
 //------------------------------------------------------------------------------
-// main section at the left:
+// Left panel
 //------------------------------------------------------------------------------
-
 echo '<div class="col-sm-6">';
+
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">Datos generales</div>';
 echo '<div class="panel-body">';
@@ -207,7 +207,7 @@ else {
 }
 
 echo $entity->getItem("alias")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
-echo $entity->getItem("apply_credit")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 8);
+echo $entity->getItem("apply_credit")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 12);
 echo $entity->getItem("credit_days")->composeHtmlInput(FItem::INPUT_NUMBER, 4, 4);
 echo $entity->getItem("web_page")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
 echo $entity->getItem("notes")->composeHtmlTextArea(4, 8, 1);
@@ -219,7 +219,7 @@ $options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVER
 echo $entity->getItem("nk_report_delivery_opt")->composeHtmlSelect($options, 4, 8);
 
 if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
-    echo $entity->getItem("apply_report_images")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 8);
+    echo $entity->getItem("apply_report_images")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 12);
 }
 
 // render checkboxes of entity types in 4 rows of 3 columnes each:
@@ -243,16 +243,19 @@ if (!$entity->isRegistryNew()) {
 
 echo '</div>';  //echo '<div class="panel-body">';
 echo '</div>';  //echo '<div class="panel panel-default">';
-echo '</div>';  //echo '<div class="col-sm-6">';
+
+echo '</div>';  // left panel
 
 //------------------------------------------------------------------------------
-// main section at the right:
+// Right panel
 //------------------------------------------------------------------------------
-
 echo '<div class="col-sm-6">';
+
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">Domicilio</div>';
 echo '<div class="panel-body">';
+
+// Address:
 
 echo $entityAddress->getItem("name")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4, ModEntityAddress::PREFIX);
 echo $entityAddress->getItem("street")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, ModEntityAddress::PREFIX);
@@ -262,7 +265,7 @@ echo $entityAddress->getItem("reference")->composeHtmlInput(FItem::INPUT_TEXT, 4
 echo $entityAddress->getItem("city")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, ModEntityAddress::PREFIX);
 echo $entityAddress->getItem("county")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, ModEntityAddress::PREFIX);
 echo $entityAddress->getItem("state_region")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, ModEntityAddress::PREFIX);
-echo $entityAddress->getItem("country")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, ModEntityAddress::PREFIX);
+echo $entityAddress->getItem("country")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4, ModEntityAddress::PREFIX);
 echo $entityAddress->getItem("location")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, ModEntityAddress::PREFIX);
 echo $entityAddress->getItem("business_hr")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, ModEntityAddress::PREFIX);
 echo $entityAddress->getItem("notes")->composeHtmlTextArea(4, 8, 1, ModEntityAddress::PREFIX);
@@ -276,62 +279,82 @@ foreach ($entityAddressCheckboxes as $checkbox) {
 }
 echo '</div>';
 
-echo '<div class="panel-group" id="accordion">';
-echo '<div class="panel panel-default">
-echo '<div class="panel-heading">
-      <h4 class="panel-title">
-        <a data-toggle="collapse" data-parent="#accordion" href="#collapse1">
-        Collapsible Group 1</a>
-      </h4>
-    </div>
-    <div id="collapse1" class="panel-collapse collapse in">
-      <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-      minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-      commodo consequat.</div>
-    </div>
-  </div>
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title">
-        <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">
-        Collapsible Group 2</a>
-      </h4>
-    </div>
-    <div id="collapse2" class="panel-collapse collapse">
-      <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-      minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-      commodo consequat.</div>
-    </div>
-  </div>
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title">
-        <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">
-        Collapsible Group 3</a>
-      </h4>
-    </div>
-    <div id="collapse3" class="panel-collapse collapse">
-      <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-      minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-      commodo consequat.</div>
-    </div>
-  </div>
-</div>
-
 echo '</div>';  //echo '<div class="panel-body">';
 echo '</div>';  //echo '<div class="panel panel-default">';
-echo '</div>';  //echo '<div class="col-sm-6">';
 
-echo '</div>';  // echo '<div class="row">';
+echo '</div>';  // right panel
+
+echo '</div>';  // row
+
+//------------------------------------------------------------------------------
+// contacts section:
+//------------------------------------------------------------------------------
+echo '<div class="row">';
+
+for ($panel = 1; $panel <= 2; $panel++) {
+    $from;
+    $to;
+    switch ($panel) {
+        case 1:
+            $from = 0;
+            $to = 5;
+            break;
+        case 2:
+            $from = 5;
+            $to = 10;
+            break;
+        default:
+    }
+
+    echo '<div class="col-sm-6">';
+    echo '<div class="panel-group" id="accordion' . $panel . '">';
+
+    for ($index = $from; $index < $to; $index++) {
+        $id = ModContact::PREFIX . $index;
+        $prefix = ModContact::PREFIX . $index . "_";
+
+        echo '<div class="panel panel-default">';
+        echo '<div class="panel-heading">';
+        echo '<div class="panel-title">';
+        echo '<a id="' . $id . '" class="small" data-toggle="collapse" data-parent="#accordion' . $panel . '" href="#collapse' . $index . '">';
+        echo 'Contacto ' . strtolower(AppUtils::getName($userSession, AppConsts::CC_CONTACT_TYPE, $contactTypes[$index])) . '</a>';
+        echo '&nbsp;<span id="' . $id . '_label" class=""></span>';
+        echo '</div>';
+        echo '</div>';
+        echo '<div id="collapse' . $index . '" class="panel-collapse collapse' . ($index == $from ? " in" : "") . '">';
+        echo '<div class="panel-body">';
+
+        echo '<div class="form-group">';
+        echo '<div class="col-sm-offset-0 col-sm-12">';
+        echo '<div class="checkbox">';
+        echo '<label class="small"><input type="checkbox" name="' . $prefix . 'apply" onclick="showLabel(\'' . $id . '_label\', this.checked)" value="1"' . ($entityAddress->isChildContact($contactTypes[$index]) ? " checked" : "") . '>Aplica</label>';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+
+        echo $contact->getItem("surname")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, $prefix);
+        echo $contact->getItem("forename")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, $prefix);
+        echo $contact->getItem("prefix")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4, $prefix);
+        echo $contact->getItem("job")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, $prefix);
+        echo $contact->getItem("mail")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, $prefix);
+        echo $contact->getItem("phone")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, $prefix);
+        echo $contact->getItem("mobile")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, $prefix);
+        echo $contact->getItem("is_report")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 12);
+
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+    }
+
+    echo '</div>';  // accordion
+    echo '</div>';  // panel
+}
+
+echo '</div>';  // row
 
 //------------------------------------------------------------------------------
 // main section at the right:
 //------------------------------------------------------------------------------
-
-echo '<br>';
 echo '<button type="submit" class="btn btn-sm btn-primary">Guardar</button>&nbsp;';
 echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/catalogs/view_entity.php?class=' . $entityClass . '" class="btn btn-sm btn-danger" role="button">Cancelar</a>';
 
@@ -339,5 +362,39 @@ echo '</form>';
 echo '</div>';  // echo '<div class="container" style="margin-top:50px">';
 
 echo FApp::composeFooter();
+$script = <<<SCRIPT
+<script>
+function showLabel(id, status) {
+    if (!status) {
+        document.getElementById(id).class = "";
+        document.getElementById(id).innerHTML = "";
+    } else {
+        document.getElementById(id).className = "label label-default";
+        document.getElementById(id).innerHTML = "Aplica";
+    }
+}
+(function () {
+    for (i = 0; i < 10; i++) {
+        document.forms[0].elements["contact_" + i + "_surname"].removeAttribute("required");
+        document.forms[0].elements["contact_" + i + "_forename"].removeAttribute("required");
+    }
+})();
+function validateForm() {
+    for (i = 0; i < 10; i++) {
+        if (document.forms[0].elements["contact_" + i + "_apply"].checked) {
+            if (document.forms[0].elements["contact_" + i + "_surname"].value == "") {
+                alert("Se debe especificar un valor para 'apellido(s)' de '" + document.getElementById("contact_" + i).innerHTML + "'.");
+                return false;
+            }
+            if (document.forms[0].elements["contact_" + i + "_forename"].value == "") {
+                alert("Se debe especificar un valor para 'nombre(s)' de '" + document.getElementById("contact_" + i).innerHTML + "'.");
+                return false;
+            }
+        }
+    }
+}
+</script>
+SCRIPT;
+echo $script;
 echo '</body>';
 echo '</html>';

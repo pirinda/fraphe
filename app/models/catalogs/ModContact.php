@@ -8,6 +8,8 @@ use app\AppConsts;
 
 class ModContact extends FRegistry
 {
+    public const PREFIX = "contact_";
+
     protected $id_contact;
     protected $name;
     protected $prefix;
@@ -35,12 +37,12 @@ class ModContact extends FRegistry
         $this->id_contact = new FItem(FItem::DATA_TYPE_INT, "id_contact", "ID contacto", "", false, true);
         $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", "", true);
         $this->prefix = new FItem(FItem::DATA_TYPE_STRING, "prefix", "Prefijo", "Sr., Lic., Ing.", false);
-        $this->surname = new FItem(FItem::DATA_TYPE_STRING, "surname", "Apellidos", "", true);
-        $this->forename = new FItem(FItem::DATA_TYPE_STRING, "forename", "Nombres", "", true);
+        $this->surname = new FItem(FItem::DATA_TYPE_STRING, "surname", "Apellido(s)", "", true);
+        $this->forename = new FItem(FItem::DATA_TYPE_STRING, "forename", "Nombre(s)", "", true);
         $this->job = new FItem(FItem::DATA_TYPE_STRING, "job", "Puesto", "", false);
-        $this->mail = new FItem(FItem::DATA_TYPE_STRING, "mail", "Mail", "", false);
-        $this->phone = new FItem(FItem::DATA_TYPE_STRING, "phone", "Teléfono", "", false);
-        $this->mobile = new FItem(FItem::DATA_TYPE_STRING, "mobile", "Móvil", "", false);
+        $this->mail = new FItem(FItem::DATA_TYPE_STRING, "mail", "Mail(s)", "separar con ;", false);
+        $this->phone = new FItem(FItem::DATA_TYPE_STRING, "phone", "Teléfono(s)", "separar con ;", false);
+        $this->mobile = new FItem(FItem::DATA_TYPE_STRING, "mobile", "Móvil(es)", "separar con ;", false);
         $this->is_report = new FItem(FItem::DATA_TYPE_BOOL, "is_report", "Contacto IR", "", false);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);

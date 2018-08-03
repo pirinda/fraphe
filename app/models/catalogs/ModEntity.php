@@ -52,8 +52,8 @@ class ModEntity extends FRegistry
         $this->code = new FItem(FItem::DATA_TYPE_STRING, "code", "Código", "", true);
         $this->alias = new FItem(FItem::DATA_TYPE_STRING, "alias", "Alias", "nombre comercial", false);
         $this->prefix = new FItem(FItem::DATA_TYPE_STRING, "prefix", "Prefijo", "Sr., Lic., Ing.", false);
-        $this->surname = new FItem(FItem::DATA_TYPE_STRING, "surname", "Apellidos", "", false);
-        $this->forename = new FItem(FItem::DATA_TYPE_STRING, "forename", "Nombres", "", false);
+        $this->surname = new FItem(FItem::DATA_TYPE_STRING, "surname", "Apellido(s)", "", false);
+        $this->forename = new FItem(FItem::DATA_TYPE_STRING, "forename", "Nombre(s)", "", false);
         $this->fiscal_id = new FItem(FItem::DATA_TYPE_STRING, "fiscal_id", "ID fiscal", "RFC", true);
         $this->is_person = new FItem(FItem::DATA_TYPE_BOOL, "is_person", "Es persona", "", false);
         $this->apply_credit = new FItem(FItem::DATA_TYPE_BOOL, "apply_credit", "Aplica crédito", "", false);
