@@ -63,7 +63,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
         $childProcessOpt = new ModTestProcessOpt();
         $childProcessOpt->setData($childData);
-        $registry->addChildProcessOpt($childProcessOpt);
+        $registry->getChildProcessOpt()[] = $childProcessOpt;
 
         try {
             $registry->setData($data);

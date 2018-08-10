@@ -70,15 +70,15 @@ class ModTest extends FRegistry
 
         $this->childProcessOpts = array();
     }
-    // TODO: make returned value by reference!
-    public function getChildProcessOpts(): array
+
+    public function &getChildProcessOpts(): array
     {
         return $this->childProcessOpts;
     }
-    // TODO: remove method!
-    public function addChildProcessOpt(ModTestProcessOpt $processOpt)
+
+    public function clearChildProcessOpts(): array
     {
-        return $this->childProcessOpts[] = $processOpt;
+        $this->childProcessOpts = array();
     }
 
     public function validate(FUserSession $userSession)

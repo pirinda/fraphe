@@ -69,6 +69,9 @@ class ModSample extends FRegistry
     protected $ts_user_ins;
     protected $ts_user_upd;
 
+    protected $childSampleTests;
+    protected $childSampleStatusLogs;
+
     function __construct()
     {
         parent::__construct(AppConsts::OC_SAMPLE, AppConsts::$tableIds[AppConsts::OC_SAMPLE]);
@@ -193,7 +196,6 @@ class ModSample extends FRegistry
         $this->items["ts_user_ins"] = $this->ts_user_ins;
         $this->items["ts_user_upd"] = $this->ts_user_upd;
 
-
         $this->number->setRangeLength(1, 25);
         $this->name->setRangeLength(1, 100);
         $this->lot->setRangeLength(0, 50);
@@ -217,17 +219,28 @@ class ModSample extends FRegistry
         $this->ref_request->setRangeLength(0, 25);
         $this->ref_agreet->setRangeLength(0, 25);
 
-        $this->childProcessOpts = array();
+        $this->clearChildSampleTests();
+        $this->clearChildSampleStatusLogs();
     }
 
-    public function getChildProcessOpts(): array
+    public function &getChildSampleTests(): array
     {
-        return $this->childProcessOpts;
+        return $this->childSampleTests;
     }
 
-    public function addChildProcessOpt(ModTestProcessOpt $processOpt)
+    public function &getChildSampleStatusLogs(): array
     {
-        return $this->childProcessOpts[] = $processOpt;
+        return $this->$childSampleStatusLogs;
+    }
+
+    public function clearChildSampleTests()
+    {
+        $this->childSampleTests = array();
+    }
+
+    public function clearChildSampleStatusLogs()
+    {
+        $this->childSampleStatusLogs = array();
     }
 
     public function validate(FUserSession $userSession)
