@@ -1,6 +1,7 @@
 <?php
 namespace app\models\catalogs;
 
+use Fraphe\App\FGuiUtils;
 use Fraphe\App\FUserSession;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
@@ -105,7 +106,7 @@ class ModEntityAddress extends FRegistry
         $this->clearChildContacts();
     }
 
-    public function getChildContacts(): array
+    public function &getChildContacts(): array
     {
         return $this->childContacts;
     }
@@ -129,12 +130,12 @@ class ModEntityAddress extends FRegistry
         return $exists;
     }
 
-    public function getChildContact($contactType): ModContact
+    public function &getChildContact($contactType)
     {
         $contact = null;
 
         foreach ($this->childContacts as $child) {
-            if ($child->getDatum("fk_contactType") == $contactType) {
+            if ($child->getDatum("fk_contact_type") == $contactType) {
                 $contact = $child;
                 break;
             }
@@ -148,6 +149,8 @@ class ModEntityAddress extends FRegistry
         parent::validate($userSession);
 
         foreach ($this->childContacts as $contact) {
+            $contact->getItem("fk_entity")->setValue($this->fk_entity->getValue());
+            $contact->getItem("fk_entity_address")->setValue($this->isRegistryNew ? -1 : $this->id);    // bypass validation
             $contact->validate($userSession);
         }
     }

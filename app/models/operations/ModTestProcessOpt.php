@@ -26,14 +26,14 @@ class ModTestProcessOpt extends FRelation
     {
         parent::__construct(AppConsts::OC_TEST_PROCESS_OPT);
 
-        $this->id_test = new FItem(FItem::DATA_TYPE_INT, "id_test", "ID ensayo", "", false);
-        $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", "", false);
+        $this->id_test = new FItem(FItem::DATA_TYPE_INT, "id_test", "ID ensayo", "", false, true);
+        $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", "", false, true);
         $this->process_days_min = new FItem(FItem::DATA_TYPE_INT, "process_days_min", "Días mínimos proceso", "", true);
         $this->process_days_max = new FItem(FItem::DATA_TYPE_INT, "process_days_max", "Días máximos proceso", "", true);
         $this->cost = new FItem(FItem::DATA_TYPE_FLOAT, "cost", "Costo", "", false);
-        $this->is_default = new FItem(FItem::DATA_TYPE_BOOL, "is_default", "Predeterminado", "", true);
-        $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", true);
-        $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", true);
+        $this->is_default = new FItem(FItem::DATA_TYPE_BOOL, "is_default", "Predeterminado", "", false);
+        $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
+        $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
         $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", "", false);
         $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", "", false);
         $this->ts_user_ins = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_ins", "Creado", "", false);
@@ -148,8 +148,8 @@ class ModTestProcessOpt extends FRelation
         $is_default = $this->is_default->getValue();
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();
-        //$fk_user_ins = $this->fk_user_ins->getValue();
-        //$fk_user_upd = $this->fk_user_upd->getValue();
+        $fk_user_ins = $this->fk_user_ins->getValue();
+        $fk_user_upd = $this->fk_user_upd->getValue();
         //$ts_user_ins = $this->ts_user_ins->getValue();
         //$ts_user_upd = $this->ts_user_upd->getValue();
 

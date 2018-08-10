@@ -88,5 +88,21 @@
                 }
             }
         }
+    },
+    "recept":{
+        "module":"Recepción",
+        "href":"app/modules.php?module=recept",
+        "menus":{
+            "recept":{
+                "menu":"Recepción",
+                "href":"menu=recept",
+                "submenus":{
+                    "recept":{
+                        "submenu":"Recepción",
+                        "href":"app/views/operations/view_recept.php"
+                    }
+                }
+            }
+        }
     }
 }

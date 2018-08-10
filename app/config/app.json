@@ -1,6 +1,6 @@
 {
-  "appName":"SYS 1.0",
-  "appVendor":"Empresa SA de CV",
+  "appName":"MyLIMS 1.0",
+  "appVendor":"CEDIMI Laboratorios",
   "appCatalogs":["catalogs"],
   "dbHost":"localhost",
   "dbPort":"3306",

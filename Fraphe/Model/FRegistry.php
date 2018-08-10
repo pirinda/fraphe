@@ -108,14 +108,14 @@ abstract class FRegistry
                 if (!is_int($value)) {
                     throw new \Exception(__METHOD__ . ": El dato '$this->idName' debe ser número entero.");
                 }
-                $this->id = $value;
-                $this->isRegistryNew = false;
+                $this->id = intval($value);
+                $this->isRegistryNew = $this->id == 0;
             }
 
             $this->items[$key]->setValue($value);
         }
 
-        if (count($data) > 1) {
+        if (count($data) > 0) {
             $this->isRegistryModified = true;
         }
 

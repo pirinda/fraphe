@@ -129,6 +129,14 @@ abstract class FGuiUtils
 
     /*
     */
+    public static function echoVarDump($var, $msg) {
+        echo '<h4>' . $msg . '</h4>';
+        var_dump($var);
+        echo '<hr>';
+    }
+
+    /*
+    */
     public static function composePdoDsn(): string
     {
         return "mysql:host=" . $_SESSION[FAppConsts::DB_HOST] . ";port=" . $_SESSION[FAppConsts::DB_PORT] . ";dbname=" . $_SESSION[FAppConsts::DB_NAME] . ";charset=UTF8";

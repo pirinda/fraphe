@@ -51,7 +51,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         //$data["is_system"] = $_POST["is_system"];
         //$data["is_deleted"] = $_POST["is_deleted"];
         $data["fk_process_area"] = intval($_POST["fk_process_area"]);
-        $data["fk_sample_category"] = intval($_POST["fk_sample_category"]);
+        $data["fk_sample_class"] = intval($_POST["fk_sample_class"]);
         $data["fk_testing_method"] = intval($_POST["fk_testing_method"]);
         $data["fk_test_acredit_attrib"] = intval($_POST["fk_test_acredit_attrib"]);
 
@@ -112,9 +112,9 @@ echo '<input type="text" class="form-control" name="name" value="' . $registry->
 echo '</div>';
 
 echo '<div class="form-group">';
-echo '<label for="fk_sample_category">' . $registry->getItem("fk_sample_category")->getName() . ': *</label>';
-echo '<select class="form-control" name="fk_sample_category">';
-foreach (AppUtils::getSelectOptions($userSession, AppConsts::OC_SAMPLE_CATEGORY, $registry->getDatum("fk_sample_category")) as $option) {
+echo '<label for="fk_sample_class">' . $registry->getItem("fk_sample_class")->getName() . ': *</label>';
+echo '<select class="form-control" name="fk_sample_class">';
+foreach (AppUtils::getSelectOptions($userSession, AppConsts::OC_SAMPLE_CLASS, $registry->getDatum("fk_sample_class")) as $option) {
     echo $option;
 }
 echo '</select>';

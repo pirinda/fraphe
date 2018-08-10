@@ -30,14 +30,13 @@ echo '<body>';
 echo FAppNavbar::compose("catalogs");
 
 $userSession = FGuiUtils::createUserSession();
-$entity = new ModEntity();
 $entityClass = 0;   // ModUtils::ENTITY_CLASS_...: 1=company; 2=customer; 3=provider
 $entityNature = 0;  // ModUtils::ENTITY_NATURE_...: 1=person; 2=organization
+$entity;
 $entityTypes;
 $entityAddress;
 $entityAddressCheckboxes = array("is_main", "is_recept", "is_process");
-$contact = new ModContact();    // dummy object
-$contactTypes = ModEntityAddress::createContactTypes();
+$contact;
 $errmsg = "";
 
 switch ($_SERVER["REQUEST_METHOD"]) {
@@ -54,12 +53,13 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
         // retrieve registry:
 
-        if (!empty($_GET[FRegistry::ID])) {
-            // registry modification:
+        $entity = new ModEntity();
 
+        if (!empty($_GET[FRegistry::ID])) {
             $entity->read($userSession, intval($_GET[FRegistry::ID]), FRegistry::MODE_WRITE);
             $entityClass = $entity->getDatum("fk_entity_class");
             $entityNature = $entity->getDatum("is_person") ? ModUtils::ENTITY_NATURE_PER : ModUtils::ENTITY_NATURE_ORG;
+
             if (!isset($entityTypes)) {
                 $entityTypes = ModEntity::createEntityTypes($entityClass);
             }
@@ -80,7 +80,8 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $entityAddress = new ModEntityAddress();
             $entityAddress->getItem("name")->setValue("Matriz");
             $entityAddress->getItem("country")->setValue("MEX");
-            $entity->getChildAddresses()[] = $entityAddress;
+            $entityAddress->getItem("is_main")->setValue(true);
+            $entity->getChildAddresses()[0] = $entityAddress;
         }
         break;
 
@@ -95,13 +96,30 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $entityNature = intval($_POST["nature"]);
         }
 
-        // retrieve registry data:
+        // retrieve registry:
 
-        $data = array();
+        $entity = new ModEntity();
 
         if (!empty($_POST[FRegistry::ID])) {
-            $data["id_entity"] = intval($_POST[FRegistry::ID]);
+            $entity->read($userSession, intval($_POST[FRegistry::ID]), FRegistry::MODE_WRITE);
+            $entityClass = $entity->getDatum("fk_entity_class");
+            $entityNature = $entity->getDatum("is_person") ? ModUtils::ENTITY_NATURE_PER : ModUtils::ENTITY_NATURE_ORG;
+
+            if (!isset($entityTypes)) {
+                $entityTypes = ModEntity::createEntityTypes($entityClass);
+            }
+            if (count($entity->getChildAddresses()) > 0) {
+                $entityAddress = $entity->getChildAddresses()[0];
+            }
         }
+
+        if (!isset($entityAddress)) {
+            $entityAddress = new ModEntityAddress();
+            $entity->getChildAddresses()[0] = $entityAddress;
+        }
+        // recover registry data:
+
+        $data = array();
 
         if ($entityNature == ModUtils::ENTITY_NATURE_ORG) {
             $data["name"] = $_POST["name"];
@@ -123,7 +141,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         //$data["billing_prefs"] = $_POST["billing_prefs"];
         $data["web_page"] = $_POST["web_page"];
         $data["notes"] = $_POST["notes"];
-        $data["apply_report_images"] = empty($_POST["apply_report_images"]) ? false : intval($_POST["apply_report_images"]) == 1;
+        $data["is_def_report_images"] = empty($_POST["is_def_report_images"]) ? false : intval($_POST["is_def_report_images"]) == 1;
         //$data["is_system"] = $_POST["is_system"];
         //$data["is_deleted"] = $_POST["is_deleted"];
         $data["fk_entity_class"] = $entityClass;
@@ -136,6 +154,8 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $data["nk_report_delivery_opt"] = $_POST["nk_report_delivery_opt"];
         }
 
+        // entity types:
+
         $entity->clearChildEntityTypes();
         foreach ($entityTypes as $entityType) {
             if (!empty($_POST[ModEntityEntityType::PREFIX . $entityType]) && intval($_POST[ModEntityEntityType::PREFIX . $entityType]) == 1) {
@@ -143,7 +163,63 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             }
         }
 
+        // entity address:
+
+        $dataAddress = array();
+        $dataAddress["id_entity_address"] = intval($_POST[ModEntityAddress::PREFIX . "id_entity_address"]);
+        $dataAddress["name"] = $_POST[ModEntityAddress::PREFIX . "name"];
+        $dataAddress["street"] = $_POST[ModEntityAddress::PREFIX . "street"];
+        $dataAddress["district"] = $_POST[ModEntityAddress::PREFIX . "district"];
+        $dataAddress["postcode"] = $_POST[ModEntityAddress::PREFIX . "postcode"];
+        $dataAddress["reference"] = $_POST[ModEntityAddress::PREFIX . "reference"];
+        $dataAddress["city"] = $_POST[ModEntityAddress::PREFIX . "city"];
+        $dataAddress["county"] = $_POST[ModEntityAddress::PREFIX . "county"];
+        $dataAddress["state_region"] = $_POST[ModEntityAddress::PREFIX . "state_region"];
+        $dataAddress["country"] = $_POST[ModEntityAddress::PREFIX . "country"];
+        $dataAddress["location"] = $_POST[ModEntityAddress::PREFIX . "location"];
+        $dataAddress["business_hr"] = $_POST[ModEntityAddress::PREFIX . "business_hr"];
+        $dataAddress["notes"] = $_POST[ModEntityAddress::PREFIX . "notes"];
+        $dataAddress["is_main"] = empty($_POST[ModEntityAddress::PREFIX . "is_main"]) ? false : intval($_POST[ModEntityAddress::PREFIX . "is_main"]) == 1;
+        $dataAddress["is_recept"] = empty($_POST[ModEntityAddress::PREFIX . "is_recept"]) ? false : intval($_POST[ModEntityAddress::PREFIX . "is_recept"]) == 1;
+        $dataAddress["is_process"] = empty($_POST[ModEntityAddress::PREFIX . "is_process"]) ? false : intval($_POST[ModEntityAddress::PREFIX . "is_process"]) == 1;
+        //$dataAddress["is_system"] = $_POST[ModEntityAddress::PREFIX . "is_system"];
+        //$dataAddress["is_deleted"] = $_POST[ModEntityAddress::PREFIX . "is_deleted"];
+        //$dataAddress["fk_entity"] = $_POST[ModEntityAddress::PREFIX . "fk_entity"];
+
+        // contacts:
+        $dataContacts = array();
+        for ($contactType = ModConsts::CC_CONTACT_TYPE_MAIN; $contactType <= ModConsts::CC_CONTACT_TYPE_COLL; $contactType++) {
+            $prefix = ModContact::PREFIX . $contactType . "_";
+            if (!empty($_POST[$prefix . "apply"]) && intval($_POST[$prefix . "apply"]) == 1) {
+                $dataContact = array();
+                $dataContact["id_contact"] = intval($_POST[$prefix . "id_contact"]);
+                //$dataContact["name"] = $_POST[$prefix . "name"];
+                $dataContact["prefix"] = $_POST[$prefix . "prefix"];
+                $dataContact["surname"] = $_POST[$prefix . "surname"];
+                $dataContact["forename"] = $_POST[$prefix . "forename"];
+                $dataContact["job"] = $_POST[$prefix . "job"];
+                $dataContact["mail"] = $_POST[$prefix . "mail"];
+                $dataContact["phone"] = $_POST[$prefix . "phone"];
+                $dataContact["mobile"] = $_POST[$prefix . "mobile"];
+                $dataContact["is_report"] = empty($_POST[$prefix . "is_report"]) ? false : intval($_POST[$prefix . "is_report"]) == 1;
+                //$dataContact["is_system"] = $_POST[$prefix . "is_system"];
+                //$dataContact["is_deleted"] = $_POST[$prefix . "is_deleted"];
+                //$dataContact["fk_entity"] = $_POST[$prefix . "fk_entity"];
+                //$dataContact["fk_entity_address"] = $_POST[$prefix . "fk_entity_address"];
+                $dataContact["fk_contact_type"] = $_POST[$prefix . "fk_contact_type"];
+                $dataContacts[] = $dataContact;
+            }
+        }
+
         try {
+            $entityAddress->setData($dataAddress);
+
+            foreach ($dataContacts as $dataContact) {
+                $contact = new ModContact();
+                $contact->setData($dataContact);
+                $entityAddress->getChildContacts()[0] = $contact;
+            }
+
             $entity->setData($data);
             $entity->save($userSession);
             header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/catalogs/view_entity.php?class=$entityClass");
@@ -175,8 +251,9 @@ if (!empty($errmsg)) {
 echo '<form class="form-horizontal" method="post" action="' . FUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '" onsubmit="return validateForm()">';
 
 // preserve entity class and nature in post:
-echo '<input type="hidden" name="class" value="' . $entityClass . '" readonly>';
-echo '<input type="hidden" name="nature" value="' . $entityNature . '" readonly>';
+echo '<input type="hidden" name="class" value="' . $entityClass . '">';
+echo '<input type="hidden" name="nature" value="' . $entityNature . '">';
+echo '<input type="hidden" name="' . FRegistry::ID . '" value="' . $entity->getId() . '">';
 
 //------------------------------------------------------------------------------
 // main section:
@@ -219,7 +296,7 @@ $options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVER
 echo $entity->getItem("nk_report_delivery_opt")->composeHtmlSelect($options, 4, 8);
 
 if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
-    echo $entity->getItem("apply_report_images")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 12);
+    echo $entity->getItem("is_def_report_images")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 12);
 }
 
 // render checkboxes of entity types in 4 rows of 3 columnes each:
@@ -234,11 +311,6 @@ for ($row = 0; $row < 3; $row++) {
         $index++;
     }
     echo '</div>';
-}
-
-if (!$entity->isRegistryNew()) {
-    echo '<br>';
-    echo $entity->getItem("id_entity")->composeHtmlInput(FItem::INPUT_NUMBER, 4, 4);
 }
 
 echo '</div>';  //echo '<div class="panel-body">';
@@ -256,7 +328,7 @@ echo '<div class="panel-heading">Domicilio</div>';
 echo '<div class="panel-body">';
 
 // Address:
-
+echo '<input type="hidden" name="' . ModEntityAddress::PREFIX . 'id_entity_address" value="' . $entityAddress->getId() . '">';
 echo $entityAddress->getItem("name")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4, ModEntityAddress::PREFIX);
 echo $entityAddress->getItem("street")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, ModEntityAddress::PREFIX);
 echo $entityAddress->getItem("district")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, ModEntityAddress::PREFIX);
@@ -273,7 +345,7 @@ echo $entityAddress->getItem("notes")->composeHtmlTextArea(4, 8, 1, ModEntityAdd
 echo '<div class="row">';
 foreach ($entityAddressCheckboxes as $checkbox) {
     echo '<div class="col-sm-4">';
-    echo '<label class="checkbox-inline small"><input type="checkbox" name="' . ModEntityEntityType::PREFIX . $checkbox . '" value="1"' . ($entityAddress->getItem($checkbox)->getValue() ? ' checked' : '') . '>' .
+    echo '<label class="checkbox-inline small"><input type="checkbox" name="' . ModEntityAddress::PREFIX . $checkbox . '" value="1"' . ($entityAddress->getItem($checkbox)->getValue() ? ' checked' : '') . '>' .
     $entityAddress->getItem($checkbox)->getName() . '</label>';
     echo '</div>';
 }
@@ -296,12 +368,12 @@ for ($panel = 1; $panel <= 2; $panel++) {
     $to;
     switch ($panel) {
         case 1:
-            $from = 0;
-            $to = 5;
+            $from = ModConsts::CC_CONTACT_TYPE_MAIN;    // 1
+            $to = ModConsts::CC_CONTACT_TYPE_PROCESS;   // 5
             break;
         case 2:
-            $from = 5;
-            $to = 10;
+            $from = ModConsts::CC_CONTACT_TYPE_RESULT;  // 6
+            $to = ModConsts::CC_CONTACT_TYPE_COLL;      // 10
             break;
         default:
     }
@@ -309,29 +381,36 @@ for ($panel = 1; $panel <= 2; $panel++) {
     echo '<div class="col-sm-6">';
     echo '<div class="panel-group" id="accordion' . $panel . '">';
 
-    for ($index = $from; $index < $to; $index++) {
-        $id = ModContact::PREFIX . $index;
-        $prefix = ModContact::PREFIX . $index . "_";
+    for ($contactType = $from; $contactType <= $to; $contactType++) {
+        $prefix = ModContact::PREFIX . $contactType . "_";
+        $contact = $entityAddress->getChildContact($contactType);
 
         echo '<div class="panel panel-default">';
         echo '<div class="panel-heading">';
         echo '<div class="panel-title">';
-        echo '<a id="' . $id . '" class="small" data-toggle="collapse" data-parent="#accordion' . $panel . '" href="#collapse' . $index . '">';
-        echo 'Contacto ' . strtolower(AppUtils::getName($userSession, AppConsts::CC_CONTACT_TYPE, $contactTypes[$index])) . '</a>';
-        echo '&nbsp;<span id="' . $id . '_label" class=""></span>';
+        echo '<a id="' . $prefix . 'panel" class="small" data-toggle="collapse" data-parent="#accordion' . $panel . '" href="#collapse' . $contactType . '">';
+        echo 'Contacto ' . strtolower(AppUtils::getName($userSession, AppConsts::CC_CONTACT_TYPE, $contactType)) . '</a>';
+        echo '&nbsp;<span id="' . $prefix . 'icon_ok" class="' . (!empty($contact) ? "glyphicon glyphicon-ok-sign small" : "") . '"></span>';
+        echo '&nbsp;<span id="' . $prefix . 'icon_file" class="' . (!empty($contact) && $contact->getItem("is_report")->getValue() ? "glyphicon glyphicon-file small" : "") . '"></span>';
         echo '</div>';
         echo '</div>';
-        echo '<div id="collapse' . $index . '" class="panel-collapse collapse' . ($index == $from ? " in" : "") . '">';
+        echo '<div id="collapse' . $contactType . '" class="panel-collapse collapse' . ($contactType == $from ? " in" : "") . '">';
         echo '<div class="panel-body">';
 
         echo '<div class="form-group">';
         echo '<div class="col-sm-offset-0 col-sm-12">';
         echo '<div class="checkbox">';
-        echo '<label class="small"><input type="checkbox" name="' . $prefix . 'apply" onclick="showLabel(\'' . $id . '_label\', this.checked)" value="1"' . ($entityAddress->isChildContact($contactTypes[$index]) ? " checked" : "") . '>Aplica</label>';
+        echo '<label class="small"><input type="checkbox" name="' . $prefix . 'apply" onclick="showContactIcons(\'' . $prefix . '\')" value="1"' . (empty($contact) ? "" : " checked") . '>Aplica</label>';
         echo '</div>';
         echo '</div>';
         echo '</div>';
 
+        if (empty($contact)) {
+            $contact = new ModContact();
+        }
+
+        echo '<input type="hidden" name="' . $prefix . 'id_contact" value="' . $contact->getId() . '">';
+        echo '<input type="hidden" name="' . $prefix . 'fk_contact_type" value="' . $contactType . '">';
         echo $contact->getItem("surname")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, $prefix);
         echo $contact->getItem("forename")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, $prefix);
         echo $contact->getItem("prefix")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4, $prefix);
@@ -339,7 +418,8 @@ for ($panel = 1; $panel <= 2; $panel++) {
         echo $contact->getItem("mail")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, $prefix);
         echo $contact->getItem("phone")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, $prefix);
         echo $contact->getItem("mobile")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, $prefix);
-        echo $contact->getItem("is_report")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 12);
+        echo $contact->getItem("is_report")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 12, $prefix);
+        echo '<script>document.forms[0].elements["' . $prefix . 'is_report"].setAttribute("onclick", "showContactIcons(\'' . $prefix . '\')");</script>';
 
         echo '</div>';
         echo '</div>';
@@ -364,30 +444,28 @@ echo '</div>';  // echo '<div class="container" style="margin-top:50px">';
 echo FApp::composeFooter();
 $script = <<<SCRIPT
 <script>
-function showLabel(id, status) {
-    if (!status) {
-        document.getElementById(id).class = "";
-        document.getElementById(id).innerHTML = "";
-    } else {
-        document.getElementById(id).className = "label label-default";
-        document.getElementById(id).innerHTML = "Aplica";
-    }
+function showContactIcons(id_prefix) {
+    var enableIconOk = document.forms[0].elements[id_prefix + "apply"].checked;
+    var enableIconFile = document.forms[0].elements[id_prefix + "is_report"].checked;
+
+    document.getElementById(id_prefix + "icon_ok").className = enableIconOk ? "glyphicon glyphicon-ok-sign small" : "";
+    document.getElementById(id_prefix + "icon_file").className = enableIconOk && enableIconFile ? "glyphicon glyphicon-file small" : "";
 }
 (function () {
-    for (i = 0; i < 10; i++) {
+    for (i = 1; i <= 10; i++) {
         document.forms[0].elements["contact_" + i + "_surname"].removeAttribute("required");
         document.forms[0].elements["contact_" + i + "_forename"].removeAttribute("required");
     }
 })();
 function validateForm() {
-    for (i = 0; i < 10; i++) {
+    for (i = 1; i <= 10; i++) {
         if (document.forms[0].elements["contact_" + i + "_apply"].checked) {
             if (document.forms[0].elements["contact_" + i + "_surname"].value == "") {
-                alert("Se debe especificar un valor para 'apellido(s)' de '" + document.getElementById("contact_" + i).innerHTML + "'.");
+                alert("Se debe especificar un valor para 'apellido(s)' de '" + document.getElementById("contact_" + i + "_panel").innerHTML + "'.");
                 return false;
             }
             if (document.forms[0].elements["contact_" + i + "_forename"].value == "") {
-                alert("Se debe especificar un valor para 'nombre(s)' de '" + document.getElementById("contact_" + i).innerHTML + "'.");
+                alert("Se debe especificar un valor para 'nombre(s)' de '" + document.getElementById("contact_" + i + "_panel").innerHTML + "'.");
                 return false;
             }
         }

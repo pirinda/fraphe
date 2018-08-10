@@ -78,7 +78,7 @@ class FItem
                 break;
 
             default:
-                throw new \Exception("Tipo de dato desconocido.");
+                throw new \Exception(__METHOD__ . ": Tipo de dato desconocido.");
         }
 
         return $default;
@@ -111,7 +111,7 @@ class FItem
                 break;
 
             default:
-                throw new \Exception("Tipo de dato desconocido.");
+                throw new \Exception(__METHOD__ . ": Tipo de dato desconocido.");
         }
     }
 
@@ -232,59 +232,59 @@ class FItem
     {
         if (!isset($this->value)) {
             if (!$this->canBeNull) {
-                throw new \Exception($this->composeItemName() . "no puede ser nulo.");
+                throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser nulo.");
             }
         }
         else {
             switch ($this->dataType) {
                 case self::DATA_TYPE_BOOL:
                     if (!is_bool($this->value)) {
-                        throw new \Exception($this->composeItemName() . "debe ser booleano.");
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "debe ser booleano.");
                     }
                     break;
 
                 case self::DATA_TYPE_INT:
                     if (!is_int($this->value)) {
-                        throw new \Exception($this->composeItemName() . "debe ser número entero.");
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "debe ser número entero.");
                     }
                     else if (!$this->canBeEmpty && empty($this->value)) {
-                        throw new \Exception($this->composeItemName() . "no puede ser cero.");
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser cero.");
                     }
                     else if (isset($this->valueMin) && is_int($this->valueMin) && $this->value < $this->valueMin) {
-                        throw new \Exception($this->composeItemName() . "no puede ser menor a " . $this->valueMin . ".");
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser menor a " . $this->valueMin . ".");
                     }
                     else if (isset($this->valueMax) && is_int($this->valueMax) && $this->value > $this->valueMax) {
-                        throw new \Exception($this->composeItemName() . "no puede ser mayor a " . $this->valueMax . ".");
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser mayor a " . $this->valueMax . ".");
                     }
                     break;
 
                 case self::DATA_TYPE_FLOAT:
                     if (!is_float($this->value)) {
-                        throw new \Exception($this->composeItemName() . "debe ser número decimal.");
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "debe ser número decimal.");
                     }
                     else if (!$this->canBeEmpty && empty($this->value)) {
-                        throw new \Exception($this->composeItemName() . "no puede ser cero.");
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser cero.");
                     }
                     else if (isset($this->valueMin) && is_float($this->valueMin) && $this->value < $this->valueMin) {
-                        throw new \Exception($this->composeItemName() . "no puede ser menor a " . $this->valueMin . ".");
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser menor a " . $this->valueMin . ".");
                     }
                     else if (isset($this->valueMax) && is_float($this->valueMax) && $this->value > $this->valueMax) {
-                        throw new \Exception($this->composeItemName() . "no puede ser mayor a " . $this->valueMax . ".");
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser mayor a " . $this->valueMax . ".");
                     }
                     break;
 
                 case self::DATA_TYPE_STRING:
                     if (!is_string($this->value)) {
-                        throw new \Exception($this->composeItemName() . "debe ser texto.");
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "debe ser texto.");
                     }
                     else if (!$this->canBeEmpty && empty($this->value)) {
-                        throw new \Exception($this->composeItemName() . "no puede estar vacío.");
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede estar vacío.");
                     }
                     else if (isset($this->lengthMin) && is_int($this->lengthMin) && strlen($this->value) < $this->lengthMin) {
-                        throw new \Exception($this->composeItemName() . "no puede tener longitud menor a " . $this->lengthMin . ".");
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede tener longitud menor a " . $this->lengthMin . ".");
                     }
                     else if (isset($this->lengthMax) && is_int($this->lengthMax) && strlen($this->value) > $this->lengthMax) {
-                        throw new \Exception($this->composeItemName() . "no puede tener longitud mayor a " . $this->lengthMax . ".");
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede tener longitud mayor a " . $this->lengthMax . ".");
                     }
                     break;
 
@@ -292,7 +292,7 @@ class FItem
                 case self::DATA_TYPE_DATETIME:
                 case self::DATA_TYPE_TIME:
                 case self::DATA_TYPE_TIMESTAMP:
-                    throw new \Exception("Tipo de dato no soportado aún.");
+                    //throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "tiene un tipo de dato no soportado aún.");
                     break;  // useless
                     /*
                     if (!is_a("DateTime")) {
@@ -309,7 +309,7 @@ class FItem
                     }
                     */
                 default:
-                    throw new \Exception("Tipo de dato desconocido.");
+                    throw new \Exception(__METHOD__ . ": " . "Tipo de dato desconocido.");
             }
         }
     }
@@ -367,11 +367,11 @@ class FItem
             case self::INPUT_DATE:
             case self::INPUT_DATETIME:
             case self::INPUT_TIME:
-                throw new \Exception("Tipo de elemento no soportado aún.");
+                throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "tiene un tipo de dato no soportado aún.");
                 break;  // useless
 
             default:
-                throw new \Exception("Tipo de element desconocido.");
+                throw new \Exception(__METHOD__ . ": " . "Tipo de element desconocido.");
         }
 
         return $html;

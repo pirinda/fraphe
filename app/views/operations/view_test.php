@@ -20,7 +20,7 @@ echo FAppNavbar::compose("catalogs");
 
 echo '<div class="container" style="margin-top:50px">';
 echo '<h3>Ensayos</h3>';
-echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_test.php" class="btn btn-primary" role="button">Crear</a>';
+echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_test.php" class="btn btn-primary btn-sm" role="button">Crear</a>';
 
 $sql = <<<SQL
 SELECT c.name AS c_name, c.code AS c_code, c.id_test AS c_id,
@@ -30,7 +30,7 @@ tm.name AS tm_name,
 taa.code AS taa_code,
 ui.name AS ui_name, uu.name AS uu_name
 FROM oc_test AS c
-INNER JOIN oc_sample_category AS sc ON c.fk_sample_category = sc.id_sample_category
+INNER JOIN oc_sample_class AS sc ON c.fk_sample_class = sc.id_sample_class
 INNER JOIN oc_testing_method AS tm ON c.fk_testing_method = tm.id_testing_method
 INNER JOIN oc_test_acredit_attrib AS taa ON c.fk_test_acredit_attrib = taa.id_test_acredit_attrib
 INNER JOIN cc_user AS ui ON c.fk_user_ins = ui.id_user
@@ -44,7 +44,7 @@ echo '<thead>';
 echo '<tr>';
 echo '<th>Nombre</th>';
 echo '<th>Código</th>';
-echo '<th>Categoría muestra</th>';
+echo '<th>Clase muestra</th>';
 echo '<th>Método analítico</th>';
 echo '<th>A/A</th>';
 echo '<th class="small">Creador</th>';
@@ -68,7 +68,7 @@ foreach ($pdo->query($sql) as $row) {
     echo '<td class="small">' . $row['c_ts_user_ins'] . '</td>';
     echo '<td class="small">' . $row['uu_name'] . '</td>';
     echo '<td class="small">' . $row['c_ts_user_upd'] . '</td>';
-    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_test.php?id=' . $row['c_id'] . '" class="btn btn-success btn-sm" role="button"><span class="glyphicon glyphicon-edit"></span></a></td>';
+    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_test.php?id=' . $row['c_id'] . '" class="btn btn-success btn-xs" role="button"><span class="glyphicon glyphicon-edit"></span></a></td>';
     echo '</tr>';
 }
 

@@ -84,6 +84,17 @@ class ModContact extends FRegistry
         $this->mobile->setRangeLength(0, 100);
     }
 
+    public function validate(FUserSession $userSession)
+    {
+        // compute data:
+
+        $this->name->setValue(trim($this->surname->getValue() . ' ' . $this->forename->getValue()));
+
+        // validate registry:
+
+        parent::validate($userSession);
+    }
+
     public function read(FUserSession $userSession, int $id, int $mode)
     {
         $this->initialize();
@@ -128,7 +139,7 @@ class ModContact extends FRegistry
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $userSession->getPdo()->prepare("INSERT INTO oc_test (" .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO cc_contact (" .
                 "id_contact, " .
                 "name, " .
                 "prefix, " .
@@ -170,7 +181,7 @@ class ModContact extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $userSession->getPdo()->prepare("UPDATE oc_test SET " .
+            $statement = $userSession->getPdo()->prepare("UPDATE cc_contact SET " .
                 "name = :name, " .
                 "prefix = :prefix, " .
                 "surname = :surname, " .

@@ -29,15 +29,15 @@ class ModTest extends FRegistry
 
     function __construct()
     {
-        parent::__construct(AppConsts::OC_TEST, "id_test");
+        parent::__construct(AppConsts::OC_TEST, AppConsts::$tableIds[AppConsts::OC_TEST]);
 
-        $this->id_test = new FItem(FItem::DATA_TYPE_INT, "id_test", "ID ensayo", "", false);
+        $this->id_test = new FItem(FItem::DATA_TYPE_INT, "id_test", "ID ensayo", "", false, true);
         $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", "", true);
         $this->code = new FItem(FItem::DATA_TYPE_STRING, "code", "Código", "", true);
         $this->sample_quantity = new FItem(FItem::DATA_TYPE_STRING, "sample_quantity", "Cantidad muestra", "", true);
         $this->sample_directs = new FItem(FItem::DATA_TYPE_STRING, "sample_directs", "Indicaciones muestra", "", true);
-        $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", true);
-        $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", true);
+        $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
+        $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
         $this->fk_process_area = new FItem(FItem::DATA_TYPE_INT, "fk_process_area", "Área proceso", "", true);
         $this->fk_sample_class = new FItem(FItem::DATA_TYPE_INT, "fk_sample_class", "Categoría muestra", "", true);
         $this->fk_testing_method = new FItem(FItem::DATA_TYPE_INT, "fk_testing_method", "Método analítico", "", true);
@@ -55,7 +55,7 @@ class ModTest extends FRegistry
         $this->items["is_system"] = $this->is_system;
         $this->items["is_deleted"] = $this->is_deleted;
         $this->items["fk_process_area"] = $this->fk_process_area;
-        $this->items["fk_sample_category"] = $this->fk_sample_category;
+        $this->items["fk_sample_class"] = $this->fk_sample_class;
         $this->items["fk_testing_method"] = $this->fk_testing_method;
         $this->items["fk_test_acredit_attrib"] = $this->fk_test_acredit_attrib;
         $this->items["fk_user_ins"] = $this->fk_user_ins;
@@ -70,12 +70,12 @@ class ModTest extends FRegistry
 
         $this->childProcessOpts = array();
     }
-
+    // TODO: make returned value by reference!
     public function getChildProcessOpts(): array
     {
         return $this->childProcessOpts;
     }
-
+    // TODO: remove method!
     public function addChildProcessOpt(ModTestProcessOpt $processOpt)
     {
         return $this->childProcessOpts[] = $processOpt;
@@ -83,9 +83,14 @@ class ModTest extends FRegistry
 
     public function validate(FUserSession $userSession)
     {
+        // validate registry:
+
         parent::validate($userSession);
 
         foreach ($this->childProcessOpts as $processOpt) {
+            $ids = array();
+            $ids["id_test"] = $this->isRegistryNew ? -1 : $this->id;    // bypass validation
+            $processOpt->setIds($ids);
             $processOpt->validate($userSession);
         }
     }
@@ -107,7 +112,7 @@ class ModTest extends FRegistry
             $this->is_system->setValue($row["is_system"]);
             $this->is_deleted->setValue($row["is_deleted"]);
             $this->fk_process_area->setValue($row["fk_process_area"]);
-            $this->fk_sample_category->setValue($row["fk_sample_category"]);
+            $this->fk_sample_class->setValue($row["fk_sample_class"]);
             $this->fk_testing_method->setValue($row["fk_testing_method"]);
             $this->fk_test_acredit_attrib->setValue($row["fk_test_acredit_attrib"]);
             $this->fk_user_ins->setValue($row["fk_user_ins"]);
@@ -155,7 +160,7 @@ class ModTest extends FRegistry
                 "is_system, " .
                 "is_deleted, " .
                 "fk_process_area, " .
-                "fk_sample_category, " .
+                "fk_sample_class, " .
                 "fk_testing_method, " .
                 "fk_test_acredit_attrib, " .
                 "fk_user_ins, " .
@@ -171,7 +176,7 @@ class ModTest extends FRegistry
                 ":is_system, " .
                 ":is_deleted, " .
                 ":fk_process_area, " .
-                ":fk_sample_category, " .
+                ":fk_sample_class, " .
                 ":fk_testing_method, " .
                 ":fk_test_acredit_attrib, " .
                 ":fk_user, " .
@@ -188,7 +193,7 @@ class ModTest extends FRegistry
                 "is_system = :is_system, " .
                 "is_deleted = :is_deleted, " .
                 "fk_process_area = :fk_process_area, " .
-                "fk_sample_category = :fk_sample_category, " .
+                "fk_sample_class = :fk_sample_class, " .
                 "fk_testing_method = :fk_testing_method, " .
                 "fk_test_acredit_attrib = :fk_test_acredit_attrib, " .
                 //"fk_user_ins = :fk_user_ins, " .
@@ -206,11 +211,11 @@ class ModTest extends FRegistry
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();
         $fk_process_area = $this->fk_process_area->getValue();
-        $fk_sample_category = $this->fk_sample_category->getValue();
+        $fk_sample_class = $this->fk_sample_class->getValue();
         $fk_testing_method = $this->fk_testing_method->getValue();
         $fk_test_acredit_attrib = $this->fk_test_acredit_attrib->getValue();
-        //$fk_user_ins = $this->fk_user_ins->getValue();
-        //$fk_user_upd = $this->fk_user_upd->getValue();
+        $fk_user_ins = $this->fk_user_ins->getValue();
+        $fk_user_upd = $this->fk_user_upd->getValue();
         //$ts_user_ins = $this->ts_user_ins->getValue();
         //$ts_user_upd = $this->ts_user_upd->getValue();
 
@@ -224,7 +229,7 @@ class ModTest extends FRegistry
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
         $statement->bindParam(":fk_process_area", $fk_process_area, \PDO::PARAM_INT);
-        $statement->bindParam(":fk_sample_category", $fk_sample_category, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_sample_class", $fk_sample_class, \PDO::PARAM_INT);
         $statement->bindParam(":fk_testing_method", $fk_testing_method, \PDO::PARAM_INT);
         $statement->bindParam(":fk_test_acredit_attrib", $fk_test_acredit_attrib, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_ins", $fk_user_ins, \PDO::PARAM_INT);

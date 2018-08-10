@@ -25,7 +25,7 @@ class ModEntity extends FRegistry
     protected $billing_prefs;
     protected $web_page;
     protected $notes;
-    protected $apply_report_images;
+    protected $is_def_report_images;
     protected $is_system;
     protected $is_deleted;
     protected $fk_entity_class;
@@ -61,7 +61,7 @@ class ModEntity extends FRegistry
         $this->billing_prefs = new FItem(FItem::DATA_TYPE_STRING, "billing_prefs", "Preferencias facturación", "", false);
         $this->web_page = new FItem(FItem::DATA_TYPE_STRING, "web_page", "Sitio web", "", false);
         $this->notes = new FItem(FItem::DATA_TYPE_STRING, "notes", "Notas", "", false);
-        $this->apply_report_images = new FItem(FItem::DATA_TYPE_BOOL, "apply_report_images", "Aplican imágenes IR", "", false);
+        $this->is_def_report_images = new FItem(FItem::DATA_TYPE_BOOL, "is_def_report_images", "Imágenes IR por defecto", "", false);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
         $this->fk_entity_class = new FItem(FItem::DATA_TYPE_INT, "fk_entity_class", "Clase entidad", "", true);
@@ -90,7 +90,7 @@ class ModEntity extends FRegistry
         $this->items["billing_prefs"] = $this->billing_prefs;
         $this->items["web_page"] = $this->web_page;
         $this->items["notes"] = $this->notes;
-        $this->items["apply_report_images"] = $this->apply_report_images;
+        $this->items["is_def_report_images"] = $this->is_def_report_images;
         $this->items["is_system"] = $this->is_system;
         $this->items["is_deleted"] = $this->is_deleted;
         $this->items["fk_entity_class"] = $this->fk_entity_class;
@@ -121,12 +121,12 @@ class ModEntity extends FRegistry
         $this->clearChildAddresses();
     }
 
-    public function getChildEntityTypes(): array
+    public function &getChildEntityTypes(): array
     {
         return $this->childEntityTypes;
     }
 
-    public function getChildAddresses(): array
+    public function &getChildAddresses(): array
     {
         return $this->childAddresses;
     }
@@ -205,12 +205,17 @@ class ModEntity extends FRegistry
 
         foreach ($this->childEntityTypes as $entityType) {
             $ids = array();
-            $ids["id_entity"] = $this->isRegistryNew ? -1 : $this->id; // bypass validation
+            $ids["id_entity"] = $this->isRegistryNew ? -1 : $this->id;  // bypass validation
             $entityType->setIds($ids);
             $entityType->validate($userSession);
         }
 
+        if (count($this->childAddresses) == 0) {
+            throw new \Exception(__METHOD__ . ": No se han definido domicilios.");
+        }
+
         foreach ($this->childAddresses as $address) {
+            $address->getItem("fk_entity")->setValue($this->isRegistryNew ? -1 : $this->id);    // bypass validation
             $address->validate($userSession);
         }
     }
@@ -238,7 +243,7 @@ class ModEntity extends FRegistry
             $this->billing_prefs->setValue($row["billing_prefs"]);
             $this->web_page->setValue($row["web_page"]);
             $this->notes->setValue($row["notes"]);
-            $this->apply_report_images->setValue($row["apply_report_images"]);
+            $this->is_def_report_images->setValue($row["is_def_report_images"]);
             $this->is_system->setValue($row["is_system"]);
             $this->is_deleted->setValue($row["is_deleted"]);
             $this->fk_entity_class->setValue($row["fk_entity_class"]);
@@ -310,7 +315,7 @@ class ModEntity extends FRegistry
                 "billing_prefs, " .
                 "web_page, " .
                 "notes, " .
-                "apply_report_images, " .
+                "is_def_report_images, " .
                 "is_system, " .
                 "is_deleted, " .
                 "fk_entity_class, " .
@@ -339,7 +344,7 @@ class ModEntity extends FRegistry
                 ":billing_prefs, " .
                 ":web_page, " .
                 ":notes, " .
-                ":apply_report_images, " .
+                ":is_def_report_images, " .
                 ":is_system, " .
                 ":is_deleted, " .
                 ":fk_entity_class, " .
@@ -369,7 +374,7 @@ class ModEntity extends FRegistry
                 "billing_prefs = :billing_prefs, " .
                 "web_page = :web_page, " .
                 "notes = :notes, " .
-                "apply_report_images = :apply_report_images, " .
+                "is_def_report_images = :is_def_report_images, " .
                 "is_system = :is_system, " .
                 "is_deleted = :is_deleted, " .
                 "fk_entity_class = :fk_entity_class, " .
@@ -400,7 +405,7 @@ class ModEntity extends FRegistry
         $billing_prefs = $this->billing_prefs->getValue();
         $web_page = $this->web_page->getValue();
         $notes = $this->notes->getValue();
-        $apply_report_images = $this->apply_report_images->getValue();
+        $is_def_report_images = $this->is_def_report_images->getValue();
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();
         $fk_entity_class = $this->fk_entity_class->getValue();
@@ -410,8 +415,8 @@ class ModEntity extends FRegistry
         $nk_entity_agent = $this->nk_entity_agent->getValue();
         $nk_user_agent = $this->nk_user_agent->getValue();
         $nk_report_delivery_opt = $this->nk_report_delivery_opt->getValue();
-        $fk_user_ins = $this->fk_user_ins->getValue();
-        $fk_user_upd = $this->fk_user_upd->getValue();
+        //$fk_user_ins = $this->fk_user_ins->getValue();
+        //$fk_user_upd = $this->fk_user_upd->getValue();
         //$ts_user_ins = $this->ts_user_ins->getValue();
         //$ts_user_upd = $this->ts_user_upd->getValue();
 
@@ -431,7 +436,7 @@ class ModEntity extends FRegistry
         $statement->bindParam(":billing_prefs", $billing_prefs);
         $statement->bindParam(":web_page", $web_page);
         $statement->bindParam(":notes", $notes);
-        $statement->bindParam(":apply_report_images", $apply_report_images, \PDO::PARAM_BOOL);
+        $statement->bindParam(":is_def_report_images", $is_def_report_images, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
         $statement->bindParam(":fk_entity_class", $fk_entity_class, \PDO::PARAM_INT);
