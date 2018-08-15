@@ -31,15 +31,15 @@ class ModSampleStatusLog extends FRegistry
     {
         parent::__construct(AppConsts::O_SAMPLE_STATUS_LOG, AppConsts::$tableIds[AppConsts::O_SAMPLE_STATUS_LOG]);
 
-        $this->id_sample_status_log = new FItem(FItem::DATA_TYPE_INT, "id_sample_status_log", "ID cambio estatus muestra", "", false, true);
-        $this->status_datetime = new FItem(FItem::DATA_TYPE_DATETIME, "status_datetime", "Fecha-hora cambio estatus", "", true);
-        $this->status_temperat_n = new FItem(FItem::DATA_TYPE_FLOAT, "status_temperat_n", "Temperatura cambio estatus", "", false);
-        $this->status_notes = new FItem(FItem::DATA_TYPE_STRING, "status_notes", "Observaciones cambio estatus", "", false);
-        $this->status_deviats = new FItem(FItem::DATA_TYPE_STRING, "status_deviats", "Desviaciones cambio estatus", "", false);
+        $this->id_sample_status_log = new FItem(FItem::DATA_TYPE_INT, "id_sample_status_log", "ID estatus muestra", "", false, true);
+        $this->status_datetime = new FItem(FItem::DATA_TYPE_DATETIME, "status_datetime", "Fecha-hora estatus", "", true);
+        $this->status_temperat_n = new FItem(FItem::DATA_TYPE_FLOAT, "status_temperat_n", "Temperatura estatus", "", false);
+        $this->status_notes = new FItem(FItem::DATA_TYPE_STRING, "status_notes", "Observaciones estatus", "", false);
+        $this->status_deviats = new FItem(FItem::DATA_TYPE_STRING, "status_deviats", "Desviaciones estatus", "", false);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
-        $this->fk_company_branch = new FItem(FItem::DATA_TYPE_INT, "fk_company_branch", "Sucursal empresa cambio estatus", "", true);
-        $this->nk_process_area = new FItem(FItem::DATA_TYPE_INT, "nk_process_area", "Área proceso cambio estatus", "", false);
+        $this->fk_company_branch = new FItem(FItem::DATA_TYPE_INT, "fk_company_branch", "Sucursal empresa estatus", "", true);
+        $this->nk_process_area = new FItem(FItem::DATA_TYPE_INT, "nk_process_area", "Área proceso estatus", "", false);
         $this->fk_sample = new FItem(FItem::DATA_TYPE_INT, "fk_sample", "Muestra", "", true);
         $this->fk_sample_status = new FItem(FItem::DATA_TYPE_INT, "fk_sample_status", "Estatus muestra", "", true);
         $this->fk_entity_status = new FItem(FItem::DATA_TYPE_INT, "fk_entity_status", "Entidad estatus", "", true);
@@ -151,7 +151,7 @@ class ModSampleStatusLog extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $userSession->getPdo()->prepare("UPDATE oc_test SET " .
+            $statement = $userSession->getPdo()->prepare("UPDATE o_sample_status_log SET " .
                 "status_datetime = :status_datetime, " .
                 "status_temperat_n = :status_temperat_n, " .
                 "status_notes = :status_notes, " .

@@ -79,7 +79,9 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 }
 
 echo '<div class="container" style="margin-top:50px">';
-echo '<h3>Ensayo</h3>';
+echo '<div class="page-header">';
+echo '<h2>Ensayo</h2>';
+echo '</div>';
 
 if (!empty($errmsg)) {
     echo '<div class="alert alert-danger alert-dismissible">';

@@ -15,6 +15,7 @@ class ModRecept extends FRegistry
     protected $recept_notes;
     protected $recept_deviats;
     protected $service_type;
+    protected $is_customer_custom;
     protected $customer_name;
     protected $customer_street;
     protected $customer_district;
@@ -24,10 +25,12 @@ class ModRecept extends FRegistry
     protected $customer_county;
     protected $customer_state_region;
     protected $customer_country;
+    protected $customer_contact;
+    protected $is_def_report_images;
     protected $ref_chain_custody;
     protected $ref_request;
     protected $ref_agreet;
-    protected $is_def_report_images;
+    protected $is_scheduled;
     protected $is_annulled;
     protected $is_system;
     protected $is_deleted;
@@ -47,14 +50,15 @@ class ModRecept extends FRegistry
 
     function __construct()
     {
-        parent::__construct(AppConsts::OC_RECEPT, AppConsts::$tableIds[AppConsts::OC_RECEPT]);
+        parent::__construct(AppConsts::O_RECEPT, AppConsts::$tableIds[AppConsts::O_RECEPT]);
 
         $this->id_recept = new FItem(FItem::DATA_TYPE_INT, "id_recept", "ID recepción", "", false, true);
-        $this->number = new FItem(FItem::DATA_TYPE_STRING, "number", "Número recepción", "", true);
+        $this->number = new FItem(FItem::DATA_TYPE_STRING, "number", "Folio recepción", "", true);
         $this->recept_datetime = new FItem(FItem::DATA_TYPE_DATETIME, "recept_datetime", "Fecha-hora recepción", "", true);
         $this->recept_notes = new FItem(FItem::DATA_TYPE_STRING, "recept_notes", "Observaciones recepción", "", false);
         $this->recept_deviats = new FItem(FItem::DATA_TYPE_STRING, "recept_deviats", "Desviaciones recepción", "", false);
         $this->service_type = new FItem(FItem::DATA_TYPE_STRING, "service_type", "Tipo servicio", "", true);
+        $this->is_customer_custom = new FItem(FItem::DATA_TYPE_BOOL, "is_customer_custom", "Cliente personalizado", "", false);
         $this->customer_name = new FItem(FItem::DATA_TYPE_STRING, "customer_name", "Nombre cliente", "", false);
         $this->customer_street = new FItem(FItem::DATA_TYPE_STRING, "customer_street", "Calle y número", "", false);
         $this->customer_district = new FItem(FItem::DATA_TYPE_STRING, "customer_district", "Colonia", "", false);
@@ -64,10 +68,12 @@ class ModRecept extends FRegistry
         $this->customer_county = new FItem(FItem::DATA_TYPE_STRING, "customer_county", "Municipio", "", true);
         $this->customer_state_region = new FItem(FItem::DATA_TYPE_STRING, "customer_state_region", "Estado", "", true);
         $this->customer_country = new FItem(FItem::DATA_TYPE_STRING, "customer_country", "País", "", true);
-        $this->ref_chain_custody = new FItem(FItem::DATA_TYPE_STRING, "ref_chain_custody", "Referencia cadena custodia", "", false);
-        $this->ref_request = new FItem(FItem::DATA_TYPE_STRING, "ref_request", "Referencia solicitud ensayos", "", false);
-        $this->ref_agreet = new FItem(FItem::DATA_TYPE_STRING, "ref_agreet", "Referencia convenio ensayos", "", false);
+        $this->customer_contact = new FItem(FItem::DATA_TYPE_STRING, "customer_contact", "Contacto", "", false);
         $this->is_def_report_images = new FItem(FItem::DATA_TYPE_BOOL, "is_def_report_images", "Imágenes IR por defecto", "", false);
+        $this->ref_chain_custody = new FItem(FItem::DATA_TYPE_STRING, "ref_chain_custody", "Ref. cadena custodia", "", false);
+        $this->ref_request = new FItem(FItem::DATA_TYPE_STRING, "ref_request", "Ref. solicitud ensayos", "", false);
+        $this->ref_agreet = new FItem(FItem::DATA_TYPE_STRING, "ref_agreet", "Ref. convenio ensayos", "", false);
+        $this->is_scheduled = new FItem(FItem::DATA_TYPE_BOOL, "is_scheduled", "Registro programado", "", false);
         $this->is_annulled = new FItem(FItem::DATA_TYPE_BOOL, "is_annulled", "Registro anulado", "", false);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
@@ -89,6 +95,7 @@ class ModRecept extends FRegistry
         $this->items["recept_notes"] = $this->recept_notes;
         $this->items["recept_deviats"] = $this->recept_deviats;
         $this->items["service_type"] = $this->service_type;
+        $this->items["is_customer_custom"] = $this->is_customer_custom;
         $this->items["customer_name"] = $this->customer_name;
         $this->items["customer_street"] = $this->customer_street;
         $this->items["customer_district"] = $this->customer_district;
@@ -98,10 +105,12 @@ class ModRecept extends FRegistry
         $this->items["customer_county"] = $this->customer_county;
         $this->items["customer_state_region"] = $this->customer_state_region;
         $this->items["customer_country"] = $this->customer_country;
+        $this->items["customer_contact"] = $this->customer_contact;
+        $this->items["is_def_report_images"] = $this->is_def_report_images;
         $this->items["ref_chain_custody"] = $this->ref_chain_custody;
         $this->items["ref_request"] = $this->ref_request;
         $this->items["ref_agreet"] = $this->ref_agreet;
-        $this->items["is_def_report_images"] = $this->is_def_report_images;
+        $this->items["is_scheduled"] = $this->is_scheduled;
         $this->items["is_annulled"] = $this->is_annulled;
         $this->items["is_system"] = $this->is_system;
         $this->items["is_deleted"] = $this->is_deleted;
@@ -130,16 +139,22 @@ class ModRecept extends FRegistry
         $this->customer_county->setRangeLength(1, 50);
         $this->customer_state_region->setRangeLength(1, 50);
         $this->customer_country->setRangeLength(1, 3);
+        $this->customer_contact->setRangeLength(0, 250);
         $this->ref_chain_custody->setRangeLength(0, 25);
         $this->ref_request->setRangeLength(0, 25);
         $this->ref_agreet->setRangeLength(0, 25);
 
-        $this->childSamples = array();
+        $this->clearChildSamples();
     }
 
     public function &getChildSamples(): array
     {
         return $this->childSamples;
+    }
+
+    public function clearChildSamples()
+    {
+        $this->childSamples = array();
     }
 
     public function validate(FUserSession $userSession)
@@ -168,6 +183,7 @@ class ModRecept extends FRegistry
             $this->recept_notes->setValue($row["recept_notes"]);
             $this->recept_deviats->setValue($row["recept_deviats"]);
             $this->service_type->setValue($row["service_type"]);
+            $this->is_customer_custom->setValue($row["is_customer_custom"]);
             $this->customer_name->setValue($row["customer_name"]);
             $this->customer_street->setValue($row["customer_street"]);
             $this->customer_district->setValue($row["customer_district"]);
@@ -177,10 +193,12 @@ class ModRecept extends FRegistry
             $this->customer_county->setValue($row["customer_county"]);
             $this->customer_state_region->setValue($row["customer_state_region"]);
             $this->customer_country->setValue($row["customer_country"]);
+            $this->customer_contact->setValue($row["customer_contact"]);
+            $this->is_def_report_images->setValue($row["is_def_report_images"]);
             $this->ref_chain_custody->setValue($row["ref_chain_custody"]);
             $this->ref_request->setValue($row["ref_request"]);
             $this->ref_agreet->setValue($row["ref_agreet"]);
-            $this->is_def_report_images->setValue($row["is_def_report_images"]);
+            $this->is_scheduled->setValue($row["is_scheduled"]);
             $this->is_annulled->setValue($row["is_annulled"]);
             $this->is_system->setValue($row["is_system"]);
             $this->is_deleted->setValue($row["is_deleted"]);
@@ -202,17 +220,13 @@ class ModRecept extends FRegistry
             // create PDO connection for reading children:
             $pdo = FGuiUtils::createPdo();
 
-            // read child process options:
-            $sql = "SELECT id_test, id_entity FROM oc_test_process_opt WHERE id_test = $this->id ORDER BY id_test, id_entity;";
+            // read child samples:
+            $sql = "SELECT id_sample FROM o_sample WHERE nk_recept = $this->id ORDER BY id_sample;";
             $statement = $pdo->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $ids = array();
-                $ids["id_test"] = intval($row["id_test"]);
-                $ids["id_entity"] = intval($row["id_entity"]);
-
-                $processOpt = new ModTestProcessOpt();
-                $processOpt->retrieve($userSession, $ids, $mode);
-                $this->childProcessOpts[] = $processOpt;
+                $sample = new ModSample();
+                $sample->read($userSession, intval($row["id_sample"]), $mode);
+                $this->childSamples[] = $sample;
             }
         }
         else {
@@ -227,69 +241,153 @@ class ModRecept extends FRegistry
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $userSession->getPdo()->prepare("INSERT INTO oc_test (" .
-                "id_test, " .
-                "name, " .
-                "code, " .
-                "sample_quantity, " .
-                "sample_directs, " .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO o_recept (" .
+                "id_recept, " .
+                "number, " .
+                "recept_datetime, " .
+                "recept_notes, " .
+                "recept_deviats, " .
+                "service_type, " .
+                "is_customer_custom, " .
+                "customer_name, " .
+                "customer_street, " .
+                "customer_district, " .
+                "customer_postcode, " .
+                "customer_reference, " .
+                "customer_city, " .
+                "customer_county, " .
+                "customer_state_region, " .
+                "customer_country, " .
+                "customer_contact, " .
+                "is_def_report_images, " .
+                "ref_chain_custody, " .
+                "ref_request, " .
+                "ref_agreet, " .
+                "is_scheduled, " .
+                "is_annulled, " .
                 "is_system, " .
                 "is_deleted, " .
-                "fk_process_area, " .
-                "fk_sample_class, " .
-                "fk_testing_method, " .
-                "fk_test_acredit_attrib, " .
+                "fk_company_branch, " .
+                "fk_customer, " .
+                "nk_customer_sample, " .
+                "nk_customer_billing, " .
+                "fk_report_contact, " .
+                "fk_report_delivery_opt, " .
+                "fk_user_receiver, " .
                 "fk_user_ins, " .
                 "fk_user_upd, " .
                 "ts_user_ins, " .
                 "ts_user_upd) " .
                 "VALUES (" .
                 "0, " .
-                ":name, " .
-                ":code, " .
-                ":sample_quantity, " .
-                ":sample_directs, " .
+                ":number, " .
+                ":recept_datetime, " .
+                ":recept_notes, " .
+                ":recept_deviats, " .
+                ":service_type, " .
+                ":is_customer_custom, " .
+                ":customer_name, " .
+                ":customer_street, " .
+                ":customer_district, " .
+                ":customer_postcode, " .
+                ":customer_reference, " .
+                ":customer_city, " .
+                ":customer_county, " .
+                ":customer_state_region, " .
+                ":customer_country, " .
+                ":customer_contact, " .
+                ":is_def_report_images, " .
+                ":ref_chain_custody, " .
+                ":ref_request, " .
+                ":ref_agreet, " .
+                ":is_scheduled, " .
+                ":is_annulled, " .
                 ":is_system, " .
                 ":is_deleted, " .
-                ":fk_process_area, " .
-                ":fk_sample_class, " .
-                ":fk_testing_method, " .
-                ":fk_test_acredit_attrib, " .
+                ":fk_company_branch, " .
+                ":fk_customer, " .
+                ":nk_customer_sample, " .
+                ":nk_customer_billing, " .
+                ":fk_report_contact, " .
+                ":fk_report_delivery_opt, " .
+                ":fk_user_receiver, " .
                 ":fk_user, " .
                 "1, " .
                 "NOW(), " .
                 "NOW());");
         }
         else {
-            $statement = $userSession->getPdo()->prepare("UPDATE oc_test SET " .
-                "name = :name, " .
-                "code = :code, " .
-                "sample_quantity = :sample_quantity, " .
-                "sample_directs = :sample_directs, " .
+            $statement = $userSession->getPdo()->prepare("UPDATE o_recept SET " .
+                "number = :number, " .
+                "recept_datetime = :recept_datetime, " .
+                "recept_notes = :recept_notes, " .
+                "recept_deviats = :recept_deviats, " .
+                "service_type = :service_type, " .
+                "is_customer_custom = :is_customer_custom, " .
+                "customer_name = :customer_name, " .
+                "customer_street = :customer_street, " .
+                "customer_district = :customer_district, " .
+                "customer_postcode = :customer_postcode, " .
+                "customer_reference = :customer_reference, " .
+                "customer_city = :customer_city, " .
+                "customer_county = :customer_county, " .
+                "customer_state_region = :customer_state_region, " .
+                "customer_country = :customer_country, " .
+                "customer_contact = :customer_contact, " .
+                "is_def_report_images = :is_def_report_images, " .
+                "ref_chain_custody = :ref_chain_custody, " .
+                "ref_request = :ref_request, " .
+                "ref_agreet = :ref_agreet, " .
+                "is_scheduled = :is_scheduled, " .
+                "is_annulled = :is_annulled, " .
                 "is_system = :is_system, " .
                 "is_deleted = :is_deleted, " .
-                "fk_process_area = :fk_process_area, " .
-                "fk_sample_class = :fk_sample_class, " .
-                "fk_testing_method = :fk_testing_method, " .
-                "fk_test_acredit_attrib = :fk_test_acredit_attrib, " .
+                "fk_company_branch = :fk_company_branch, " .
+                "fk_customer = :fk_customer, " .
+                "nk_customer_sample = :nk_customer_sample, " .
+                "nk_customer_billing = :nk_customer_billing, " .
+                "fk_report_contact = :fk_report_contact, " .
+                "fk_report_delivery_opt = :fk_report_delivery_opt, " .
+                "fk_user_receiver = :fk_user_receiver, " .
                 //"fk_user_ins = :fk_user_ins, " .
                 "fk_user_upd = :fk_user, " .
                 //"ts_user_ins = :ts_user_ins, " .
                 "ts_user_upd = NOW() " .
-                "WHERE id_test = :id;");
+                "WHERE id_recept = :id;");
         }
 
-        //$id_test = $this->id_test->getValue();
-        $name = $this->name->getValue();
-        $code = $this->code->getValue();
-        $sample_quantity = $this->sample_quantity->getValue();
-        $sample_directs = $this->sample_directs->getValue();
+        //$id_recept = $this->id_recept->getValue();
+        $number = $this->number->getValue();
+        $recept_datetime = $this->recept_datetime->getValue();
+        $recept_notes = $this->recept_notes->getValue();
+        $recept_deviats = $this->recept_deviats->getValue();
+        $service_type = $this->service_type->getValue();
+        $is_customer_custom = $this->is_customer_custom->getValue();
+        $customer_name = $this->customer_name->getValue();
+        $customer_street = $this->customer_street->getValue();
+        $customer_district = $this->customer_district->getValue();
+        $customer_postcode = $this->customer_postcode->getValue();
+        $customer_reference = $this->customer_reference->getValue();
+        $customer_city = $this->customer_city->getValue();
+        $customer_county = $this->customer_county->getValue();
+        $customer_state_region = $this->customer_state_region->getValue();
+        $customer_country = $this->customer_country->getValue();
+        $customer_contact = $this->customer_contact->getValue();
+        $is_def_report_images = $this->is_def_report_images->getValue();
+        $ref_chain_custody = $this->ref_chain_custody->getValue();
+        $ref_request = $this->ref_request->getValue();
+        $ref_agreet = $this->ref_agreet->getValue();
+        $is_scheduled = $this->is_scheduled->getValue();
+        $is_annulled = $this->is_annulled->getValue();
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();
-        $fk_process_area = $this->fk_process_area->getValue();
-        $fk_sample_class = $this->fk_sample_class->getValue();
-        $fk_testing_method = $this->fk_testing_method->getValue();
-        $fk_test_acredit_attrib = $this->fk_test_acredit_attrib->getValue();
+        $fk_company_branch = $this->fk_company_branch->getValue();
+        $fk_customer = $this->fk_customer->getValue();
+        $nk_customer_sample = $this->nk_customer_sample->getValue();
+        $nk_customer_billing = $this->nk_customer_billing->getValue();
+        $fk_report_contact = $this->fk_report_contact->getValue();
+        $fk_report_delivery_opt = $this->fk_report_delivery_opt->getValue();
+        $fk_user_receiver = $this->fk_user_receiver->getValue();
         $fk_user_ins = $this->fk_user_ins->getValue();
         $fk_user_upd = $this->fk_user_upd->getValue();
         //$ts_user_ins = $this->ts_user_ins->getValue();
@@ -297,17 +395,38 @@ class ModRecept extends FRegistry
 
         $fk_user = $userSession->getCurUser()->getId();
 
-        //$statement->bindParam(":id_test", $id_test, \PDO::PARAM_INT);
-        $statement->bindParam(":name", $name);
-        $statement->bindParam(":code", $code);
-        $statement->bindParam(":sample_quantity", $sample_quantity);
-        $statement->bindParam(":sample_directs", $sample_directs);
+        //$statement->bindParam(":id_recept", $id_recept, \PDO::PARAM_INT);
+        $statement->bindParam(":number", $number);
+        $statement->bindParam(":recept_datetime", $recept_datetime);
+        $statement->bindParam(":recept_notes", $recept_notes);
+        $statement->bindParam(":recept_deviats", $recept_deviats);
+        $statement->bindParam(":service_type", $service_type);
+        $statement->bindParam(":is_customer_custom", $is_customer_custom, \PDO::PARAM_BOOL);
+        $statement->bindParam(":customer_name", $customer_name);
+        $statement->bindParam(":customer_street", $customer_street);
+        $statement->bindParam(":customer_district", $customer_district);
+        $statement->bindParam(":customer_postcode", $customer_postcode);
+        $statement->bindParam(":customer_reference", $customer_reference);
+        $statement->bindParam(":customer_city", $customer_city);
+        $statement->bindParam(":customer_county", $customer_county);
+        $statement->bindParam(":customer_state_region", $customer_state_region);
+        $statement->bindParam(":customer_country", $customer_country);
+        $statement->bindParam(":customer_contact", $customer_contact);
+        $statement->bindParam(":is_def_report_images", $is_def_report_images, \PDO::PARAM_BOOL);
+        $statement->bindParam(":ref_chain_custody", $ref_chain_custody);
+        $statement->bindParam(":ref_request", $ref_request);
+        $statement->bindParam(":ref_agreet", $ref_agreet);
+        $statement->bindParam(":is_scheduled", $is_scheduled, \PDO::PARAM_BOOL);
+        $statement->bindParam(":is_annulled", $is_annulled, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
-        $statement->bindParam(":fk_process_area", $fk_process_area, \PDO::PARAM_INT);
-        $statement->bindParam(":fk_sample_class", $fk_sample_class, \PDO::PARAM_INT);
-        $statement->bindParam(":fk_testing_method", $fk_testing_method, \PDO::PARAM_INT);
-        $statement->bindParam(":fk_test_acredit_attrib", $fk_test_acredit_attrib, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_company_branch", $fk_company_branch, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_customer", $fk_customer, \PDO::PARAM_INT);
+        $statement->bindParam(":nk_customer_sample", $nk_customer_sample, \PDO::PARAM_INT);
+        $statement->bindParam(":nk_customer_billing", $nk_customer_billing, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_report_contact", $fk_report_contact, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_report_delivery_opt", $fk_report_delivery_opt, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_user_receiver", $fk_user_receiver, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_ins", $fk_user_ins, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_upd", $fk_user_upd, \PDO::PARAM_INT);
         //$statement->bindParam(":ts_user_ins", $ts_user_ins);
@@ -327,13 +446,13 @@ class ModRecept extends FRegistry
             $this->isRegistryNew = false;
         }
 
-        // save child process options:
-        foreach ($this->childProcessOpts as $processOpt) {
-            $ids = array();
-            $ids["id_test"] = $this->id;
+        // save child samples:
+        foreach ($this->childSamples as $sample) {
+            $data = array();
+            $data["nk_recept"] = $this->id;
 
-            $processOpt->setIds($ids);
-            $processOpt->save($userSession);
+            $sample->setData($data);
+            $sample->save($userSession);
         }
     }
 

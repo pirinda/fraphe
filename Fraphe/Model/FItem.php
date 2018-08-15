@@ -35,6 +35,7 @@ class FItem
     protected $valueMax;
     protected $lengthMin;
     protected $lengthMax;
+    protected $guiReadOnly;
 
     function __construct(int $dataType, string $key, string $name, string $hint, bool $mandatory, bool $isPk = false)
     {
@@ -135,6 +136,11 @@ class FItem
         $this->lengthMax = $length;
     }
 
+    public function setGuiReadOnly(bool $guiReadOnly)
+    {
+        $this->guiReadOnly = $guiReadOnly;
+    }
+
     public function setRangeValue(int $valueMin, int $valueMax)
     {
         $this->valueMin = $valueMin;
@@ -216,6 +222,11 @@ class FItem
     public function getLengthMax(): int
     {
         return $this->lengthMax;
+    }
+
+    public function isGuiReadOnly(): bool
+    {
+        return $this->guiReadOnly;
     }
 
     public function reset()
@@ -330,7 +341,7 @@ class FItem
                 $html .= '<label class="control-label small" for="' . $key . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
                 $html .= '</div>';
                 $html .= '<div class="col-sm-' . $lengthInput . '">';
-                $html .= '<input type="text" class="form-control input-sm" name="' . $key . '" value="' . $this->value . '"' . $required . $placeholder . $maxLength . '>';
+                $html .= '<input type="text" class="form-control input-sm" name="' . $key . '" value="' . $this->value . '"' . $required . $placeholder . $maxLength . ($this->guiReadOnly ? ' readonly' : '') . '>';
                 $html .= '</div>';
                 $html .= '</div>';
                 break;
@@ -346,7 +357,7 @@ class FItem
                 $html .= '<label class="control-label small" for="' . ($this->isPk ? FRegistry::ID : $key) . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
                 $html .= '</div>';
                 $html .= '<div class="col-sm-' . $lengthInput . '">';
-                $html .= '<input type="number" class="form-control input-sm" name="' . ($this->isPk ? FRegistry::ID : $key) . '" value="' . $this->value . '"' . $required . $readonly . $placeholder . $min . $max . '>';
+                $html .= '<input type="number" class="form-control input-sm" name="' . ($this->isPk ? FRegistry::ID : $key) . '" value="' . $this->value . '"' . $required . $readonly . $placeholder . $min . $max . ($this->guiReadOnly ? ' readonly' : '') . '>';
                 $html .= '</div>';
                 $html .= '</div>';
                 break;
@@ -358,14 +369,38 @@ class FItem
                 $html .= '<div class="form-group">';
                 $html .= '<div class="col-sm-offset-' . $lengthLabel . ' col-sm-' . $lengthInput . '">';
                 $html .= '<div class="checkbox">';
-                $html .= '<label class="small"><input type="checkbox" name="' . $key . '" value="1"' . ($this->value ? " checked" : "") . '>' . $this->name . '</label>';
+                $html .= '<label class="small"><input type="checkbox" name="' . $key . '" value="1"' . ($this->value ? ' checked' : '') . ($this->guiReadOnly ? ' readonly' : '') . '>' . $this->name . '</label>';
                 $html .= '</div>';
                 $html .= '</div>';
                 $html .= '</div>';
                 break;
 
             case self::INPUT_DATE:
+                $placeholder = ' placeholder="' . $this->name . (empty($this->hint) ? '' : ' (' . $this->hint . ')') . '"';
+
+                $html .= '<div class="form-group">';
+                $html .= '<div class="col-sm-' . $lengthLabel . '">';
+                $html .= '<label class="control-label small" for="' . $key . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
+                $html .= '</div>';
+                $html .= '<div class="col-sm-' . $lengthInput . '">';
+                $html .= '<input type="date" class="form-control input-sm" name="' . $key . '" value="' . $this->value . '"' . $required . $placeholder . ($this->guiReadOnly ? ' readonly' : '') . '>';
+                $html .= '</div>';
+                $html .= '</div>';
+                break;
+
             case self::INPUT_DATETIME:
+            $placeholder = ' placeholder="' . $this->name . (empty($this->hint) ? '' : ' (' . $this->hint . ')') . '"';
+
+            $html .= '<div class="form-group">';
+            $html .= '<div class="col-sm-' . $lengthLabel . '">';
+            $html .= '<label class="control-label small" for="' . $key . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
+            $html .= '</div>';
+            $html .= '<div class="col-sm-' . $lengthInput . '">';
+            $html .= '<input type="datetime-local" class="form-control input-sm" name="' . $key . '" value="' . $this->value . '"' . $required . $placeholder . ($this->guiReadOnly ? ' readonly' : '') . '>';
+            $html .= '</div>';
+            $html .= '</div>';
+            break;
+
             case self::INPUT_TIME:
                 throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "tiene un tipo de dato no soportado aún.");
                 break;  // useless

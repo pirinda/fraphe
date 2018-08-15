@@ -356,7 +356,6 @@ class ModEntityAddress extends FRegistry
         }
 
         // save child contacts:
-
         foreach ($this->childContacts as $contact) {
             // assure link to parent:
             $data = array();

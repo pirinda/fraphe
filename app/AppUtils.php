@@ -6,7 +6,7 @@ use Fraphe\Model\FRegistry;
 
 abstract class AppUtils
 {
-    public static function getSelectOptions(FUserSession $userSession, int $catalog, int $selectedId = 0): array
+    public static function getSelectOptions(FUserSession $userSession, int $catalog, int $selectedId, array $params = null): array
     {
         $sql;
         $options = array();
@@ -27,14 +27,39 @@ abstract class AppUtils
                 break;
 
             // "name" sorted by name + ID:
+            case AppConsts::OC_SAMPLING_EQUIPT:
             case AppConsts::OC_SAMPLING_METHOD:
             case AppConsts::OC_TESTING_METHOD:
+            case AppConsts::OC_CONTAINER_TYPE:
                 $sql = "SELECT $tableId AS _val, name AS _opt FROM $table WHERE NOT is_deleted ORDER BY name, $tableId;";
+                break;
+
+            // "name" sorted by code + ID:
+            case AppConsts::OC_CONTAINER_UNIT:
+                $sql = "SELECT $tableId AS _val, code AS _opt FROM $table WHERE NOT is_deleted ORDER BY code, $tableId;";
                 break;
 
             // "code - name" sorted by ID + name:
             case AppConsts::OC_TEST_ACREDIT_ATTRIB:
                 $sql = "SELECT $tableId AS _val, CONCAT(code, ' - ', name) AS _opt FROM $table WHERE NOT is_deleted ORDER BY $tableId, name;";
+                break;
+
+            // "name (code)" sorted by name + ID:
+            // params expected: fk_entity_class,
+            case AppConsts::CC_ENTITY:
+                $type;
+                if (isset($params["entity_type"])) {
+                    $type = $params["entity_type"];
+                }
+
+                $sql = "SELECT e.$tableId AS _val, CONCAT(e.name, ' (', e.code, ')') AS _opt ";
+                $sql .= "FROM $table AS e ";
+
+                if (isset($type)) {
+                    $sql .= "INNER JOIN " . $table = AppConsts::$tables[AppConsts::CC_ENTITY_ENTITY_TYPE] . " AS et ON et.id_entity = e.id_entity AND et.id_entity_type = " . $type . " ";
+                }
+
+                $sql .= "WHERE NOT e.is_deleted AND e.fk_entity_class = " . $params["fk_entity_class"] . " ORDER BY e.name, e.code, e.$tableId;";
                 break;
 
             default:

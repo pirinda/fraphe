@@ -75,7 +75,7 @@ class ModSampleTest extends FRelation
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $userSession->getPdo()->prepare("INSERT INTO cc_entity_entity_type (" .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO o_sample_test (" .
                 "id_sample, " .
                 "id_test, " .
                 "id_entity, " .

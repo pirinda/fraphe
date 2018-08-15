@@ -1,5 +1,5 @@
 {
-  "appName":"MyLIMS 1.0",
+  "appName":"LIMS 1.0",
   "appVendor":"CEDIMI Laboratorios",
   "appCatalogs":["catalogs"],
   "dbHost":"localhost",

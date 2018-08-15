@@ -39,7 +39,7 @@ class ModTest extends FRegistry
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
         $this->fk_process_area = new FItem(FItem::DATA_TYPE_INT, "fk_process_area", "Área proceso", "", true);
-        $this->fk_sample_class = new FItem(FItem::DATA_TYPE_INT, "fk_sample_class", "Categoría muestra", "", true);
+        $this->fk_sample_class = new FItem(FItem::DATA_TYPE_INT, "fk_sample_class", "Clase muestra", "", true);
         $this->fk_testing_method = new FItem(FItem::DATA_TYPE_INT, "fk_testing_method", "Método analítico", "", true);
         $this->fk_test_acredit_attrib = new FItem(FItem::DATA_TYPE_INT, "fk_test_acredit_attrib", "Acreditación/ autorización", "", true);
         $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", "", false);

@@ -138,7 +138,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         $data["is_person"] = $entityNature == ModUtils::ENTITY_NATURE_PER;
         $data["apply_credit"] = empty($_POST["apply_credit"]) ? false : intval($_POST["apply_credit"]) == 1;
         $data["credit_days"] = intval($_POST["credit_days"]);
-        //$data["billing_prefs"] = $_POST["billing_prefs"];
+        $data["billing_prefs"] = $_POST["billing_prefs"];
         $data["web_page"] = $_POST["web_page"];
         $data["notes"] = $_POST["notes"];
         $data["is_def_report_images"] = empty($_POST["is_def_report_images"]) ? false : intval($_POST["is_def_report_images"]) == 1;
@@ -234,7 +234,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
 echo '<div class="container" style="margin-top:50px">';
 echo '<div class="page-header">';
-echo '<h1>' . ModUtils::getEntityClassSingular($entityClass) . ' ' . ModUtils::getEntityNatureAcronym($entityNature) . '</h1>';
+echo '<h2>' . ModUtils::getEntityClassSingular($entityClass) . ' ' . ModUtils::getEntityNatureAcronym($entityNature) . '</h2>';
 echo '</div>';
 
 if (!empty($errmsg)) {
@@ -250,7 +250,7 @@ if (!empty($errmsg)) {
 
 echo '<form class="form-horizontal" method="post" action="' . FUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '" onsubmit="return validateForm()">';
 
-// preserve entity class and nature in post:
+// preserve entity class and nature and registry ID in post:
 echo '<input type="hidden" name="class" value="' . $entityClass . '">';
 echo '<input type="hidden" name="nature" value="' . $entityNature . '">';
 echo '<input type="hidden" name="' . FRegistry::ID . '" value="' . $entity->getId() . '">';
@@ -286,17 +286,35 @@ else {
 echo $entity->getItem("alias")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
 echo $entity->getItem("apply_credit")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 12);
 echo $entity->getItem("credit_days")->composeHtmlInput(FItem::INPUT_NUMBER, 4, 4);
+echo $entity->getItem("billing_prefs")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
 echo $entity->getItem("web_page")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
 echo $entity->getItem("notes")->composeHtmlTextArea(4, 8, 1);
 
-$options = AppUtils::getSelectOptions($userSession, AppConsts::CC_MARKET_SEGMENT, $entity->getDatum("nk_market_segment"));
-echo $entity->getItem("nk_market_segment")->composeHtmlSelect($options, 4, 8);
-
-$options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $entity->getDatum("nk_report_delivery_opt"));
-echo $entity->getItem("nk_report_delivery_opt")->composeHtmlSelect($options, 4, 8);
-
 if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
+    $options = AppUtils::getSelectOptions($userSession, AppConsts::CC_MARKET_SEGMENT, $entity->getDatum("nk_market_segment"));
+    echo $entity->getItem("nk_market_segment")->composeHtmlSelect($options, 4, 8);
+
+    $options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $entity->getDatum("nk_report_delivery_opt"));
+    echo $entity->getItem("nk_report_delivery_opt")->composeHtmlSelect($options, 4, 8);
+
     echo $entity->getItem("is_def_report_images")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 12);
+
+    $params = array();
+    $params["fk_entity_class"] = ModConsts::CC_ENTITY_CLASS_CUST;
+    $params["entity_type"] = ModConsts::CC_ENTITY_TYPE_CUST_CORP;
+    $options = AppUtils::getSelectOptions($userSession, AppConsts::CC_ENTITY, $entity->getDatum("nk_entity_parent"));
+    echo $entity->getItem("nk_entity_parent")->composeHtmlSelect($options, 4, 8);
+
+    $params = array();
+    $params["fk_entity_class"] = ModConsts::CC_ENTITY_CLASS_CUST;
+    $options = AppUtils::getSelectOptions($userSession, AppConsts::CC_ENTITY, $entity->getDatum("nk_entity_billing"));
+    echo $entity->getItem("nk_entity_billing")->composeHtmlSelect($options, 4, 8);
+
+    $params = array();
+    $params["fk_entity_class"] = ModConsts::CC_ENTITY_CLASS_PROV;
+    $params["entity_type"] = ModConsts::CC_ENTITY_TYPE_CUST_SAL_INT;
+    $options = AppUtils::getSelectOptions($userSession, AppConsts::CC_ENTITY, $entity->getDatum("nk_entity_parent"));
+    echo $entity->getItem("nk_entity_parent")->composeHtmlSelect($options, 4, 8);
 }
 
 // render checkboxes of entity types in 4 rows of 3 columnes each:
@@ -442,7 +460,7 @@ echo '</form>';
 echo '</div>';  // echo '<div class="container" style="margin-top:50px">';
 
 echo FApp::composeFooter();
-$script = <<<SCRIPT
+echo <<<SCRIPT
 <script>
 function showContactIcons(id_prefix) {
     var enableIconOk = document.forms[0].elements[id_prefix + "apply"].checked;
@@ -473,6 +491,5 @@ function validateForm() {
 }
 </script>
 SCRIPT;
-echo $script;
 echo '</body>';
 echo '</html>';
