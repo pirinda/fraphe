@@ -9,6 +9,9 @@ use app\AppConsts;
 
 class ModSample extends FRegistry
 {
+    public const SERVICE_ORDINARY = "O";
+    public const SERVICE_URGENT = "U";
+
     protected $id_sample;
     protected $number;
     protected $name;
@@ -20,11 +23,11 @@ class ModSample extends FRegistry
     protected $is_sampling_company;
     protected $sampling_guide;
     protected $sampling_area;
-    protected $sampling_images;
     protected $sampling_datetime_n;
     protected $sampling_temperat_n;
     protected $sampling_notes;
     protected $sampling_deviats;
+    protected $sampling_images;
     protected $recept_datetime;
     protected $recept_temperat;
     protected $recept_notes;
@@ -43,7 +46,7 @@ class ModSample extends FRegistry
     protected $customer_state_region;
     protected $customer_country;
     protected $customer_contact;
-    protected $is_def_report_images;
+    protected $is_def_sampling_image;
     protected $ref_chain_custody;
     protected $ref_request;
     protected $ref_agreet;
@@ -73,6 +76,7 @@ class ModSample extends FRegistry
     protected $ts_user_upd;
 
     protected $childSampleTests;
+    protected $childSampleImages;
     protected $childSampleStatusLogs;
 
     function __construct()
@@ -90,13 +94,13 @@ class ModSample extends FRegistry
         $this->is_sampling_company = new FItem(FItem::DATA_TYPE_INT, "is_sampling_company", "Muestreo propio", "", true);
         $this->sampling_guide = new FItem(FItem::DATA_TYPE_INT, "sampling_guide", "Número guía muestreo", "", true);
         $this->sampling_area = new FItem(FItem::DATA_TYPE_STRING, "sampling_area", "Área muestreo", "", true);
-        $this->sampling_images = new FItem(FItem::DATA_TYPE_INT, "sampling_images", "Imágenes muestreo", "", true);
         $this->sampling_datetime_n = new FItem(FItem::DATA_TYPE_DATETIME, "sampling_datetime_n", "Fecha-hora muestreo", "", false);
-        $this->sampling_temperat_n = new FItem(FItem::DATA_TYPE_FLOAT, "sampling_temperat_n", "Temperatura muestreo", "", false);
+        $this->sampling_temperat_n = new FItem(FItem::DATA_TYPE_FLOAT, "sampling_temperat_n", "Temp. muestreo °C", "", false);
         $this->sampling_notes = new FItem(FItem::DATA_TYPE_STRING, "sampling_notes", "Observaciones muestreo", "", false);
         $this->sampling_deviats = new FItem(FItem::DATA_TYPE_STRING, "sampling_deviats", "Desviaciones muestreo", "", false);
+        $this->sampling_images = new FItem(FItem::DATA_TYPE_INT, "sampling_images", "Imágenes muestreo", "", true);
         $this->recept_datetime = new FItem(FItem::DATA_TYPE_DATETIME, "recept_datetime", "Fecha-hora recepción", "", true);
-        $this->recept_temperat = new FItem(FItem::DATA_TYPE_FLOAT, "recept_temperat", "Temperatura recepción", "", true);
+        $this->recept_temperat = new FItem(FItem::DATA_TYPE_FLOAT, "recept_temperat", "Temp. recepción °C", "", true);
         $this->recept_notes = new FItem(FItem::DATA_TYPE_STRING, "recept_notes", "Observaciones recepción", "", false);
         $this->recept_deviats = new FItem(FItem::DATA_TYPE_STRING, "recept_deviats", "Desviaciones recepción", "", false);
         $this->sample_child = new FItem(FItem::DATA_TYPE_INT, "sample_child", "Muestra hijo número", "", true);
@@ -113,7 +117,7 @@ class ModSample extends FRegistry
         $this->customer_state_region = new FItem(FItem::DATA_TYPE_STRING, "customer_state_region", "Estado", "", true);
         $this->customer_country = new FItem(FItem::DATA_TYPE_STRING, "customer_country", "País", "", true);
         $this->customer_contact = new FItem(FItem::DATA_TYPE_STRING, "customer_contact", "Contacto", "", false);
-        $this->is_def_report_images = new FItem(FItem::DATA_TYPE_BOOL, "is_def_report_images", "Imágenes IR por defecto", "", false);
+        $this->is_def_sampling_image = new FItem(FItem::DATA_TYPE_BOOL, "is_def_sampling_image", "Aplica imagen muestreo p/def.", "", false);
         $this->ref_chain_custody = new FItem(FItem::DATA_TYPE_STRING, "ref_chain_custody", "Ref. cadena custodia", "", false);
         $this->ref_request = new FItem(FItem::DATA_TYPE_STRING, "ref_request", "Ref. solicitud ensayos", "", false);
         $this->ref_agreet = new FItem(FItem::DATA_TYPE_STRING, "ref_agreet", "Ref. convenio ensayos", "", false);
@@ -153,11 +157,11 @@ class ModSample extends FRegistry
         $this->items["is_sampling_company"] = $this->is_sampling_company;
         $this->items["sampling_guide"] = $this->sampling_guide;
         $this->items["sampling_area"] = $this->sampling_area;
-        $this->items["sampling_images"] = $this->sampling_images;
         $this->items["sampling_datetime_n"] = $this->sampling_datetime_n;
         $this->items["sampling_temperat_n"] = $this->sampling_temperat_n;
         $this->items["sampling_notes"] = $this->sampling_notes;
         $this->items["sampling_deviats"] = $this->sampling_deviats;
+        $this->items["sampling_images"] = $this->sampling_images;
         $this->items["recept_datetime"] = $this->recept_datetime;
         $this->items["recept_temperat"] = $this->recept_temperat;
         $this->items["recept_notes"] = $this->recept_notes;
@@ -176,7 +180,7 @@ class ModSample extends FRegistry
         $this->items["customer_state_region"] = $this->customer_state_region;
         $this->items["customer_country"] = $this->customer_country;
         $this->items["customer_contact"] = $this->customer_contact;
-        $this->items["is_def_report_images"] = $this->is_def_report_images;
+        $this->items["is_def_sampling_image"] = $this->is_def_sampling_image;
         $this->items["ref_chain_custody"] = $this->ref_chain_custody;
         $this->items["ref_request"] = $this->ref_request;
         $this->items["ref_agreet"] = $this->ref_agreet;
@@ -238,14 +242,24 @@ class ModSample extends FRegistry
         return $this->childSampleTests;
     }
 
+    public function &getChildSampleImages(): array
+    {
+        return $this->childSampleImages;
+    }
+
     public function &getChildSampleStatusLogs(): array
     {
-        return $this->$childSampleStatusLogs;
+        return $this->childSampleStatusLogs;
     }
 
     public function clearChildSampleTests()
     {
         $this->childSampleTests = array();
+    }
+
+    public function clearChildSampleImages()
+    {
+        $this->childSampleImages = array();
     }
 
     public function clearChildSampleStatusLogs()
@@ -259,11 +273,21 @@ class ModSample extends FRegistry
 
         parent::validate($userSession);
 
-        foreach ($this->childSampleTests as $sampleTest) {
+        foreach ($this->childSampleTests as $test) {
             $ids = array();
-            $ids["id_sample"] = $this->isRegistryNew ? -1 : $this->id;    // bypass validation
-            $processOpt->setIds($ids);
-            $processOpt->validate($userSession);
+            $ids["id_sample"] = $this->isRegistryNew ? -1 : $this->id;  // bypass validation
+            $test->setIds($ids);
+            $test->validate($userSession);
+        }
+
+        foreach ($this->childSampleImages as $image) {
+            $image->getItem("fk_sample")->setValue($this->isRegistryNew ? -1 : $this->id);  // bypass validation
+            $image->validate($userSession);
+        }
+
+        foreach ($this->$childSampleStatusLogs as $statusLog) {
+            $statusLog->getItem("fk_sample")->setValue($this->isRegistryNew ? -1 : $this->id);  // bypass validation
+            $statusLog->validate($userSession);
         }
     }
 
@@ -287,11 +311,11 @@ class ModSample extends FRegistry
             $this->is_sampling_company->setValue($row["is_sampling_company"]);
             $this->sampling_guide->setValue($row["sampling_guide"]);
             $this->sampling_area->setValue($row["sampling_area"]);
-            $this->sampling_images->setValue($row["sampling_images"]);
             $this->sampling_datetime_n->setValue($row["sampling_datetime_n"]);
             $this->sampling_temperat_n->setValue($row["sampling_temperat_n"]);
             $this->sampling_notes->setValue($row["sampling_notes"]);
             $this->sampling_deviats->setValue($row["sampling_deviats"]);
+            $this->sampling_images->setValue($row["sampling_images"]);
             $this->recept_datetime->setValue($row["recept_datetime"]);
             $this->recept_temperat->setValue($row["recept_temperat"]);
             $this->recept_notes->setValue($row["recept_notes"]);
@@ -310,7 +334,7 @@ class ModSample extends FRegistry
             $this->customer_state_region->setValue($row["customer_state_region"]);
             $this->customer_country->setValue($row["customer_country"]);
             $this->customer_contact->setValue($row["customer_contact"]);
-            $this->is_def_report_images->setValue($row["is_def_report_images"]);
+            $this->is_def_sampling_image->setValue($row["is_def_sampling_image"]);
             $this->ref_chain_custody->setValue($row["ref_chain_custody"]);
             $this->ref_request->setValue($row["ref_request"]);
             $this->ref_agreet->setValue($row["ref_agreet"]);
@@ -359,6 +383,15 @@ class ModSample extends FRegistry
                 $this->childSampleTests[] = $sampleTest;
             }
 
+            // read child sample images:
+            $sql = "SELECT id_sample_image FROM o_sample_image WHERE fk_sample = $this->id ORDER BY id_sample_image;";
+            $statement = $pdo->query($sql);
+            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                $sampleImage = new ModSampleImage();
+                $sampleImage->read($userSession, intval($row["id_sample_image"]), $mode);
+                $this->childSampleImages[] = $sampleImage;
+            }
+
             // read child sample status log entries:
             $sql = "SELECT id_sample_status_log FROM o_sample_status_log WHERE fk_sample = $this->id ORDER BY id_sample_status_log;";
             $statement = $pdo->query($sql);
@@ -392,11 +425,11 @@ class ModSample extends FRegistry
                 "is_sampling_company, " .
                 "sampling_guide, " .
                 "sampling_area, " .
-                "sampling_images, " .
                 "sampling_datetime_n, " .
                 "sampling_temperat_n, " .
                 "sampling_notes, " .
                 "sampling_deviats, " .
+                "sampling_images, " .
                 "recept_datetime, " .
                 "recept_temperat, " .
                 "recept_notes, " .
@@ -415,7 +448,7 @@ class ModSample extends FRegistry
                 "customer_state_region, " .
                 "customer_country, " .
                 "customer_contact, " .
-                "is_def_report_images, " .
+                "is_def_sampling_image, " .
                 "ref_chain_custody, " .
                 "ref_request, " .
                 "ref_agreet, " .
@@ -455,11 +488,11 @@ class ModSample extends FRegistry
                 ":is_sampling_company, " .
                 ":sampling_guide, " .
                 ":sampling_area, " .
-                ":sampling_images, " .
                 ":sampling_datetime_n, " .
                 ":sampling_temperat_n, " .
                 ":sampling_notes, " .
                 ":sampling_deviats, " .
+                ":sampling_images, " .
                 ":recept_datetime, " .
                 ":recept_temperat, " .
                 ":recept_notes, " .
@@ -478,7 +511,7 @@ class ModSample extends FRegistry
                 ":customer_state_region, " .
                 ":customer_country, " .
                 ":customer_contact, " .
-                ":is_def_report_images, " .
+                ":is_def_sampling_image, " .
                 ":ref_chain_custody, " .
                 ":ref_request, " .
                 ":ref_agreet, " .
@@ -519,11 +552,11 @@ class ModSample extends FRegistry
                 "is_sampling_company = :is_sampling_company, " .
                 "sampling_guide = :sampling_guide, " .
                 "sampling_area = :sampling_area, " .
-                "sampling_images = :sampling_images, " .
                 "sampling_datetime_n = :sampling_datetime_n, " .
                 "sampling_temperat_n = :sampling_temperat_n, " .
                 "sampling_notes = :sampling_notes, " .
                 "sampling_deviats = :sampling_deviats, " .
+                "sampling_images = :sampling_images, " .
                 "recept_datetime = :recept_datetime, " .
                 "recept_temperat = :recept_temperat, " .
                 "recept_notes = :recept_notes, " .
@@ -542,7 +575,7 @@ class ModSample extends FRegistry
                 "customer_state_region = :customer_state_region, " .
                 "customer_country = :customer_country, " .
                 "customer_contact = :customer_contact, " .
-                "is_def_report_images = :is_def_report_images, " .
+                "is_def_sampling_image = :is_def_sampling_image, " .
                 "ref_chain_custody = :ref_chain_custody, " .
                 "ref_request = :ref_request, " .
                 "ref_agreet = :ref_agreet, " .
@@ -566,6 +599,10 @@ class ModSample extends FRegistry
                 "nk_recept = :nk_recept, " .
                 "fk_user_sampler = :fk_user_sampler, " .
                 "fk_user_receiver = :fk_user_receiver, " .
+                "fk_user_ins = :fk_user_ins, " .
+                "fk_user_upd = :fk_user_upd, " .
+                "ts_user_ins = NOW(), " .
+                "ts_user_upd = NOW(), " .
                 //"fk_user_ins = :fk_user_ins, " .
                 "fk_user_upd = :fk_user, " .
                 //"ts_user_ins = :ts_user_ins, " .
@@ -584,11 +621,11 @@ class ModSample extends FRegistry
         $is_sampling_company = $this->is_sampling_company->getValue();
         $sampling_guide = $this->sampling_guide->getValue();
         $sampling_area = $this->sampling_area->getValue();
-        $sampling_images = $this->sampling_images->getValue();
         $sampling_datetime_n = $this->sampling_datetime_n->getValue();
         $sampling_temperat_n = $this->sampling_temperat_n->getValue();
         $sampling_notes = $this->sampling_notes->getValue();
         $sampling_deviats = $this->sampling_deviats->getValue();
+        $sampling_images = $this->sampling_images->getValue();
         $recept_datetime = $this->recept_datetime->getValue();
         $recept_temperat = $this->recept_temperat->getValue();
         $recept_notes = $this->recept_notes->getValue();
@@ -607,7 +644,7 @@ class ModSample extends FRegistry
         $customer_state_region = $this->customer_state_region->getValue();
         $customer_country = $this->customer_country->getValue();
         $customer_contact = $this->customer_contact->getValue();
-        $is_def_report_images = $this->is_def_report_images->getValue();
+        $is_def_sampling_image = $this->is_def_sampling_image->getValue();
         $ref_chain_custody = $this->ref_chain_custody->getValue();
         $ref_request = $this->ref_request->getValue();
         $ref_agreet = $this->ref_agreet->getValue();
@@ -649,11 +686,11 @@ class ModSample extends FRegistry
         $statement->bindParam(":is_sampling_company", $is_sampling_company, \PDO::PARAM_INT);
         $statement->bindParam(":sampling_guide", $sampling_guide, \PDO::PARAM_INT);
         $statement->bindParam(":sampling_area", $sampling_area);
-        $statement->bindParam(":sampling_images", $sampling_images, \PDO::PARAM_INT);
         $statement->bindParam(":sampling_datetime_n", $sampling_datetime_n);
         $statement->bindParam(":sampling_temperat_n", $sampling_temperat_n);
         $statement->bindParam(":sampling_notes", $sampling_notes);
         $statement->bindParam(":sampling_deviats", $sampling_deviats);
+        $statement->bindParam(":sampling_images", $sampling_images, \PDO::PARAM_INT);
         $statement->bindParam(":recept_datetime", $recept_datetime);
         $statement->bindParam(":recept_temperat", $recept_temperat);
         $statement->bindParam(":recept_notes", $recept_notes);
@@ -672,7 +709,7 @@ class ModSample extends FRegistry
         $statement->bindParam(":customer_state_region", $customer_state_region);
         $statement->bindParam(":customer_country", $customer_country);
         $statement->bindParam(":customer_contact", $customer_contact);
-        $statement->bindParam(":is_def_report_images", $is_def_report_images, \PDO::PARAM_BOOL);
+        $statement->bindParam(":is_def_sampling_image", $is_def_sampling_image, \PDO::PARAM_BOOL);
         $statement->bindParam(":ref_chain_custody", $ref_chain_custody);
         $statement->bindParam(":ref_request", $ref_request);
         $statement->bindParam(":ref_agreet", $ref_agreet);
@@ -717,24 +754,35 @@ class ModSample extends FRegistry
 
         // save child sample tests:
         $userSession->getPdo()->exec("DELETE FROM o_sample_test WHERE id_sample = $this->id;"); // pure relations
-        foreach ($this->childSampleTests as $sampleTest) {
+        foreach ($this->childSampleTests as $test) {
             $ids = array();
             $ids["id_sample"] = $this->id;
 
-            $sampleTest->setIds($ids);
-            $sampleTest->forceRegistryNew();    // it is a pure relation
-            $sampleTest->save($userSession);
+            $test->setIds($ids);
+            $test->forceRegistryNew();  // it is a pure relation
+            $test->save($userSession);
         }
 
-        // save child sample status log entries:
-        foreach ($this->childSampleStatusLogs as $sampleStatusLog) {
+        // save child sample images:
+        foreach ($this->childSampleImages as $image) {
             // assure link to parent:
             $data = array();
             $data["fk_sample"] = $this->id;
-            $sampleStatusLog->setData($data);
+            $image->setData($data);
 
             // save child:
-            $sampleStatusLog->save($userSession);
+            $image->save($userSession);
+        }
+
+        // save child sample status log entries:
+        foreach ($this->childSampleStatusLogs as $statusLog) {
+            // assure link to parent:
+            $data = array();
+            $data["fk_sample"] = $this->id;
+            $statusLog->setData($data);
+
+            // save child:
+            $statusLog->save($userSession);
         }
     }
 

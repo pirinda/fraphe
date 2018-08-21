@@ -26,7 +26,7 @@ class ModRecept extends FRegistry
     protected $customer_state_region;
     protected $customer_country;
     protected $customer_contact;
-    protected $is_def_report_images;
+    protected $is_def_sampling_image;
     protected $ref_chain_custody;
     protected $ref_request;
     protected $ref_agreet;
@@ -69,7 +69,7 @@ class ModRecept extends FRegistry
         $this->customer_state_region = new FItem(FItem::DATA_TYPE_STRING, "customer_state_region", "Estado", "", true);
         $this->customer_country = new FItem(FItem::DATA_TYPE_STRING, "customer_country", "País", "", true);
         $this->customer_contact = new FItem(FItem::DATA_TYPE_STRING, "customer_contact", "Contacto", "", false);
-        $this->is_def_report_images = new FItem(FItem::DATA_TYPE_BOOL, "is_def_report_images", "Imágenes IR por defecto", "", false);
+        $this->is_def_sampling_image = new FItem(FItem::DATA_TYPE_BOOL, "is_def_sampling_image", "Aplica imagen muestreo p/def.", "", false);
         $this->ref_chain_custody = new FItem(FItem::DATA_TYPE_STRING, "ref_chain_custody", "Ref. cadena custodia", "", false);
         $this->ref_request = new FItem(FItem::DATA_TYPE_STRING, "ref_request", "Ref. solicitud ensayos", "", false);
         $this->ref_agreet = new FItem(FItem::DATA_TYPE_STRING, "ref_agreet", "Ref. convenio ensayos", "", false);
@@ -106,7 +106,7 @@ class ModRecept extends FRegistry
         $this->items["customer_state_region"] = $this->customer_state_region;
         $this->items["customer_country"] = $this->customer_country;
         $this->items["customer_contact"] = $this->customer_contact;
-        $this->items["is_def_report_images"] = $this->is_def_report_images;
+        $this->items["is_def_sampling_image"] = $this->is_def_sampling_image;
         $this->items["ref_chain_custody"] = $this->ref_chain_custody;
         $this->items["ref_request"] = $this->ref_request;
         $this->items["ref_agreet"] = $this->ref_agreet;
@@ -194,7 +194,7 @@ class ModRecept extends FRegistry
             $this->customer_state_region->setValue($row["customer_state_region"]);
             $this->customer_country->setValue($row["customer_country"]);
             $this->customer_contact->setValue($row["customer_contact"]);
-            $this->is_def_report_images->setValue($row["is_def_report_images"]);
+            $this->is_def_sampling_image->setValue($row["is_def_sampling_image"]);
             $this->ref_chain_custody->setValue($row["ref_chain_custody"]);
             $this->ref_request->setValue($row["ref_request"]);
             $this->ref_agreet->setValue($row["ref_agreet"]);
@@ -259,7 +259,7 @@ class ModRecept extends FRegistry
                 "customer_state_region, " .
                 "customer_country, " .
                 "customer_contact, " .
-                "is_def_report_images, " .
+                "is_def_sampling_image, " .
                 "ref_chain_custody, " .
                 "ref_request, " .
                 "ref_agreet, " .
@@ -296,7 +296,7 @@ class ModRecept extends FRegistry
                 ":customer_state_region, " .
                 ":customer_country, " .
                 ":customer_contact, " .
-                ":is_def_report_images, " .
+                ":is_def_sampling_image, " .
                 ":ref_chain_custody, " .
                 ":ref_request, " .
                 ":ref_agreet, " .
@@ -334,7 +334,7 @@ class ModRecept extends FRegistry
                 "customer_state_region = :customer_state_region, " .
                 "customer_country = :customer_country, " .
                 "customer_contact = :customer_contact, " .
-                "is_def_report_images = :is_def_report_images, " .
+                "is_def_sampling_image = :is_def_sampling_image, " .
                 "ref_chain_custody = :ref_chain_custody, " .
                 "ref_request = :ref_request, " .
                 "ref_agreet = :ref_agreet, " .
@@ -373,7 +373,7 @@ class ModRecept extends FRegistry
         $customer_state_region = $this->customer_state_region->getValue();
         $customer_country = $this->customer_country->getValue();
         $customer_contact = $this->customer_contact->getValue();
-        $is_def_report_images = $this->is_def_report_images->getValue();
+        $is_def_sampling_image = $this->is_def_sampling_image->getValue();
         $ref_chain_custody = $this->ref_chain_custody->getValue();
         $ref_request = $this->ref_request->getValue();
         $ref_agreet = $this->ref_agreet->getValue();
@@ -412,7 +412,7 @@ class ModRecept extends FRegistry
         $statement->bindParam(":customer_state_region", $customer_state_region);
         $statement->bindParam(":customer_country", $customer_country);
         $statement->bindParam(":customer_contact", $customer_contact);
-        $statement->bindParam(":is_def_report_images", $is_def_report_images, \PDO::PARAM_BOOL);
+        $statement->bindParam(":is_def_sampling_image", $is_def_sampling_image, \PDO::PARAM_BOOL);
         $statement->bindParam(":ref_chain_custody", $ref_chain_custody);
         $statement->bindParam(":ref_request", $ref_request);
         $statement->bindParam(":ref_agreet", $ref_agreet);

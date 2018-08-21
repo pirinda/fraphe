@@ -3,9 +3,15 @@ namespace app;
 
 use Fraphe\App\FUserSession;
 use Fraphe\Model\FRegistry;
+use app\models\catalogs\ModEntity;
 
 abstract class AppUtils
 {
+    public static function composeSelectOption(int $selectedId = 0): string
+    {
+        return '<option value="0"' . ($selectedId == 0 ? " selected" : "") . '>- seleccionar -</option>';
+    }
+
     public static function getSelectOptions(FUserSession $userSession, int $catalog, int $selectedId, array $params = null): array
     {
         $sql;
@@ -27,11 +33,15 @@ abstract class AppUtils
                 break;
 
             // "name" sorted by name + ID:
-            case AppConsts::OC_SAMPLING_EQUIPT:
             case AppConsts::OC_SAMPLING_METHOD:
             case AppConsts::OC_TESTING_METHOD:
             case AppConsts::OC_CONTAINER_TYPE:
                 $sql = "SELECT $tableId AS _val, name AS _opt FROM $table WHERE NOT is_deleted ORDER BY name, $tableId;";
+                break;
+
+            // "name" sorted by name + ID:
+            case AppConsts::OC_SAMPLING_EQUIPT:
+                $sql = "SELECT $tableId AS _val, CONCAT(name, ' (', code, ')') AS _opt FROM $table WHERE NOT is_deleted ORDER BY name, $tableId;";
                 break;
 
             // "name" sorted by code + ID:
@@ -45,27 +55,44 @@ abstract class AppUtils
                 break;
 
             // "name (code)" sorted by name + ID:
-            // params expected: fk_entity_class,
+            // $params keys that must be supplied: fk_entity_class
+            //$ params keys that can be supplied: entity_type or entity_type_n (from 1 to n)
             case AppConsts::CC_ENTITY:
-                $type;
+                $sqlType = "";
+                $sqlCorp = "";
+
                 if (isset($params["entity_type"])) {
-                    $type = $params["entity_type"];
+                    $sqlType = strval($params["entity_type"]);
+                }
+                else {
+                    $i = 1;
+                    while (true) {
+                        if (!isset($params["entity_type_$i"])) {
+                            break;
+                        }
+                        else {
+                            $sqlType .= (empty($sqlType) ? "" : ", ") . strval($params["entity_type_$i"]);
+                            $i++;
+                        }
+                    }
+                }
+                if (isset($params[ModEntity::PARAM_CORP_MEMBERS])) {
+                    $sqlCorp = "AND e.nk_entity_parent = " . $params[ModEntity::PARAM_CORP_MEMBERS] . " ";
                 }
 
-                $sql = "SELECT e.$tableId AS _val, CONCAT(e.name, ' (', e.code, ')') AS _opt ";
+
+                $sql = "SELECT e.$tableId AS _val, CONCAT(e.name, IF(e.alias = '', '', CONCAT(', \"', e.alias, '\",')), ' (', e.code, ')') AS _opt ";
                 $sql .= "FROM $table AS e ";
-
-                if (isset($type)) {
-                    $sql .= "INNER JOIN " . $table = AppConsts::$tables[AppConsts::CC_ENTITY_ENTITY_TYPE] . " AS et ON et.id_entity = e.id_entity AND et.id_entity_type = " . $type . " ";
+                if (!empty($sqlType)) {
+                    $sql .= "INNER JOIN " . AppConsts::$tables[AppConsts::CC_ENTITY_ENTITY_TYPE] . " AS et ON et.id_entity = e.id_entity AND et.id_entity_type IN (" . $sqlType . ") ";
                 }
-
-                $sql .= "WHERE NOT e.is_deleted AND e.fk_entity_class = " . $params["fk_entity_class"] . " ORDER BY e.name, e.code, e.$tableId;";
+                $sql .= "WHERE NOT e.is_deleted AND e.fk_entity_class = " . strval($params["fk_entity_class"]) . " " . $sqlCorp . "ORDER BY e.name, e.code, e.$tableId;";
                 break;
 
             default:
         }
 
-        $options[] = '<option value="0"' . ($selectedId == 0 ? " selected" : "") . '>- seleccionar -</option>';
+        $options[] = self::composeSelectOption($selectedId);
 
         if (isset($sql)) {
             foreach ($userSession->getPdo()->query($sql) as $row) {

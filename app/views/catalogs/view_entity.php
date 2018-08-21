@@ -25,7 +25,7 @@ echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/catalogs/for
 echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/catalogs/form_entity.php?class=' . $_GET["class"] . '&nature=2" class="btn btn-primary btn-sm" role="button" data-toggle="tooltip" data-placement="bottom" title="' . ModUtils::getEntityNature(ModUtils::ENTITY_NATURE_ORG) . '">Crear ' .  ModUtils::getEntityNatureAcronym(ModUtils::ENTITY_NATURE_ORG) . '</a>';
 
 $sql = <<<SQL
-SELECT c.name AS c_name, c.code AS c_code, c.id_entity AS c_id,
+SELECT c.name AS c_name, c.code AS c_code, c.alias AS c_alias, c.id_entity AS c_id,
 c.ts_user_ins AS c_ts_user_ins, c.ts_user_upd AS c_ts_user_upd,
 ui.name AS ui_name, uu.name AS uu_name
 FROM cc_entity AS c
@@ -41,6 +41,7 @@ echo '<thead>';
 echo '<tr>';
 echo '<th>Nombre</th>';
 echo '<th>Código</th>';
+echo '<th>Alias</th>';
 echo '<th class="small">Creador</th>';
 echo '<th class="small">Creación</th>';
 echo '<th class="small">Modificador</th>';
@@ -55,6 +56,7 @@ foreach ($pdo->query($sql) as $row) {
     echo '<tr>';
     echo '<td>' . $row['c_name'] . '</td>';
     echo '<td>' . $row['c_code'] . '</td>';
+    echo '<td>' . $row['c_alias'] . '</td>';
     echo '<td class="small">' . $row['ui_name'] . '</td>';
     echo '<td class="small">' . $row['c_ts_user_ins'] . '</td>';
     echo '<td class="small">' . $row['uu_name'] . '</td>';

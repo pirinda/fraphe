@@ -146,7 +146,7 @@ abstract class FGuiUtils
     */
     public static function createPdo(): \PDO
     {
-        $pdo = new \PDO(self::composePdoDsn(), $_SESSION[FAppConsts::DB_USER_NAME], $_SESSION[FAppConsts::DB_USER_PSWD]);
+        $pdo = new \PDO(self::composePdoDsn(), $_SESSION[FAppConsts::DB_USER_NAME], $_SESSION[FAppConsts::DB_USER_PSWD], array(\PDO::ATTR_PERSISTENT => true));
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         return $pdo;
     }

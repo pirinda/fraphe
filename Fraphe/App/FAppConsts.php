@@ -5,6 +5,7 @@ abstract class FAppConsts
 {
     public const APP_NAME = "appName";
     public const APP_VENDOR = "appVendor";
+    public const APP_MODE = "appMode";
     public const APP_MODS = "appModules";
 
     public const ROOT_DIR = "rootDir";

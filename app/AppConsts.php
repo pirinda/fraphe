@@ -16,11 +16,12 @@ abstract class AppConsts
     public const CC_MARKET_SEGMENT = 101031;
     public const CC_ENTITY_CLASS = 101041;
     public const CC_ENTITY_TYPE = 101042;
-    public const CC_ENTITY = 101046;
-    public const CC_ENTITY_ENTITY_TYPE = 101047;
-    public const CC_ENTITY_ADDRESS = 101048;
-    public const CC_CONTACT_TYPE = 101051;
-    public const CC_CONTACT = 101056;
+    public const CC_ENTITY = 101051;
+    public const CC_ENTITY_ENTITY_TYPE = 101056;
+    public const CC_ENTITY_IMAGE = 101058;
+    public const CC_ENTITY_ADDRESS = 101061;
+    public const CC_CONTACT_TYPE = 101071;
+    public const CC_CONTACT = 101076;
 
     public const OC_PROCESS_AREA = 201011;
     public const OC_SAMPLE_CLASS = 201021;
@@ -51,6 +52,7 @@ abstract class AppConsts
 
     public const O_SAMPLE = 202001;
     public const O_SAMPLE_TEST = 202006;
+    public const O_SAMPLE_IMAGE = 202008;
     public const O_SAMPLE_STATUS_LOG = 202009;
     public const O_RECEPT = 202011;
     public const O_JOB = 202021;
@@ -73,6 +75,7 @@ abstract class AppConsts
         self::CC_ENTITY_TYPE => "cc_entity_type",
         self::CC_ENTITY => "cc_entity",
         self::CC_ENTITY_ENTITY_TYPE => "cc_entity_entity_type",
+        self::CC_ENTITY_IMAGE => "cc_entity_image",
         self::CC_ENTITY_ADDRESS => "cc_entity_address",
         self::CC_CONTACT_TYPE => "cc_contact_type",
         self::CC_CONTACT => "cc_contact",
@@ -106,6 +109,7 @@ abstract class AppConsts
 
         self::O_SAMPLE => "o_sample",
         self::O_SAMPLE_TEST => "o_sample_test",
+        self::O_SAMPLE_IMAGE => "o_sample_image",
         self::O_SAMPLE_STATUS_LOG => "o_sample_status_log",
         self::O_RECEPT => "o_recept",
         self::O_JOB => "o_job",
@@ -123,11 +127,13 @@ abstract class AppConsts
         self::CC_USER_JOB => "id_user_job",
         self::CC_USER => "id_user",
         //
+        //
         self::CC_MARKET_SEGMENT => "id_market_segment",
         self::CC_ENTITY_CLASS => "id_entity_class",
         self::CC_ENTITY_TYPE => "id_entity_type",
         self::CC_ENTITY => "id_entity",
         //
+        self::CC_ENTITY_IMAGE => "id_entity_image",
         self::CC_ENTITY_ADDRESS => "id_entity_address",
         self::CC_CONTACT_TYPE => "id_contact_type",
         self::CC_CONTACT => "id_contact",
@@ -160,6 +166,7 @@ abstract class AppConsts
 
         self::O_SAMPLE => "id_sample",
         //
+        self::O_SAMPLE_IMAGE => "id_sample_image",
         self::O_SAMPLE_STATUS_LOG => "id_sample_status_log",
         self::O_RECEPT => "id_recept",
         self::O_JOB => "id_job",

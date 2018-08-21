@@ -3,6 +3,7 @@ namespace app\models\catalogs;
 
 use Fraphe\App\FGuiUtils;
 use Fraphe\App\FUserSession;
+use Fraphe\Lib\FFiles;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
@@ -11,6 +12,9 @@ use app\models\ModUtils;
 
 class ModEntity extends FRegistry
 {
+    public const ID_DIGITS = 6;
+    public const PARAM_CORP_MEMBERS = "corp_members";
+
     protected $id_entity;
     protected $name;
     protected $code;
@@ -20,12 +24,12 @@ class ModEntity extends FRegistry
     protected $forename;
     protected $fiscal_id;
     protected $is_person;
-    protected $apply_credit;
+    protected $is_credit;
     protected $credit_days;
     protected $billing_prefs;
     protected $web_page;
     protected $notes;
-    protected $is_def_report_images;
+    protected $is_def_sampling_image;
     protected $is_system;
     protected $is_deleted;
     protected $fk_entity_class;
@@ -40,6 +44,7 @@ class ModEntity extends FRegistry
     protected $ts_user_upd;
 
     protected $childEntityTypes;
+    protected $childImages;
     protected $childAddresses;
 
     function __construct()
@@ -55,12 +60,12 @@ class ModEntity extends FRegistry
         $this->forename = new FItem(FItem::DATA_TYPE_STRING, "forename", "Nombre(s)", "", false);
         $this->fiscal_id = new FItem(FItem::DATA_TYPE_STRING, "fiscal_id", "ID fiscal", "RFC", true);
         $this->is_person = new FItem(FItem::DATA_TYPE_BOOL, "is_person", "Es persona", "", false);
-        $this->apply_credit = new FItem(FItem::DATA_TYPE_BOOL, "apply_credit", "Aplica crédito", "", false);
+        $this->is_credit = new FItem(FItem::DATA_TYPE_BOOL, "is_credit", "Aplica crédito", "", false);
         $this->credit_days = new FItem(FItem::DATA_TYPE_INT, "credit_days", "Días crédito", "", false);
         $this->billing_prefs = new FItem(FItem::DATA_TYPE_STRING, "billing_prefs", "Preferencias facturación", "opc1=val1; opc2=val2; ...", false);
         $this->web_page = new FItem(FItem::DATA_TYPE_STRING, "web_page", "Sitio web", "", false);
         $this->notes = new FItem(FItem::DATA_TYPE_STRING, "notes", "Notas", "", false);
-        $this->is_def_report_images = new FItem(FItem::DATA_TYPE_BOOL, "is_def_report_images", "Imágenes IR por defecto", "", false);
+        $this->is_def_sampling_image = new FItem(FItem::DATA_TYPE_BOOL, "is_def_sampling_image", "Aplica imagen muestreo p/def.", "", false);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
         $this->fk_entity_class = new FItem(FItem::DATA_TYPE_INT, "fk_entity_class", "Clase entidad", "", true);
@@ -83,12 +88,12 @@ class ModEntity extends FRegistry
         $this->items["forename"] = $this->forename;
         $this->items["fiscal_id"] = $this->fiscal_id;
         $this->items["is_person"] = $this->is_person;
-        $this->items["apply_credit"] = $this->apply_credit;
+        $this->items["is_credit"] = $this->is_credit;
         $this->items["credit_days"] = $this->credit_days;
         $this->items["billing_prefs"] = $this->billing_prefs;
         $this->items["web_page"] = $this->web_page;
         $this->items["notes"] = $this->notes;
-        $this->items["is_def_report_images"] = $this->is_def_report_images;
+        $this->items["is_def_sampling_image"] = $this->is_def_sampling_image;
         $this->items["is_system"] = $this->is_system;
         $this->items["is_deleted"] = $this->is_deleted;
         $this->items["fk_entity_class"] = $this->fk_entity_class;
@@ -115,12 +120,18 @@ class ModEntity extends FRegistry
         $this->notes->setRangeLength(0, 500);
 
         $this->clearChildEntityTypes();
+        $this->clearChildImages();
         $this->clearChildAddresses();
     }
 
     public function &getChildEntityTypes(): array
     {
         return $this->childEntityTypes;
+    }
+
+    public function &getChildImages(): array
+    {
+        return $this->childImages;
     }
 
     public function &getChildAddresses(): array
@@ -131,6 +142,11 @@ class ModEntity extends FRegistry
     public function clearChildEntityTypes()
     {
         $this->childEntityTypes = array();
+    }
+
+    public function clearChildImages()
+    {
+        $this->childImages = array();
     }
 
     public function clearChildAddresses()
@@ -166,6 +182,10 @@ class ModEntity extends FRegistry
         }
 
         return !$exists;
+    }
+
+    public function composeTargetFileDefSamplingImage(int $num) {
+        return FFiles::createFileNameForId(ModEntityImage::PREFIX, self::ID_DIGITS, $this->id, $num, "jpg");
     }
 
     public function tailor()
@@ -207,6 +227,11 @@ class ModEntity extends FRegistry
             $entityType->validate($userSession);
         }
 
+        foreach ($this->childImages as $image) {
+            $image->getItem("fk_entity")->setValue($this->isRegistryNew ? -1 : $this->id);      // bypass validation
+            $image->validate($userSession);
+        }
+
         if (count($this->childAddresses) == 0) {
             throw new \Exception(__METHOD__ . ": No se han definido domicilios.");
         }
@@ -235,12 +260,12 @@ class ModEntity extends FRegistry
             $this->forename->setValue($row["forename"]);
             $this->fiscal_id->setValue($row["fiscal_id"]);
             $this->is_person->setValue($row["is_person"]);
-            $this->apply_credit->setValue($row["apply_credit"]);
+            $this->is_credit->setValue($row["is_credit"]);
             $this->credit_days->setValue($row["credit_days"]);
             $this->billing_prefs->setValue($row["billing_prefs"]);
             $this->web_page->setValue($row["web_page"]);
             $this->notes->setValue($row["notes"]);
-            $this->is_def_report_images->setValue($row["is_def_report_images"]);
+            $this->is_def_sampling_image->setValue($row["is_def_sampling_image"]);
             $this->is_system->setValue($row["is_system"]);
             $this->is_deleted->setValue($row["is_deleted"]);
             $this->fk_entity_class->setValue($row["fk_entity_class"]);
@@ -271,6 +296,15 @@ class ModEntity extends FRegistry
                 $entityType = new ModEntityEntityType();
                 $entityType->retrieve($userSession, $ids, $mode);
                 $this->childEntityTypes[] = $entityType;
+            }
+
+            // read child entity images:
+            $sql = "SELECT id_entity_image FROM cc_entity_image WHERE fk_entity = $this->id ORDER BY id_entity_image;";
+            $statement = $pdo->query($sql);
+            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                $image = new ModEntityImage();
+                $image->read($userSession, intval($row["id_entity_image"]), $mode);
+                $this->childImages[] = $image;
             }
 
             // read child entity addresses:
@@ -306,12 +340,12 @@ class ModEntity extends FRegistry
                 "forename, " .
                 "fiscal_id, " .
                 "is_person, " .
-                "apply_credit, " .
+                "is_credit, " .
                 "credit_days, " .
                 "billing_prefs, " .
                 "web_page, " .
                 "notes, " .
-                "is_def_report_images, " .
+                "is_def_sampling_image, " .
                 "is_system, " .
                 "is_deleted, " .
                 "fk_entity_class, " .
@@ -334,12 +368,12 @@ class ModEntity extends FRegistry
                 ":forename, " .
                 ":fiscal_id, " .
                 ":is_person, " .
-                ":apply_credit, " .
+                ":is_credit, " .
                 ":credit_days, " .
                 ":billing_prefs, " .
                 ":web_page, " .
                 ":notes, " .
-                ":is_def_report_images, " .
+                ":is_def_sampling_image, " .
                 ":is_system, " .
                 ":is_deleted, " .
                 ":fk_entity_class, " .
@@ -363,12 +397,12 @@ class ModEntity extends FRegistry
                 "forename = :forename, " .
                 "fiscal_id = :fiscal_id, " .
                 "is_person = :is_person, " .
-                "apply_credit = :apply_credit, " .
+                "is_credit = :is_credit, " .
                 "credit_days = :credit_days, " .
                 "billing_prefs = :billing_prefs, " .
                 "web_page = :web_page, " .
                 "notes = :notes, " .
-                "is_def_report_images = :is_def_report_images, " .
+                "is_def_sampling_image = :is_def_sampling_image, " .
                 "is_system = :is_system, " .
                 "is_deleted = :is_deleted, " .
                 "fk_entity_class = :fk_entity_class, " .
@@ -393,12 +427,12 @@ class ModEntity extends FRegistry
         $forename = $this->forename->getValue();
         $fiscal_id = $this->fiscal_id->getValue();
         $is_person = $this->is_person->getValue();
-        $apply_credit = $this->apply_credit->getValue();
+        $is_credit = $this->is_credit->getValue();
         $credit_days = $this->credit_days->getValue();
         $billing_prefs = $this->billing_prefs->getValue();
         $web_page = $this->web_page->getValue();
         $notes = $this->notes->getValue();
-        $is_def_report_images = $this->is_def_report_images->getValue();
+        $is_def_sampling_image = $this->is_def_sampling_image->getValue();
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();
         $fk_entity_class = $this->fk_entity_class->getValue();
@@ -407,8 +441,8 @@ class ModEntity extends FRegistry
         $nk_entity_billing = $this->nk_entity_billing->getValue();
         $nk_entity_agent = $this->nk_entity_agent->getValue();
         $nk_report_delivery_opt = $this->nk_report_delivery_opt->getValue();
-        //$fk_user_ins = $this->fk_user_ins->getValue();
-        //$fk_user_upd = $this->fk_user_upd->getValue();
+        $fk_user_ins = $this->fk_user_ins->getValue();
+        $fk_user_upd = $this->fk_user_upd->getValue();
         //$ts_user_ins = $this->ts_user_ins->getValue();
         //$ts_user_upd = $this->ts_user_upd->getValue();
 
@@ -423,12 +457,12 @@ class ModEntity extends FRegistry
         $statement->bindParam(":forename", $forename);
         $statement->bindParam(":fiscal_id", $fiscal_id);
         $statement->bindParam(":is_person", $is_person, \PDO::PARAM_BOOL);
-        $statement->bindParam(":apply_credit", $apply_credit, \PDO::PARAM_BOOL);
+        $statement->bindParam(":is_credit", $is_credit, \PDO::PARAM_BOOL);
         $statement->bindParam(":credit_days", $credit_days, \PDO::PARAM_INT);
         $statement->bindParam(":billing_prefs", $billing_prefs);
         $statement->bindParam(":web_page", $web_page);
         $statement->bindParam(":notes", $notes);
-        $statement->bindParam(":is_def_report_images", $is_def_report_images, \PDO::PARAM_BOOL);
+        $statement->bindParam(":is_def_sampling_image", $is_def_sampling_image, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
         $statement->bindParam(":fk_entity_class", $fk_entity_class, \PDO::PARAM_INT);
@@ -490,6 +524,17 @@ class ModEntity extends FRegistry
             $entityType->setIds($ids);
             $entityType->forceRegistryNew();    // it is a pure relation
             $entityType->save($userSession);
+        }
+
+        // save child entity images:
+        $index = 0;
+        foreach ($this->childImages as $image) {
+            $data = array();
+            $data["fk_entity"] = $this->id;
+            $data["def_sampling_image"] = $this->composeTargetFileDefSamplingImage(++$index);
+
+            $image->setData($data);
+            $image->save($userSession);
         }
 
         // save child entity addresses:

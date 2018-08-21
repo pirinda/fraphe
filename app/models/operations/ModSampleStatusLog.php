@@ -33,7 +33,7 @@ class ModSampleStatusLog extends FRegistry
 
         $this->id_sample_status_log = new FItem(FItem::DATA_TYPE_INT, "id_sample_status_log", "ID estatus muestra", "", false, true);
         $this->status_datetime = new FItem(FItem::DATA_TYPE_DATETIME, "status_datetime", "Fecha-hora estatus", "", true);
-        $this->status_temperat_n = new FItem(FItem::DATA_TYPE_FLOAT, "status_temperat_n", "Temperatura estatus", "", false);
+        $this->status_temperat_n = new FItem(FItem::DATA_TYPE_FLOAT, "status_temperat_n", "Temp. estatus °C", "", false);
         $this->status_notes = new FItem(FItem::DATA_TYPE_STRING, "status_notes", "Observaciones estatus", "", false);
         $this->status_deviats = new FItem(FItem::DATA_TYPE_STRING, "status_deviats", "Desviaciones estatus", "", false);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);

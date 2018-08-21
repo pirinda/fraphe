@@ -11,6 +11,7 @@ use Fraphe\App\FApp;
 use Fraphe\App\FAppConsts;
 use Fraphe\App\FAppNavbar;
 use Fraphe\App\FGuiUtils;
+use Fraphe\Lib\FFiles;
 use Fraphe\Lib\FUtils;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
@@ -20,6 +21,7 @@ use app\models\ModConsts;
 use app\models\ModUtils;
 use app\models\catalogs\ModEntity;
 use app\models\catalogs\ModEntityEntityType;
+use app\models\catalogs\ModEntityImage;
 use app\models\catalogs\ModEntityAddress;
 use app\models\catalogs\ModContact;
 
@@ -34,10 +36,12 @@ $entityClass = 0;   // ModUtils::ENTITY_CLASS_...: 1=company; 2=customer; 3=prov
 $entityNature = 0;  // ModUtils::ENTITY_NATURE_...: 1=person; 2=organization
 $entity;
 $entityTypes;
+$entityImage;
 $entityAddress;
 $entityAddressCheckboxes = array("is_main", "is_recept", "is_process");
 $contact;
 $errmsg = "";
+$targetFile = "";
 
 switch ($_SERVER["REQUEST_METHOD"]) {
     case "GET":
@@ -63,9 +67,14 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             if (!isset($entityTypes)) {
                 $entityTypes = ModEntity::createEntityTypes($entityClass);
             }
+            if (count($entity->getChildImages()) > 0) {
+                $entityImage = $entity->getChildImages()[0];
+            }
             if (count($entity->getChildAddresses()) > 0) {
                 $entityAddress = $entity->getChildAddresses()[0];
             }
+
+            $targetFile = "../../img/entity/" . $entity->composeTargetFileDefSamplingImage(1);
         }
         else {
             // registry creation:
@@ -83,6 +92,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $entityAddress->getItem("is_main")->setValue(true);
             $entity->getChildAddresses()[0] = $entityAddress;
         }
+
         break;
 
     case "POST":
@@ -108,6 +118,9 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             if (!isset($entityTypes)) {
                 $entityTypes = ModEntity::createEntityTypes($entityClass);
             }
+            if (count($entity->getChildImages()) > 0) {
+                $entityImage = $entity->getChildImages()[0];
+            }
             if (count($entity->getChildAddresses()) > 0) {
                 $entityAddress = $entity->getChildAddresses()[0];
             }
@@ -115,8 +128,12 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
         if (!isset($entityAddress)) {
             $entityAddress = new ModEntityAddress();
+            $entityAddress->getItem("name")->setValue("Matriz");
+            $entityAddress->getItem("country")->setValue("MEX");
+            $entityAddress->getItem("is_main")->setValue(true);
             $entity->getChildAddresses()[0] = $entityAddress;
         }
+
         // recover registry data:
 
         $data = array();
@@ -136,35 +153,47 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
         $data["fiscal_id"] = $_POST["fiscal_id"];
         $data["is_person"] = $entityNature == ModUtils::ENTITY_NATURE_PER;
-        $data["apply_credit"] = empty($_POST["apply_credit"]) ? false : intval($_POST["apply_credit"]) == 1;
+        $data["is_credit"] = empty($_POST["is_credit"]) ? false : boolval($_POST["is_credit"]);
         $data["credit_days"] = intval($_POST["credit_days"]);
         $data["billing_prefs"] = $_POST["billing_prefs"];
         $data["web_page"] = $_POST["web_page"];
         $data["notes"] = $_POST["notes"];
-        $data["is_def_report_images"] = empty($_POST["is_def_report_images"]) ? false : intval($_POST["is_def_report_images"]) == 1;
+        $data["is_def_sampling_image"] = empty($_POST["is_def_sampling_image"]) ? false : boolval($_POST["is_def_sampling_image"]);
         //$data["is_system"] = $_POST["is_system"];
         //$data["is_deleted"] = $_POST["is_deleted"];
         $data["fk_entity_class"] = $entityClass;
         if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
             $data["nk_market_segment"] = $_POST["nk_market_segment"];
-            //$data["nk_entity_parent"] = $_POST["nk_entity_parent"];
-            //$data["nk_entity_billing"] = $_POST["nk_entity_billing"];
-            //$data["nk_entity_agent"] = $_POST["nk_entity_agent"];
-            //$data["nk_user_agent"] = $_POST["nk_user_agent"];
+            $data["nk_entity_parent"] = $_POST["nk_entity_parent"];
+            $data["nk_entity_billing"] = $_POST["nk_entity_billing"];
+            $data["nk_entity_agent"] = $_POST["nk_entity_agent"];
             $data["nk_report_delivery_opt"] = $_POST["nk_report_delivery_opt"];
         }
 
         // entity types:
-
         $entity->clearChildEntityTypes();
         foreach ($entityTypes as $entityType) {
-            if (!empty($_POST[ModEntityEntityType::PREFIX . $entityType]) && intval($_POST[ModEntityEntityType::PREFIX . $entityType]) == 1) {
+            if (!empty($_POST[ModEntityEntityType::PREFIX . $entityType]) && boolval($_POST[ModEntityEntityType::PREFIX . $entityType])) {
                 $entity->addChildEntityType($entityType);
             }
         }
 
-        // entity address:
+        // entity image:
+        if (!empty($_POST["load_def_sampling_image"]) && boolval($_POST["load_def_sampling_image"])) {
+            if (!isset($entityImage)) {
+                $entityImage = new ModEntityImage();
+                $entity->getChildImages()[0] = $entityImage;
+            }
 
+            $dataImage = array();
+            $dataImage["id_entity_image"] = intval($_POST[ModEntityImage::PREFIX . "id_entity_image"]);
+            $dataImage["def_sampling_image"] = $_POST[ModEntityImage::PREFIX . "def_sampling_image"];
+            //$data["is_system"] = $_POST["is_system"];
+            //$data["is_deleted"] = $_POST["is_deleted"];
+            //$data["fk_entity"] = $_POST["fk_entity"];
+        }
+
+        // entity address:
         $dataAddress = array();
         $dataAddress["id_entity_address"] = intval($_POST[ModEntityAddress::PREFIX . "id_entity_address"]);
         $dataAddress["name"] = $_POST[ModEntityAddress::PREFIX . "name"];
@@ -179,9 +208,9 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         $dataAddress["location"] = $_POST[ModEntityAddress::PREFIX . "location"];
         $dataAddress["business_hr"] = $_POST[ModEntityAddress::PREFIX . "business_hr"];
         $dataAddress["notes"] = $_POST[ModEntityAddress::PREFIX . "notes"];
-        $dataAddress["is_main"] = empty($_POST[ModEntityAddress::PREFIX . "is_main"]) ? false : intval($_POST[ModEntityAddress::PREFIX . "is_main"]) == 1;
-        $dataAddress["is_recept"] = empty($_POST[ModEntityAddress::PREFIX . "is_recept"]) ? false : intval($_POST[ModEntityAddress::PREFIX . "is_recept"]) == 1;
-        $dataAddress["is_process"] = empty($_POST[ModEntityAddress::PREFIX . "is_process"]) ? false : intval($_POST[ModEntityAddress::PREFIX . "is_process"]) == 1;
+        $dataAddress["is_main"] = empty($_POST[ModEntityAddress::PREFIX . "is_main"]) ? false : boolval($_POST[ModEntityAddress::PREFIX . "is_main"]);
+        $dataAddress["is_recept"] = empty($_POST[ModEntityAddress::PREFIX . "is_recept"]) ? false : boolval($_POST[ModEntityAddress::PREFIX . "is_recept"]);
+        $dataAddress["is_process"] = empty($_POST[ModEntityAddress::PREFIX . "is_process"]) ? false : boolval($_POST[ModEntityAddress::PREFIX . "is_process"]);
         //$dataAddress["is_system"] = $_POST[ModEntityAddress::PREFIX . "is_system"];
         //$dataAddress["is_deleted"] = $_POST[ModEntityAddress::PREFIX . "is_deleted"];
         //$dataAddress["fk_entity"] = $_POST[ModEntityAddress::PREFIX . "fk_entity"];
@@ -190,7 +219,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         $dataContacts = array();
         for ($contactType = ModConsts::CC_CONTACT_TYPE_MAIN; $contactType <= ModConsts::CC_CONTACT_TYPE_COLL; $contactType++) {
             $prefix = ModContact::PREFIX . $contactType . "_";
-            if (!empty($_POST[$prefix . "apply"]) && intval($_POST[$prefix . "apply"]) == 1) {
+            if (!empty($_POST[$prefix . "apply"]) && boolval($_POST[$prefix . "apply"])) {
                 $dataContact = array();
                 $dataContact["id_contact"] = intval($_POST[$prefix . "id_contact"]);
                 //$dataContact["name"] = $_POST[$prefix . "name"];
@@ -201,7 +230,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
                 $dataContact["mail"] = $_POST[$prefix . "mail"];
                 $dataContact["phone"] = $_POST[$prefix . "phone"];
                 $dataContact["mobile"] = $_POST[$prefix . "mobile"];
-                $dataContact["is_report"] = empty($_POST[$prefix . "is_report"]) ? false : intval($_POST[$prefix . "is_report"]) == 1;
+                $dataContact["is_report"] = empty($_POST[$prefix . "is_report"]) ? false : boolval($_POST[$prefix . "is_report"]);
                 //$dataContact["is_system"] = $_POST[$prefix . "is_system"];
                 //$dataContact["is_deleted"] = $_POST[$prefix . "is_deleted"];
                 //$dataContact["fk_entity"] = $_POST[$prefix . "fk_entity"];
@@ -212,6 +241,10 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         }
 
         try {
+            if (!empty($_POST["load_def_sampling_image"]) && boolval($_POST["load_def_sampling_image"])) {
+                $entityImage->setData($dataImage);
+            }
+
             $entityAddress->setData($dataAddress);
 
             foreach ($dataContacts as $dataContact) {
@@ -222,11 +255,18 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
             $entity->setData($data);
             $entity->save($userSession);
+
+            if (!empty($_POST["load_def_sampling_image"]) && boolval($_POST["load_def_sampling_image"])) {
+                $targetFile = "../../img/entity/" . $entity->composeTargetFileDefSamplingImage(1);
+                FFiles::uploadFile($_FILES[ModEntityImage::PREFIX . "def_sampling_image_file"], $targetFile);
+            }
+
             header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/catalogs/view_entity.php?class=$entityClass");
         }
         catch (Exception $e) {
             $errmsg = $e->getMessage();
         }
+
         break;
 
     default:
@@ -248,7 +288,7 @@ if (!empty($errmsg)) {
 // Input Form for Entity
 ////////////////////////////////////////////////////////////////////////////////
 
-echo '<form class="form-horizontal" method="post" action="' . FUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '" onsubmit="return validateForm()">';
+echo '<form class="form-horizontal" method="post" action="' . FUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '" onsubmit="return validateForm()" enctype="multipart/form-data">';
 
 // preserve entity class and nature and registry ID in post:
 echo '<input type="hidden" name="class" value="' . $entityClass . '">';
@@ -284,7 +324,7 @@ else {
 }
 
 echo $entity->getItem("alias")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
-echo $entity->getItem("apply_credit")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 12);
+echo $entity->getItem("is_credit")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 12);
 echo $entity->getItem("credit_days")->composeHtmlInput(FItem::INPUT_NUMBER, 4, 4);
 echo $entity->getItem("billing_prefs")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
 echo $entity->getItem("web_page")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
@@ -294,27 +334,59 @@ if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
     $options = AppUtils::getSelectOptions($userSession, AppConsts::CC_MARKET_SEGMENT, $entity->getDatum("nk_market_segment"));
     echo $entity->getItem("nk_market_segment")->composeHtmlSelect($options, 4, 8);
 
-    $options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $entity->getDatum("nk_report_delivery_opt"));
-    echo $entity->getItem("nk_report_delivery_opt")->composeHtmlSelect($options, 4, 8);
-
-    echo $entity->getItem("is_def_report_images")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 12);
-
     $params = array();
     $params["fk_entity_class"] = ModConsts::CC_ENTITY_CLASS_CUST;
-    $params["entity_type"] = ModConsts::CC_ENTITY_TYPE_CUST_CORP;
-    $options = AppUtils::getSelectOptions($userSession, AppConsts::CC_ENTITY, $entity->getDatum("nk_entity_parent"));
+    $params["entity_type_1"] = ModConsts::CC_ENTITY_TYPE_CUST_CORP;
+    $options = AppUtils::getSelectOptions($userSession, AppConsts::CC_ENTITY, $entity->getDatum("nk_entity_parent"), $params);
     echo $entity->getItem("nk_entity_parent")->composeHtmlSelect($options, 4, 8);
 
     $params = array();
     $params["fk_entity_class"] = ModConsts::CC_ENTITY_CLASS_CUST;
-    $options = AppUtils::getSelectOptions($userSession, AppConsts::CC_ENTITY, $entity->getDatum("nk_entity_billing"));
+    $options = AppUtils::getSelectOptions($userSession, AppConsts::CC_ENTITY, $entity->getDatum("nk_entity_billing"), $params);
     echo $entity->getItem("nk_entity_billing")->composeHtmlSelect($options, 4, 8);
 
     $params = array();
     $params["fk_entity_class"] = ModConsts::CC_ENTITY_CLASS_PROV;
-    $params["entity_type"] = ModConsts::CC_ENTITY_TYPE_CUST_SAL_INT;
-    $options = AppUtils::getSelectOptions($userSession, AppConsts::CC_ENTITY, $entity->getDatum("nk_entity_parent"));
-    echo $entity->getItem("nk_entity_parent")->composeHtmlSelect($options, 4, 8);
+    $params["entity_type_1"] = ModConsts::CC_ENTITY_TYPE_CUST_SAL_EXT;
+    $params["entity_type_2"] = ModConsts::CC_ENTITY_TYPE_CUST_SAL_INT;
+    $options = AppUtils::getSelectOptions($userSession, AppConsts::CC_ENTITY, $entity->getDatum("nk_entity_agent"), $params);
+    echo $entity->getItem("nk_entity_agent")->composeHtmlSelect($options, 4, 8);
+
+    $options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $entity->getDatum("nk_report_delivery_opt"));
+    echo $entity->getItem("nk_report_delivery_opt")->composeHtmlSelect($options, 4, 8);
+
+    echo $entity->getItem("is_def_sampling_image")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 12);
+
+    echo '<input type="hidden" name="' . ModEntityImage::PREFIX . 'id_entity_image" value="' . (!isset($entityImage) ? 0 : $entityImage->getId()) . '">';
+
+    echo '<div class="row">';
+    echo '<div class="col-sm-4">';
+    echo '<label class="control-label small" for="">Imagen muestreo p/def.:</label>';
+    echo '</div>';
+    echo '<div class="col-sm-8 text-center small">';
+    echo '<div class="thumbnail">';
+    echo '<img src="' . $targetFile . '" alt="Sin imagen" width="150" height="100">';
+    echo '<p>' . (!isset($entityImage) ? "n/d" : $entityImage->getItem("def_sampling_image")->getValue()) . '</p>';
+    echo '</div>';
+    echo '</div>';
+    echo '</div>';
+
+    echo '<div class="form-group">';
+    echo '<div class="col-sm-12">';
+    echo '<div class="checkbox">';
+    echo '<label class="small"><input type="checkbox" name="load_def_sampling_image" id="load_def_sampling_image" onclick="switchInputFile();" value="1">Subir nueva imagen muestreo p/def.</label>';
+    echo '</div>';
+    echo '</div>';
+    echo '</div>';
+
+    echo '<div class="form-group">';
+    echo '<div class="col-sm-4">';
+    echo '<label class="control-label small" for="' . ModEntityImage::PREFIX . 'def_sampling_image_file">Imagen muestreo p/def.:</label>';
+    echo '</div>';
+    echo '<div class="col-sm-8">';
+    echo '<input type="file" class="form-control input-sm" name="' . ModEntityImage::PREFIX . 'def_sampling_image_file" id="' . ModEntityImage::PREFIX . 'def_sampling_image_file" disabled>';
+    echo '</div>';
+    echo '</div>';
 }
 
 // render checkboxes of entity types in 4 rows of 3 columnes each:
@@ -453,7 +525,7 @@ echo '</div>';  // row
 //------------------------------------------------------------------------------
 // main section at the right:
 //------------------------------------------------------------------------------
-echo '<button type="submit" class="btn btn-sm btn-primary">Guardar</button>&nbsp;';
+echo '<button type="submit" class="btn btn-sm btn-primary" name="submit">Guardar</button>&nbsp;';
 echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/catalogs/view_entity.php?class=' . $entityClass . '" class="btn btn-sm btn-danger" role="button">Cancelar</a>';
 
 echo '</form>';
@@ -462,6 +534,14 @@ echo '</div>';  // echo '<div class="container" style="margin-top:50px">';
 echo FApp::composeFooter();
 echo <<<SCRIPT
 <script>
+function switchInputFile() {
+    if (document.getElementById("load_def_sampling_image").checked) {
+        document.getElementById("image_def_sampling_image_file").removeAttribute("disabled");
+    }
+    else {
+        document.getElementById("image_def_sampling_image_file").setAttribute("disabled", "");
+    }
+}
 function showContactIcons(id_prefix) {
     var enableIconOk = document.forms[0].elements[id_prefix + "apply"].checked;
     var enableIconFile = document.forms[0].elements[id_prefix + "is_report"].checked;
@@ -488,6 +568,7 @@ function validateForm() {
             }
         }
     }
+    return checkBeforeSubmit(); // prevent multiple form submitions
 }
 </script>
 SCRIPT;

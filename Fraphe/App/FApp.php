@@ -31,10 +31,16 @@ abstract class FApp
         $html .= '<title>' . $_SESSION[FAppConsts::APP_NAME] . '</title>';
         $html .= '<meta charset="utf-8">';
         $html .= '<meta name="viewport" content="width=device-width, initial-scale=1">';
+        /*
+        $html .= '<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">';
+        $html .= '<meta http-equiv="Pragma" content="no-cache">';
+        $html .= '<meta http-equiv="Expires" content="0">';
+        */
         $html .= '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">';
         $html .= '<link rel="stylesheet" href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'css/fraphe.css">';
         $html .= '<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>';
         $html .= '<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>';
+        $html .= '<script type="text/javascript" src="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'js/main.js"></script>';
         $html .= '</head>';
 
         return $html;
@@ -95,6 +101,7 @@ abstract class FApp
             // set application-configuration session variables:
             $_SESSION[FAppConsts::APP_NAME] = $json[FAppConsts::APP_NAME];
             $_SESSION[FAppConsts::APP_VENDOR] = $json[FAppConsts::APP_VENDOR];
+            $_SESSION[FAppConsts::APP_MODE] = $json[FAppConsts::APP_MODE];
             $_SESSION[FAppConsts::DB_HOST] = $json[FAppConsts::DB_HOST];
             $_SESSION[FAppConsts::DB_PORT] = $json[FAppConsts::DB_PORT];
             $_SESSION[FAppConsts::DB_NAME] = $json[FAppConsts::DB_NAME];

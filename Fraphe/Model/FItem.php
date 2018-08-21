@@ -36,6 +36,7 @@ class FItem
     protected $lengthMin;
     protected $lengthMax;
     protected $guiReadOnly;
+    protected $guiEvents;
 
     function __construct(int $dataType, string $key, string $name, string $hint, bool $mandatory, bool $isPk = false)
     {
@@ -136,11 +137,6 @@ class FItem
         $this->lengthMax = $length;
     }
 
-    public function setGuiReadOnly(bool $guiReadOnly)
-    {
-        $this->guiReadOnly = $guiReadOnly;
-    }
-
     public function setRangeValue(int $valueMin, int $valueMax)
     {
         $this->valueMin = $valueMin;
@@ -157,6 +153,16 @@ class FItem
     {
         $this->canBeNull = !$mandatory;
         $this->canBeEmpty = !$mandatory;
+    }
+
+    public function setGuiReadOnly(bool $guiReadOnly)
+    {
+        $this->guiReadOnly = $guiReadOnly;
+    }
+
+    public function setGuiEvents(string $guiEvents)
+    {
+        $this->guiEvents = $guiEvents;
     }
 
     public function getDataType(): int
@@ -341,7 +347,9 @@ class FItem
                 $html .= '<label class="control-label small" for="' . $key . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
                 $html .= '</div>';
                 $html .= '<div class="col-sm-' . $lengthInput . '">';
-                $html .= '<input type="text" class="form-control input-sm" name="' . $key . '" value="' . $this->value . '"' . $required . $placeholder . $maxLength . ($this->guiReadOnly ? ' readonly' : '') . '>';
+                $html .= '<input type="text" class="form-control input-sm" name="' . $key . '" id="' . $key . '" value="' . $this->value . '"' . $required . $placeholder . $maxLength .
+                    ($this->guiReadOnly ? ' readonly' : '') .
+                    (!empty($this->guiEvents) ? ' ' . $this->guiEvents: '') . '>';
                 $html .= '</div>';
                 $html .= '</div>';
                 break;
@@ -357,7 +365,9 @@ class FItem
                 $html .= '<label class="control-label small" for="' . ($this->isPk ? FRegistry::ID : $key) . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
                 $html .= '</div>';
                 $html .= '<div class="col-sm-' . $lengthInput . '">';
-                $html .= '<input type="number" class="form-control input-sm" name="' . ($this->isPk ? FRegistry::ID : $key) . '" value="' . $this->value . '"' . $required . $readonly . $placeholder . $min . $max . ($this->guiReadOnly ? ' readonly' : '') . '>';
+                $html .= '<input type="number" class="form-control input-sm" name="' . ($this->isPk ? FRegistry::ID : $key) . '" id="' . ($this->isPk ? FRegistry::ID : $key) . '" value="' . $this->value . '"' . $required . $readonly . $placeholder . $min . $max .
+                    ($this->guiReadOnly ? ' readonly' : '') .
+                    (!empty($this->guiEvents) ? ' ' . $this->guiEvents: '') . '>';
                 $html .= '</div>';
                 $html .= '</div>';
                 break;
@@ -369,7 +379,10 @@ class FItem
                 $html .= '<div class="form-group">';
                 $html .= '<div class="col-sm-offset-' . $lengthLabel . ' col-sm-' . $lengthInput . '">';
                 $html .= '<div class="checkbox">';
-                $html .= '<label class="small"><input type="checkbox" name="' . $key . '" value="1"' . ($this->value ? ' checked' : '') . ($this->guiReadOnly ? ' readonly' : '') . '>' . $this->name . '</label>';
+                $html .= '<label class="small"><input type="checkbox" name="' . $key . '" id="' . $key . '" value="1"' . ($this->value ? ' checked' : '') .
+                    ($this->guiReadOnly ? ' readonly' : '') .
+                    (!empty($this->guiEvents) ? ' ' . $this->guiEvents: '') .
+                    '>' . $this->name . '</label>';
                 $html .= '</div>';
                 $html .= '</div>';
                 $html .= '</div>';
@@ -383,23 +396,27 @@ class FItem
                 $html .= '<label class="control-label small" for="' . $key . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
                 $html .= '</div>';
                 $html .= '<div class="col-sm-' . $lengthInput . '">';
-                $html .= '<input type="date" class="form-control input-sm" name="' . $key . '" value="' . $this->value . '"' . $required . $placeholder . ($this->guiReadOnly ? ' readonly' : '') . '>';
+                $html .= '<input type="date" class="form-control input-sm" name="' . $key . '" id="' . $key . '" value="' . $this->value . '"' . $required . $placeholder .
+                    ($this->guiReadOnly ? ' readonly' : '') .
+                    (!empty($this->guiEvents) ? ' ' . $this->guiEvents: '') . '>';
                 $html .= '</div>';
                 $html .= '</div>';
                 break;
 
             case self::INPUT_DATETIME:
-            $placeholder = ' placeholder="' . $this->name . (empty($this->hint) ? '' : ' (' . $this->hint . ')') . '"';
+                $placeholder = ' placeholder="' . $this->name . (empty($this->hint) ? '' : ' (' . $this->hint . ')') . '"';
 
-            $html .= '<div class="form-group">';
-            $html .= '<div class="col-sm-' . $lengthLabel . '">';
-            $html .= '<label class="control-label small" for="' . $key . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
-            $html .= '</div>';
-            $html .= '<div class="col-sm-' . $lengthInput . '">';
-            $html .= '<input type="datetime-local" class="form-control input-sm" name="' . $key . '" value="' . $this->value . '"' . $required . $placeholder . ($this->guiReadOnly ? ' readonly' : '') . '>';
-            $html .= '</div>';
-            $html .= '</div>';
-            break;
+                $html .= '<div class="form-group">';
+                $html .= '<div class="col-sm-' . $lengthLabel . '">';
+                $html .= '<label class="control-label small" for="' . $key . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
+                $html .= '</div>';
+                $html .= '<div class="col-sm-' . $lengthInput . '">';
+                $html .= '<input type="datetime-local" class="form-control input-sm" name="' . $key . '" id="' . $key . '" value="' . $this->value . '"' . $required . $placeholder .
+                    ($this->guiReadOnly ? ' readonly' : '') .
+                    (!empty($this->guiEvents) ? ' ' . $this->guiEvents: '') . '>';
+                $html .= '</div>';
+                $html .= '</div>';
+                break;
 
             case self::INPUT_TIME:
                 throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "tiene un tipo de dato no soportado aún.");
@@ -426,7 +443,10 @@ class FItem
         $html .= '<label class="control-label small" for="' . $key . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
         $html .= '</div>';
         $html .= '<div class="col-sm-' . $lengthInput . '">';
-        $html .= '<textarea class="form-control input-sm" name="' . $key . '" rows="' . $rows . '"' . $required . $placeholder . $maxLength . '>' . $this->value . '</textarea>';
+        $html .= '<textarea class="form-control input-sm" name="' . $key . '" id="' . $key . '" rows="' . $rows . '"' . $required . $placeholder . $maxLength .
+            ($this->guiReadOnly ? ' readonly' : '') .
+            (!empty($this->guiEvents) ? ' ' . $this->guiEvents: '') .
+            '>' . $this->value . '</textarea>';
         $html .= '</div>';
         $html .= '</div>';
 
@@ -444,7 +464,9 @@ class FItem
         $html .= '<label class="control-label small" for="' . $key . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
         $html .= '</div>';
         $html .= '<div class="col-sm-' . $lengthInput . '">';
-        $html .= '<select class="form-control input-sm" name="' . $key . '">';
+        $html .= '<select class="form-control input-sm" name="' . $key . '" id="' . $key . '"' .
+            ($this->guiReadOnly ? ' readonly' : '') .
+            (!empty($this->guiEvents) ? ' ' . $this->guiEvents: '') . '>';
         foreach ($options as $option) {
             $html .= $option;
         }
