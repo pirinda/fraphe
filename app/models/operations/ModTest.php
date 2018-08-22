@@ -17,7 +17,7 @@ class ModTest extends FRegistry
     protected $is_system;
     protected $is_deleted;
     protected $fk_process_area;
-    protected $fk_sample_category;
+    protected $fk_sample_class;
     protected $fk_testing_method;
     protected $fk_test_acredit_attrib;
     protected $fk_user_ins;

@@ -12,6 +12,9 @@ class ModRecept extends FRegistry
     protected $id_recept;
     protected $number;
     protected $recept_datetime;
+    protected $recept_temperat;
+    protected $recept_process_days;
+    protected $recept_deadline;
     protected $recept_notes;
     protected $recept_deviats;
     protected $service_type;
@@ -55,6 +58,9 @@ class ModRecept extends FRegistry
         $this->id_recept = new FItem(FItem::DATA_TYPE_INT, "id_recept", "ID recepción", "", false, true);
         $this->number = new FItem(FItem::DATA_TYPE_STRING, "number", "Folio recepción", "", true);
         $this->recept_datetime = new FItem(FItem::DATA_TYPE_DATETIME, "recept_datetime", "Fecha-hora recepción", "", true);
+        $this->recept_temperat = new FItem(FItem::DATA_TYPE_FLOAT, "recept_temperat", "Temp. recepción °C", "", true);
+        $this->recept_process_days = new FItem(FItem::DATA_TYPE_INT, "recept_process_days", "Días proceso recepción", "", true);
+        $this->recept_deadline = new FItem(FItem::DATA_TYPE_DATE, "recept_deadline", "Fecha límite recepción", "", true);
         $this->recept_notes = new FItem(FItem::DATA_TYPE_STRING, "recept_notes", "Observaciones recepción", "", false);
         $this->recept_deviats = new FItem(FItem::DATA_TYPE_STRING, "recept_deviats", "Desviaciones recepción", "", false);
         $this->service_type = new FItem(FItem::DATA_TYPE_STRING, "service_type", "Tipo servicio", "", true);
@@ -92,6 +98,9 @@ class ModRecept extends FRegistry
         $this->items["id_recept"] = $this->id_recept;
         $this->items["number"] = $this->number;
         $this->items["recept_datetime"] = $this->recept_datetime;
+        $this->items["recept_temperat"] = $this->recept_temperat;
+        $this->items["recept_process_days"] = $this->recept_process_days;
+        $this->items["recept_deadline"] = $this->recept_deadline;
         $this->items["recept_notes"] = $this->recept_notes;
         $this->items["recept_deviats"] = $this->recept_deviats;
         $this->items["service_type"] = $this->service_type;
@@ -180,6 +189,9 @@ class ModRecept extends FRegistry
             $this->id_recept->setValue($row["id_recept"]);
             $this->number->setValue($row["number"]);
             $this->recept_datetime->setValue($row["recept_datetime"]);
+            $this->recept_temperat->setValue($row["recept_temperat"]);
+            $this->recept_process_days->setValue($row["recept_process_days"]);
+            $this->recept_deadline->setValue($row["recept_deadline"]);
             $this->recept_notes->setValue($row["recept_notes"]);
             $this->recept_deviats->setValue($row["recept_deviats"]);
             $this->service_type->setValue($row["service_type"]);
@@ -245,6 +257,9 @@ class ModRecept extends FRegistry
                 "id_recept, " .
                 "number, " .
                 "recept_datetime, " .
+                "recept_temperat, " .
+                "recept_process_days, " .
+                "recept_deadline, " .
                 "recept_notes, " .
                 "recept_deviats, " .
                 "service_type, " .
@@ -282,6 +297,9 @@ class ModRecept extends FRegistry
                 "0, " .
                 ":number, " .
                 ":recept_datetime, " .
+                ":recept_temperat, " .
+                ":recept_process_days, " .
+                ":recept_deadline, " .
                 ":recept_notes, " .
                 ":recept_deviats, " .
                 ":service_type, " .
@@ -320,6 +338,9 @@ class ModRecept extends FRegistry
             $statement = $userSession->getPdo()->prepare("UPDATE o_recept SET " .
                 "number = :number, " .
                 "recept_datetime = :recept_datetime, " .
+                "recept_temperat = :recept_temperat, " .
+                "recept_process_days = :recept_process_days, " .
+                "recept_deadline = :recept_deadline, " .
                 "recept_notes = :recept_notes, " .
                 "recept_deviats = :recept_deviats, " .
                 "service_type = :service_type, " .
@@ -359,6 +380,9 @@ class ModRecept extends FRegistry
         //$id_recept = $this->id_recept->getValue();
         $number = $this->number->getValue();
         $recept_datetime = $this->recept_datetime->getValue();
+        $recept_temperat = $this->recept_temperat->getValue();
+        $recept_process_days = $this->recept_process_days->getValue();
+        $recept_deadline = $this->recept_deadline->getValue();
         $recept_notes = $this->recept_notes->getValue();
         $recept_deviats = $this->recept_deviats->getValue();
         $service_type = $this->service_type->getValue();
@@ -398,6 +422,9 @@ class ModRecept extends FRegistry
         //$statement->bindParam(":id_recept", $id_recept, \PDO::PARAM_INT);
         $statement->bindParam(":number", $number);
         $statement->bindParam(":recept_datetime", $recept_datetime);
+        $statement->bindParam(":recept_temperat", $recept_temperat);
+        $statement->bindParam(":recept_process_days", $recept_process_days, \PDO::PARAM_INT);
+        $statement->bindParam(":recept_deadline", $recept_deadline);
         $statement->bindParam(":recept_notes", $recept_notes);
         $statement->bindParam(":recept_deviats", $recept_deviats);
         $statement->bindParam(":service_type", $service_type);

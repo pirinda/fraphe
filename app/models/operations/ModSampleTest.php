@@ -13,7 +13,8 @@ class ModSampleTest extends FRelation
     protected $id_test;
     protected $id_entity;
     protected $position;
-    protected $process_days;
+    protected $process_days_min;
+    protected $process_days_max;
     protected $cost;
 
     function __construct()
@@ -24,14 +25,16 @@ class ModSampleTest extends FRelation
         $this->id_test = new FItem(FItem::DATA_TYPE_INT, "id_test", "ID ensayo", "", false, true);
         $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", "", false, true);
         $this->position = new FItem(FItem::DATA_TYPE_INT, "position", "Partida ensayo", "", true);
-        $this->process_days = new FItem(FItem::DATA_TYPE_INT, "process_days", "Días proceso", "", true);
+        $this->process_days_min = new FItem(FItem::DATA_TYPE_INT, "process_days_min", "Días mínimos proceso", "", true);
+        $this->process_days_max = new FItem(FItem::DATA_TYPE_INT, "process_days_max", "Días máximos proceso", "", true);
         $this->cost = new FItem(FItem::DATA_TYPE_FLOAT, "cost", "Costo", "", false);
 
         $this->items["id_sample"] = $this->id_sample;
         $this->items["id_test"] = $this->id_test;
         $this->items["id_entity"] = $this->id_entity;
         $this->items["position"] = $this->position;
-        $this->items["process_days"] = $this->process_days;
+        $this->items["process_days_min"] = $this->process_days_min;
+        $this->items["process_days_max"] = $this->process_days_max;
         $this->items["cost"] = $this->cost;
 
         // create relation IDs:
@@ -57,7 +60,8 @@ class ModSampleTest extends FRelation
             $this->id_test->setValue($row["id_test"]);
             $this->id_entity->setValue($row["id_entity"]);
             $this->position->setValue($row["position"]);
-            $this->process_days->setValue($row["process_days"]);
+            $this->process_days_min->setValue($row["process_days_min"]);
+            $this->process_days_max->setValue($row["process_days_max"]);
             $this->cost->setValue($row["cost"]);
 
             $this->isRegistryNew = false;
@@ -80,14 +84,16 @@ class ModSampleTest extends FRelation
                 "id_test, " .
                 "id_entity, " .
                 "position, " .
-                "process_days, " .
+                "process_days_min, " .
+                "process_days_max, " .
                 "cost) " .
                 "VALUES (" .
                 ":id_sample, " .
                 ":id_test, " .
                 ":id_entity, " .
                 ":position, " .
-                ":process_days, " .
+                ":process_days_min, " .
+                ":process_days_max, " .
                 ":cost);");
         }
         else {
@@ -98,14 +104,16 @@ class ModSampleTest extends FRelation
         $id_test = $this->id_test->getValue();
         $id_entity = $this->id_entity->getValue();
         $position = $this->position->getValue();
-        $process_days = $this->process_days->getValue();
+        $process_days_min = $this->process_days_min->getValue();
+        $process_days_max = $this->process_days_max->getValue();
         $cost = $this->cost->getValue();
 
         $statement->bindParam(":id_sample", $id_sample, \PDO::PARAM_INT);
         $statement->bindParam(":id_test", $id_test, \PDO::PARAM_INT);
         $statement->bindParam(":id_entity", $id_entity, \PDO::PARAM_INT);
         $statement->bindParam(":position", $position, \PDO::PARAM_INT);
-        $statement->bindParam(":process_days", $process_days, \PDO::PARAM_INT);
+        $statement->bindParam(":process_days_min", $process_days_min, \PDO::PARAM_INT);
+        $statement->bindParam(":process_days_max", $process_days_max, \PDO::PARAM_INT);
         $statement->bindParam(":cost", $cost);
 
         $statement->execute();
