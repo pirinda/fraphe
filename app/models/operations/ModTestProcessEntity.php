@@ -7,7 +7,7 @@ use Fraphe\Model\FRegistry;
 use Fraphe\Model\FRelation;
 use app\AppConsts;
 
-class ModTestProcessOpt extends FRelation
+class ModTestProcessEntity extends FRelation
 {
     protected $id_test;
     protected $id_entity;

@@ -20,8 +20,8 @@ class ModSampleStatusLog extends FRegistry
     protected $nk_process_area;
     protected $fk_sample;
     protected $fk_sample_status;
-    protected $fk_status_entity;
-    protected $fk_status_user;
+    protected $fk_entity_status;
+    protected $fk_user_status;
     protected $fk_user_ins;
     protected $fk_user_upd;
     protected $ts_user_ins;
@@ -42,8 +42,8 @@ class ModSampleStatusLog extends FRegistry
         $this->nk_process_area = new FItem(FItem::DATA_TYPE_INT, "nk_process_area", "Área proceso estatus", "", false);
         $this->fk_sample = new FItem(FItem::DATA_TYPE_INT, "fk_sample", "Muestra", "", true);
         $this->fk_sample_status = new FItem(FItem::DATA_TYPE_INT, "fk_sample_status", "Estatus muestra", "", true);
-        $this->fk_status_entity = new FItem(FItem::DATA_TYPE_INT, "fk_status_entity", "Entidad estatus", "", true);
-        $this->fk_status_user = new FItem(FItem::DATA_TYPE_INT, "fk_status_user", "Usuario estatus", "", true);
+        $this->fk_entity_status = new FItem(FItem::DATA_TYPE_INT, "fk_entity_status", "Entidad estatus", "", true);
+        $this->fk_user_status = new FItem(FItem::DATA_TYPE_INT, "fk_user_status", "Usuario estatus", "", true);
         $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", "", false);
         $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", "", false);
         $this->ts_user_ins = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_ins", "Creado", "", false);
@@ -60,8 +60,8 @@ class ModSampleStatusLog extends FRegistry
         $this->items["nk_process_area"] = $this->nk_process_area;
         $this->items["fk_sample"] = $this->fk_sample;
         $this->items["fk_sample_status"] = $this->fk_sample_status;
-        $this->items["fk_status_entity"] = $this->fk_status_entity;
-        $this->items["fk_status_user"] = $this->fk_status_user;
+        $this->items["fk_entity_status"] = $this->fk_entity_status;
+        $this->items["fk_user_status"] = $this->fk_user_status;
         $this->items["fk_user_ins"] = $this->fk_user_ins;
         $this->items["fk_user_upd"] = $this->fk_user_upd;
         $this->items["ts_user_ins"] = $this->ts_user_ins;
@@ -91,8 +91,8 @@ class ModSampleStatusLog extends FRegistry
             $this->nk_process_area->setValue($row["nk_process_area"]);
             $this->fk_sample->setValue($row["fk_sample"]);
             $this->fk_sample_status->setValue($row["fk_sample_status"]);
-            $this->fk_status_entity->setValue($row["fk_status_entity"]);
-            $this->fk_status_user->setValue($row["fk_status_user"]);
+            $this->fk_entity_status->setValue($row["fk_entity_status"]);
+            $this->fk_user_status->setValue($row["fk_user_status"]);
             $this->fk_user_ins->setValue($row["fk_user_ins"]);
             $this->fk_user_upd->setValue($row["fk_user_upd"]);
             $this->ts_user_ins->setValue($row["ts_user_ins"]);
@@ -125,8 +125,8 @@ class ModSampleStatusLog extends FRegistry
                 "nk_process_area, " .
                 "fk_sample, " .
                 "fk_sample_status, " .
-                "fk_status_entity, " .
-                "fk_status_user, " .
+                "fk_entity_status, " .
+                "fk_user_status, " .
                 "fk_user_ins, " .
                 "fk_user_upd, " .
                 "ts_user_ins, " .
@@ -143,8 +143,8 @@ class ModSampleStatusLog extends FRegistry
                 ":nk_process_area, " .
                 ":fk_sample, " .
                 ":fk_sample_status, " .
-                ":fk_status_entity, " .
-                ":fk_status_user, " .
+                ":fk_entity_status, " .
+                ":fk_user_status, " .
                 ":fk_user, " .
                 "1, " .
                 "NOW(), " .
@@ -162,8 +162,8 @@ class ModSampleStatusLog extends FRegistry
                 "nk_process_area = :nk_process_area, " .
                 "fk_sample = :fk_sample, " .
                 "fk_sample_status = :fk_sample_status, " .
-                "fk_status_entity = :fk_status_entity, " .
-                "fk_status_user = :fk_status_user, " .
+                "fk_entity_status = :fk_entity_status, " .
+                "fk_user_status = :fk_user_status, " .
                 //"fk_user_ins = :fk_user_ins, " .
                 "fk_user_upd = :fk_user_upd, " .
                 //"ts_user_ins = NOW(), " .
@@ -182,8 +182,8 @@ class ModSampleStatusLog extends FRegistry
         $nk_process_area = $this->nk_process_area->getValue();
         $fk_sample = $this->fk_sample->getValue();
         $fk_sample_status = $this->fk_sample_status->getValue();
-        $fk_status_entity = $this->fk_status_entity->getValue();
-        $fk_status_user = $this->fk_status_user->getValue();
+        $fk_entity_status = $this->fk_entity_status->getValue();
+        $fk_user_status = $this->fk_user_status->getValue();
         $fk_user_ins = $this->fk_user_ins->getValue();
         $fk_user_upd = $this->fk_user_upd->getValue();
         //$ts_user_ins = $this->ts_user_ins->getValue();
@@ -202,8 +202,8 @@ class ModSampleStatusLog extends FRegistry
         $statement->bindParam(":nk_process_area", $nk_process_area, \PDO::PARAM_INT);
         $statement->bindParam(":fk_sample", $fk_sample, \PDO::PARAM_INT);
         $statement->bindParam(":fk_sample_status", $fk_sample_status, \PDO::PARAM_INT);
-        $statement->bindParam(":fk_status_entity", $fk_status_entity, \PDO::PARAM_INT);
-        $statement->bindParam(":fk_status_user", $fk_status_user, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_entity_status", $fk_entity_status, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_user_status", $fk_user_status, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_ins", $fk_user_ins, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_upd", $fk_user_upd, \PDO::PARAM_INT);
         //$statement->bindParam(":ts_user_ins", $ts_user_ins);

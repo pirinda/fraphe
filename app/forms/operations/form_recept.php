@@ -69,9 +69,9 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         $childData["cost"] = floatval($_POST["po_cost"]);
         $childData["is_default"] = boolval($_POST["po_is_default"]);
 
-        $childProcessOpt = new ModTestProcessOpt();
-        $childProcessOpt->setData($childData);
-        $registry->getChildProcessOpt()[] = $childProcessOpt;
+        $childProcessEntity = new ModTestProcessEntity();
+        $childProcessEntity->setData($childData);
+        $registry->getChildProcessEntitys()[] = $childProcessEntity;
 
         try {
             $registry->setData($data);
@@ -141,8 +141,8 @@ $options = array();
 $options[] = AppUtils::composeSelectOption();
 echo $recept->getItem("fk_report_contact")->composeHtmlSelect($options, 4, 8);
 
-$options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $recept->getDatum("fk_report_delivery_opt"), $params);
-echo $recept->getItem("fk_report_delivery_opt")->composeHtmlSelect($options, 4, 8);
+$options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $recept->getDatum("fk_report_delivery_type"), $params);
+echo $recept->getItem("fk_report_delivery_type")->composeHtmlSelect($options, 4, 8);
 
 echo $recept->getItem("is_def_sampling_image")->composeHtmlInput(FItem::INPUT_CHECKBOX, 4, 8);
 
@@ -253,14 +253,14 @@ echo $sample->getItem("fk_container_type")->composeHtmlSelect($options, 4, 8);
 
 $sample->getItem("recept_datetime")->setGuiReadOnly(true);
 echo $sample->getItem("recept_datetime")->composeHtmlInput(FItem::INPUT_DATETIME, 4, 6);
-echo $sample->getItem("recept_temperat")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4);
+echo $sample->getItem("recept_temperat_n")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4);
 
 $options = array();
 $options[] = AppUtils::composeSelectOption();
 echo $recept->getItem("fk_report_contact")->composeHtmlSelect($options, 4, 8);
 
-$options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $sample->getDatum("fk_report_delivery_opt"), $params);
-echo $sample->getItem("fk_report_delivery_opt")->composeHtmlSelect($options, 4, 8);
+$options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $sample->getDatum("fk_report_delivery_type"), $params);
+echo $sample->getItem("fk_report_delivery_type")->composeHtmlSelect($options, 4, 8);
 
 echo $recept->getItem("is_def_sampling_image")->composeHtmlInput(FItem::INPUT_CHECKBOX, 4, 8);
 
@@ -345,7 +345,7 @@ echo <<<SCRIPT
     changedCustomer(document.getElementById("fk_customer"));
 })();
 function changedCustomer(element) {
-    var selects = ["nk_customer_sample", "fk_report_contact", "fk_report_delivery_opt"];
+    var selects = ["nk_customer_sample", "fk_report_contact", "fk_report_delivery_type"];
     var checkboxes = ["is_customer_custom", "is_def_sampling_image"];
 
     if (element.value == "0") {
@@ -396,7 +396,7 @@ function loadCustomer() {
 
             document.getElementById("nk_customer_sample").innerHTML = customer.corp_members;
             document.getElementById("fk_report_contact").innerHTML = customer.contacts;
-            document.getElementById("fk_report_delivery_opt").value = customer.nk_report_delivery_opt;
+            document.getElementById("fk_report_delivery_type").value = customer.nk_report_delivery_type;
             document.getElementById("is_def_sampling_image").checked = customer.is_def_sampling_image;
         }
     };

@@ -167,7 +167,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $data["nk_entity_parent"] = $_POST["nk_entity_parent"];
             $data["nk_entity_billing"] = $_POST["nk_entity_billing"];
             $data["nk_entity_agent"] = $_POST["nk_entity_agent"];
-            $data["nk_report_delivery_opt"] = $_POST["nk_report_delivery_opt"];
+            $data["nk_report_delivery_type"] = $_POST["nk_report_delivery_type"];
         }
 
         // entity types:
@@ -352,8 +352,8 @@ if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
     $options = AppUtils::getSelectOptions($userSession, AppConsts::CC_ENTITY, $entity->getDatum("nk_entity_agent"), $params);
     echo $entity->getItem("nk_entity_agent")->composeHtmlSelect($options, 4, 8);
 
-    $options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $entity->getDatum("nk_report_delivery_opt"));
-    echo $entity->getItem("nk_report_delivery_opt")->composeHtmlSelect($options, 4, 8);
+    $options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $entity->getDatum("nk_report_delivery_type"));
+    echo $entity->getItem("nk_report_delivery_type")->composeHtmlSelect($options, 4, 8);
 
     echo $entity->getItem("is_def_sampling_image")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 12);
 

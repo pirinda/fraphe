@@ -37,7 +37,7 @@ class ModEntity extends FRegistry
     protected $nk_entity_parent;
     protected $nk_entity_billing;
     protected $nk_entity_agent;
-    protected $nk_report_delivery_opt;
+    protected $nk_report_delivery_type;
     protected $fk_user_ins;
     protected $fk_user_upd;
     protected $ts_user_ins;
@@ -73,7 +73,7 @@ class ModEntity extends FRegistry
         $this->nk_entity_parent = new FItem(FItem::DATA_TYPE_INT, "nk_entity_parent", "Entidad padre", "", false);
         $this->nk_entity_billing = new FItem(FItem::DATA_TYPE_INT, "nk_entity_billing", "Entidad facturación", "", false);
         $this->nk_entity_agent = new FItem(FItem::DATA_TYPE_INT, "nk_entity_agent", "Agente comercial", "", false);
-        $this->nk_report_delivery_opt = new FItem(FItem::DATA_TYPE_INT, "nk_report_delivery_opt", "Opción entrega IR", "", false);
+        $this->nk_report_delivery_type = new FItem(FItem::DATA_TYPE_INT, "nk_report_delivery_type", "Tipo entrega IR", "", false);
         $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", "", false);
         $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", "", false);
         $this->ts_user_ins = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_ins", "Creado", "", false);
@@ -101,7 +101,7 @@ class ModEntity extends FRegistry
         $this->items["nk_entity_parent"] = $this->nk_entity_parent;
         $this->items["nk_entity_billing"] = $this->nk_entity_billing;
         $this->items["nk_entity_agent"] = $this->nk_entity_agent;
-        $this->items["nk_report_delivery_opt"] = $this->nk_report_delivery_opt;
+        $this->items["nk_report_delivery_type"] = $this->nk_report_delivery_type;
         $this->items["fk_user_ins"] = $this->fk_user_ins;
         $this->items["fk_user_upd"] = $this->fk_user_upd;
         $this->items["ts_user_ins"] = $this->ts_user_ins;
@@ -197,7 +197,7 @@ class ModEntity extends FRegistry
         // tailor foreign keys according to entity class:
         $isCustomer = $this->fk_entity_class->getValue() == ModUtils::ENTITY_CLASS_CUST;
         $this->nk_market_segment->setMandatory($isCustomer);
-        $this->nk_report_delivery_opt->setMandatory($isCustomer);
+        $this->nk_report_delivery_type->setMandatory($isCustomer);
 
         // tailor surename and forename according to is-person flag:
         $isPerson = $this->is_person->getValue();
@@ -273,7 +273,7 @@ class ModEntity extends FRegistry
             $this->nk_entity_parent->setValue($row["nk_entity_parent"]);
             $this->nk_entity_billing->setValue($row["nk_entity_billing"]);
             $this->nk_entity_agent->setValue($row["nk_entity_agent"]);
-            $this->nk_report_delivery_opt->setValue($row["nk_report_delivery_opt"]);
+            $this->nk_report_delivery_type->setValue($row["nk_report_delivery_type"]);
             $this->fk_user_ins->setValue($row["fk_user_ins"]);
             $this->fk_user_upd->setValue($row["fk_user_upd"]);
             $this->ts_user_ins->setValue($row["ts_user_ins"]);
@@ -353,7 +353,7 @@ class ModEntity extends FRegistry
                 "nk_entity_parent, " .
                 "nk_entity_billing, " .
                 "nk_entity_agent, " .
-                "nk_report_delivery_opt, " .
+                "nk_report_delivery_type, " .
                 "fk_user_ins, " .
                 "fk_user_upd, " .
                 "ts_user_ins, " .
@@ -381,7 +381,7 @@ class ModEntity extends FRegistry
                 ":nk_entity_parent, " .
                 ":nk_entity_billing, " .
                 ":nk_entity_agent, " .
-                ":nk_report_delivery_opt, " .
+                ":nk_report_delivery_type, " .
                 ":fk_user, " .
                 "1, " .
                 "NOW(), " .
@@ -410,7 +410,7 @@ class ModEntity extends FRegistry
                 "nk_entity_parent = :nk_entity_parent, " .
                 "nk_entity_billing = :nk_entity_billing, " .
                 "nk_entity_agent = :nk_entity_agent, " .
-                "nk_report_delivery_opt = :nk_report_delivery_opt, " .
+                "nk_report_delivery_type = :nk_report_delivery_type, " .
                 //"fk_user_ins = :fk_user_ins, " .
                 "fk_user_upd = :fk_user, " .
                 //"ts_user_ins = :ts_user_ins, " .
@@ -440,7 +440,7 @@ class ModEntity extends FRegistry
         $nk_entity_parent = $this->nk_entity_parent->getValue();
         $nk_entity_billing = $this->nk_entity_billing->getValue();
         $nk_entity_agent = $this->nk_entity_agent->getValue();
-        $nk_report_delivery_opt = $this->nk_report_delivery_opt->getValue();
+        $nk_report_delivery_type = $this->nk_report_delivery_type->getValue();
         $fk_user_ins = $this->fk_user_ins->getValue();
         $fk_user_upd = $this->fk_user_upd->getValue();
         //$ts_user_ins = $this->ts_user_ins->getValue();
@@ -490,11 +490,11 @@ class ModEntity extends FRegistry
         else {
             $statement->bindParam(":nk_entity_agent", $nk_entity_agent, \PDO::PARAM_INT);
         }
-        if (empty($nk_report_delivery_opt)) {
-            $statement->bindValue(":nk_report_delivery_opt", null, \PDO::PARAM_NULL);
+        if (empty($nk_report_delivery_type)) {
+            $statement->bindValue(":nk_report_delivery_type", null, \PDO::PARAM_NULL);
         }
         else {
-            $statement->bindParam(":nk_report_delivery_opt", $nk_report_delivery_opt, \PDO::PARAM_INT);
+            $statement->bindParam(":nk_report_delivery_type", $nk_report_delivery_type, \PDO::PARAM_INT);
         }
         //$statement->bindParam(":fk_user_ins", $fk_user_ins, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_upd", $fk_user_upd, \PDO::PARAM_INT);

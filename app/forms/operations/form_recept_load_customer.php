@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         $registry = $entity;
         $json .= '"customer_name":"' . $registry->getDatum("name") . '", ';
         $json .= '"is_def_sampling_image":' . ($registry->getDatum("is_def_sampling_image") ? 'true' : 'false') . ', ';
-        $json .= '"nk_report_delivery_opt":' . $registry->getDatum("nk_report_delivery_opt") . ', ';
+        $json .= '"nk_report_delivery_type":' . $registry->getDatum("nk_report_delivery_type") . ', ';
 
         // get customer's address data:
         $registry = $entity->getChildAddresses()[0];

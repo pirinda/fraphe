@@ -25,14 +25,14 @@ class ModSample extends FRegistry
     protected $sampling_area;
     protected $sampling_datetime_n;
     protected $sampling_temperat_n;
-    protected $sampling_notes;
     protected $sampling_deviats;
+    protected $sampling_notes;
     protected $sampling_images;
     protected $recept_entry;
-    protected $recept_datetime;
-    protected $recept_temperat;
-    protected $recept_notes;
+    protected $recept_datetime_n;
+    protected $recept_temperat_n;
     protected $recept_deviats;
+    protected $recept_notes;
     protected $service_type;
     protected $is_customer_custom;
     protected $customer_name;
@@ -58,7 +58,7 @@ class ModSample extends FRegistry
     protected $nk_customer_sample;
     protected $nk_customer_billing;
     protected $fk_report_contact;
-    protected $fk_report_delivery_opt;
+    protected $fk_report_delivery_type;
     protected $fk_sample_class;
     protected $fk_sample_type;
     protected $fk_sample_status;
@@ -98,14 +98,14 @@ class ModSample extends FRegistry
         $this->sampling_area = new FItem(FItem::DATA_TYPE_STRING, "sampling_area", "Área muestreo", "", true);
         $this->sampling_datetime_n = new FItem(FItem::DATA_TYPE_DATETIME, "sampling_datetime_n", "Fecha-hora muestreo", "", false);
         $this->sampling_temperat_n = new FItem(FItem::DATA_TYPE_FLOAT, "sampling_temperat_n", "Temp. muestreo °C", "", false);
-        $this->sampling_notes = new FItem(FItem::DATA_TYPE_STRING, "sampling_notes", "Observaciones muestreo", "", false);
         $this->sampling_deviats = new FItem(FItem::DATA_TYPE_STRING, "sampling_deviats", "Desviaciones muestreo", "", false);
+        $this->sampling_notes = new FItem(FItem::DATA_TYPE_STRING, "sampling_notes", "Observaciones muestreo", "", false);
         $this->sampling_images = new FItem(FItem::DATA_TYPE_INT, "sampling_images", "Imágenes muestreo", "", true);
         $this->recept_entry = new FItem(FItem::DATA_TYPE_INT, "recept_entry", "Partida recepción", "", true);
-        $this->recept_datetime = new FItem(FItem::DATA_TYPE_DATETIME, "recept_datetime", "Fecha-hora recepción", "", true);
-        $this->recept_temperat = new FItem(FItem::DATA_TYPE_FLOAT, "recept_temperat", "Temp. recepción °C", "", true);
-        $this->recept_notes = new FItem(FItem::DATA_TYPE_STRING, "recept_notes", "Observaciones recepción", "", false);
+        $this->recept_datetime_n = new FItem(FItem::DATA_TYPE_DATETIME, "recept_datetime_n", "Fecha-hora recepción", "", false);
+        $this->recept_temperat_n = new FItem(FItem::DATA_TYPE_FLOAT, "recept_temperat_n", "Temp. recepción °C", "", false);
         $this->recept_deviats = new FItem(FItem::DATA_TYPE_STRING, "recept_deviats", "Desviaciones recepción", "", false);
+        $this->recept_notes = new FItem(FItem::DATA_TYPE_STRING, "recept_notes", "Observaciones recepción", "", false);
         $this->service_type = new FItem(FItem::DATA_TYPE_STRING, "service_type", "Tipo servicio", "", true);
         $this->is_customer_custom = new FItem(FItem::DATA_TYPE_BOOL, "is_customer_custom", "Cliente personalizado", "", false);
         $this->customer_name = new FItem(FItem::DATA_TYPE_STRING, "customer_name", "Nombre cliente", "", false);
@@ -131,7 +131,7 @@ class ModSample extends FRegistry
         $this->nk_customer_sample = new FItem(FItem::DATA_TYPE_INT, "nk_customer_sample", "Cliente muestra", "", false);
         $this->nk_customer_billing = new FItem(FItem::DATA_TYPE_INT, "nk_customer_billing", "Cliente facturación", "", false);
         $this->fk_report_contact = new FItem(FItem::DATA_TYPE_INT, "fk_report_contact", "Contacto IR", "", true);
-        $this->fk_report_delivery_opt = new FItem(FItem::DATA_TYPE_INT, "fk_report_delivery_opt", "Opción entrega IR", "", true);
+        $this->fk_report_delivery_type = new FItem(FItem::DATA_TYPE_INT, "fk_report_delivery_type", "Tipo entrega IR", "", true);
         $this->fk_sample_class = new FItem(FItem::DATA_TYPE_INT, "fk_sample_class", "Clase muestra", "", true);
         $this->fk_sample_type = new FItem(FItem::DATA_TYPE_INT, "fk_sample_type", "Tipo muestra", "", true);
         $this->fk_sample_status = new FItem(FItem::DATA_TYPE_INT, "fk_sample_status", "Estatus muestra", "", true);
@@ -163,14 +163,14 @@ class ModSample extends FRegistry
         $this->items["sampling_area"] = $this->sampling_area;
         $this->items["sampling_datetime_n"] = $this->sampling_datetime_n;
         $this->items["sampling_temperat_n"] = $this->sampling_temperat_n;
-        $this->items["sampling_notes"] = $this->sampling_notes;
         $this->items["sampling_deviats"] = $this->sampling_deviats;
+        $this->items["sampling_notes"] = $this->sampling_notes;
         $this->items["sampling_images"] = $this->sampling_images;
         $this->items["recept_entry"] = $this->recept_entry;
-        $this->items["recept_datetime"] = $this->recept_datetime;
-        $this->items["recept_temperat"] = $this->recept_temperat;
-        $this->items["recept_notes"] = $this->recept_notes;
+        $this->items["recept_datetime_n"] = $this->recept_datetime_n;
+        $this->items["recept_temperat_n"] = $this->recept_temperat_n;
         $this->items["recept_deviats"] = $this->recept_deviats;
+        $this->items["recept_notes"] = $this->recept_notes;
         $this->items["service_type"] = $this->service_type;
         $this->items["is_customer_custom"] = $this->is_customer_custom;
         $this->items["customer_name"] = $this->customer_name;
@@ -196,7 +196,7 @@ class ModSample extends FRegistry
         $this->items["nk_customer_sample"] = $this->nk_customer_sample;
         $this->items["nk_customer_billing"] = $this->nk_customer_billing;
         $this->items["fk_report_contact"] = $this->fk_report_contact;
-        $this->items["fk_report_delivery_opt"] = $this->fk_report_delivery_opt;
+        $this->items["fk_report_delivery_type"] = $this->fk_report_delivery_type;
         $this->items["fk_sample_class"] = $this->fk_sample_class;
         $this->items["fk_sample_type"] = $this->fk_sample_type;
         $this->items["fk_sample_status"] = $this->fk_sample_status;
@@ -219,10 +219,10 @@ class ModSample extends FRegistry
         $this->name->setRangeLength(1, 100);
         $this->lot->setRangeLength(0, 50);
         $this->sampling_area->setRangeLength(1, 100);
-        $this->sampling_notes->setRangeLength(0, 500);
         $this->sampling_deviats->setRangeLength(0, 500);
-        $this->recept_notes->setRangeLength(0, 500);
+        $this->sampling_notes->setRangeLength(0, 500);
         $this->recept_deviats->setRangeLength(0, 500);
+        $this->recept_notes->setRangeLength(0, 500);
         $this->service_type->setRangeLength(1, 1);
         $this->customer_name->setRangeLength(0, 201);
         $this->customer_street->setRangeLength(0, 200);
@@ -319,14 +319,14 @@ class ModSample extends FRegistry
             $this->sampling_area->setValue($row["sampling_area"]);
             $this->sampling_datetime_n->setValue($row["sampling_datetime_n"]);
             $this->sampling_temperat_n->setValue($row["sampling_temperat_n"]);
-            $this->sampling_notes->setValue($row["sampling_notes"]);
             $this->sampling_deviats->setValue($row["sampling_deviats"]);
+            $this->sampling_notes->setValue($row["sampling_notes"]);
             $this->sampling_images->setValue($row["sampling_images"]);
             $this->recept_entry->setValue($row["recept_entry"]);
-            $this->recept_datetime->setValue($row["recept_datetime"]);
-            $this->recept_temperat->setValue($row["recept_temperat"]);
-            $this->recept_notes->setValue($row["recept_notes"]);
+            $this->recept_datetime_n->setValue($row["recept_datetime_n"]);
+            $this->recept_temperat_n->setValue($row["recept_temperat_n"]);
             $this->recept_deviats->setValue($row["recept_deviats"]);
+            $this->recept_notes->setValue($row["recept_notes"]);
             $this->service_type->setValue($row["service_type"]);
             $this->is_customer_custom->setValue($row["is_customer_custom"]);
             $this->customer_name->setValue($row["customer_name"]);
@@ -352,7 +352,7 @@ class ModSample extends FRegistry
             $this->nk_customer_sample->setValue($row["nk_customer_sample"]);
             $this->nk_customer_billing->setValue($row["nk_customer_billing"]);
             $this->fk_report_contact->setValue($row["fk_report_contact"]);
-            $this->fk_report_delivery_opt->setValue($row["fk_report_delivery_opt"]);
+            $this->fk_report_delivery_type->setValue($row["fk_report_delivery_type"]);
             $this->fk_sample_class->setValue($row["fk_sample_class"]);
             $this->fk_sample_type->setValue($row["fk_sample_type"]);
             $this->fk_sample_status->setValue($row["fk_sample_status"]);
@@ -435,14 +435,14 @@ class ModSample extends FRegistry
                 "sampling_area, " .
                 "sampling_datetime_n, " .
                 "sampling_temperat_n, " .
-                "sampling_notes, " .
                 "sampling_deviats, " .
+                "sampling_notes, " .
                 "sampling_images, " .
                 "recept_entry, " .
-                "recept_datetime, " .
-                "recept_temperat, " .
-                "recept_notes, " .
+                "recept_datetime_n, " .
+                "recept_temperat_n, " .
                 "recept_deviats, " .
+                "recept_notes, " .
                 "service_type, " .
                 "is_customer_custom, " .
                 "customer_name, " .
@@ -468,7 +468,7 @@ class ModSample extends FRegistry
                 "nk_customer_sample, " .
                 "nk_customer_billing, " .
                 "fk_report_contact, " .
-                "fk_report_delivery_opt, " .
+                "fk_report_delivery_type, " .
                 "fk_sample_class, " .
                 "fk_sample_type, " .
                 "fk_sample_status, " .
@@ -500,14 +500,14 @@ class ModSample extends FRegistry
                 ":sampling_area, " .
                 ":sampling_datetime_n, " .
                 ":sampling_temperat_n, " .
-                ":sampling_notes, " .
                 ":sampling_deviats, " .
+                ":sampling_notes, " .
                 ":sampling_images, " .
                 ":recept_entry, " .
-                ":recept_datetime, " .
-                ":recept_temperat, " .
-                ":recept_notes, " .
+                ":recept_datetime_n, " .
+                ":recept_temperat_n, " .
                 ":recept_deviats, " .
+                ":recept_notes, " .
                 ":service_type, " .
                 ":is_customer_custom, " .
                 ":customer_name, " .
@@ -533,7 +533,7 @@ class ModSample extends FRegistry
                 ":nk_customer_sample, " .
                 ":nk_customer_billing, " .
                 ":fk_report_contact, " .
-                ":fk_report_delivery_opt, " .
+                ":fk_report_delivery_type, " .
                 ":fk_sample_class, " .
                 ":fk_sample_type, " .
                 ":fk_sample_status, " .
@@ -566,14 +566,14 @@ class ModSample extends FRegistry
                 "sampling_area = :sampling_area, " .
                 "sampling_datetime_n = :sampling_datetime_n, " .
                 "sampling_temperat_n = :sampling_temperat_n, " .
-                "sampling_notes = :sampling_notes, " .
                 "sampling_deviats = :sampling_deviats, " .
+                "sampling_notes = :sampling_notes, " .
                 "sampling_images = :sampling_images, " .
                 "recept_entry = :recept_entry, " .
-                "recept_datetime = :recept_datetime, " .
-                "recept_temperat = :recept_temperat, " .
-                "recept_notes = :recept_notes, " .
+                "recept_datetime_n = :recept_datetime_n, " .
+                "recept_temperat_n = :recept_temperat_n, " .
                 "recept_deviats = :recept_deviats, " .
+                "recept_notes = :recept_notes, " .
                 "service_type = :service_type, " .
                 "is_customer_custom = :is_customer_custom, " .
                 "customer_name = :customer_name, " .
@@ -599,7 +599,7 @@ class ModSample extends FRegistry
                 "nk_customer_sample = :nk_customer_sample, " .
                 "nk_customer_billing = :nk_customer_billing, " .
                 "fk_report_contact = :fk_report_contact, " .
-                "fk_report_delivery_opt = :fk_report_delivery_opt, " .
+                "fk_report_delivery_type = :fk_report_delivery_type, " .
                 "fk_sample_class = :fk_sample_class, " .
                 "fk_sample_type = :fk_sample_type, " .
                 "fk_sample_status = :fk_sample_status, " .
@@ -633,14 +633,14 @@ class ModSample extends FRegistry
         $sampling_area = $this->sampling_area->getValue();
         $sampling_datetime_n = $this->sampling_datetime_n->getValue();
         $sampling_temperat_n = $this->sampling_temperat_n->getValue();
-        $sampling_notes = $this->sampling_notes->getValue();
         $sampling_deviats = $this->sampling_deviats->getValue();
+        $sampling_notes = $this->sampling_notes->getValue();
         $sampling_images = $this->sampling_images->getValue();
         $recept_entry = $this->recept_entry->getValue();
-        $recept_datetime = $this->recept_datetime->getValue();
-        $recept_temperat = $this->recept_temperat->getValue();
-        $recept_notes = $this->recept_notes->getValue();
+        $recept_datetime_n = $this->recept_datetime_n->getValue();
+        $recept_temperat_n = $this->recept_temperat_n->getValue();
         $recept_deviats = $this->recept_deviats->getValue();
+        $recept_notes = $this->recept_notes->getValue();
         $service_type = $this->service_type->getValue();
         $is_customer_custom = $this->is_customer_custom->getValue();
         $customer_name = $this->customer_name->getValue();
@@ -666,7 +666,7 @@ class ModSample extends FRegistry
         $nk_customer_sample = $this->nk_customer_sample->getValue();
         $nk_customer_billing = $this->nk_customer_billing->getValue();
         $fk_report_contact = $this->fk_report_contact->getValue();
-        $fk_report_delivery_opt = $this->fk_report_delivery_opt->getValue();
+        $fk_report_delivery_type = $this->fk_report_delivery_type->getValue();
         $fk_sample_class = $this->fk_sample_class->getValue();
         $fk_sample_type = $this->fk_sample_type->getValue();
         $fk_sample_status = $this->fk_sample_status->getValue();
@@ -700,14 +700,14 @@ class ModSample extends FRegistry
         $statement->bindParam(":sampling_area", $sampling_area);
         $statement->bindParam(":sampling_datetime_n", $sampling_datetime_n);
         $statement->bindParam(":sampling_temperat_n", $sampling_temperat_n);
-        $statement->bindParam(":sampling_notes", $sampling_notes);
         $statement->bindParam(":sampling_deviats", $sampling_deviats);
+        $statement->bindParam(":sampling_notes", $sampling_notes);
         $statement->bindParam(":sampling_images", $sampling_images, \PDO::PARAM_INT);
         $statement->bindParam(":recept_entry", $recept_entry, \PDO::PARAM_INT);
-        $statement->bindParam(":recept_datetime", $recept_datetime);
-        $statement->bindParam(":recept_temperat", $recept_temperat);
-        $statement->bindParam(":recept_notes", $recept_notes);
+        $statement->bindParam(":recept_datetime_n", $recept_datetime_n);
+        $statement->bindParam(":recept_temperat_n", $recept_temperat_n);
         $statement->bindParam(":recept_deviats", $recept_deviats);
+        $statement->bindParam(":recept_notes", $recept_notes);
         $statement->bindParam(":service_type", $service_type);
         $statement->bindParam(":is_customer_custom", $is_customer_custom, \PDO::PARAM_BOOL);
         $statement->bindParam(":customer_name", $customer_name);
@@ -733,7 +733,7 @@ class ModSample extends FRegistry
         $statement->bindParam(":nk_customer_sample", $nk_customer_sample, \PDO::PARAM_INT);
         $statement->bindParam(":nk_customer_billing", $nk_customer_billing, \PDO::PARAM_INT);
         $statement->bindParam(":fk_report_contact", $fk_report_contact, \PDO::PARAM_INT);
-        $statement->bindParam(":fk_report_delivery_opt", $fk_report_delivery_opt, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_report_delivery_type", $fk_report_delivery_type, \PDO::PARAM_INT);
         $statement->bindParam(":fk_sample_class", $fk_sample_class, \PDO::PARAM_INT);
         $statement->bindParam(":fk_sample_type", $fk_sample_type, \PDO::PARAM_INT);
         $statement->bindParam(":fk_sample_status", $fk_sample_status, \PDO::PARAM_INT);

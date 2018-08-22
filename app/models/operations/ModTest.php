@@ -25,7 +25,7 @@ class ModTest extends FRegistry
     protected $ts_user_ins;
     protected $ts_user_upd;
 
-    protected $childProcessOpts;
+    protected $childProcessEntitys;
 
     function __construct()
     {
@@ -68,17 +68,17 @@ class ModTest extends FRegistry
         $this->sample_quantity->setRangeLength(1, 100);
         $this->sample_directs->setRangeLength(1, 500);
 
-        $this->childProcessOpts = array();
+        $this->childProcessEntitys = array();
     }
 
-    public function &getChildProcessOpts(): array
+    public function &getChildProcessEntitys(): array
     {
-        return $this->childProcessOpts;
+        return $this->childProcessEntitys;
     }
 
-    public function clearChildProcessOpts(): array
+    public function clearChildProcessEntitys(): array
     {
-        $this->childProcessOpts = array();
+        $this->childProcessEntitys = array();
     }
 
     public function validate(FUserSession $userSession)
@@ -87,7 +87,7 @@ class ModTest extends FRegistry
 
         parent::validate($userSession);
 
-        foreach ($this->childProcessOpts as $processOpt) {
+        foreach ($this->childProcessEntitys as $processOpt) {
             $ids = array();
             $ids["id_test"] = $this->isRegistryNew ? -1 : $this->id;    // bypass validation
             $processOpt->setIds($ids);
@@ -134,9 +134,9 @@ class ModTest extends FRegistry
                 $ids["id_test"] = intval($row["id_test"]);
                 $ids["id_entity"] = intval($row["id_entity"]);
 
-                $processOpt = new ModTestProcessOpt();
+                $processOpt = new ModTestProcessEntity();
                 $processOpt->retrieve($userSession, $ids, $mode);
-                $this->childProcessOpts[] = $processOpt;
+                $this->childProcessEntitys[] = $processOpt;
             }
         }
         else {
@@ -252,7 +252,7 @@ class ModTest extends FRegistry
         }
 
         // save child process options:
-        foreach ($this->childProcessOpts as $processOpt) {
+        foreach ($this->childProcessEntitys as $processOpt) {
             $ids = array();
             $ids["id_test"] = $this->id;
 

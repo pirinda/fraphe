@@ -12,11 +12,11 @@ class ModRecept extends FRegistry
     protected $id_recept;
     protected $number;
     protected $recept_datetime;
-    protected $recept_temperat;
+    protected $recept_temperat_n;
     protected $recept_process_days;
     protected $recept_deadline;
-    protected $recept_notes;
     protected $recept_deviats;
+    protected $recept_notes;
     protected $service_type;
     protected $is_customer_custom;
     protected $customer_name;
@@ -42,7 +42,7 @@ class ModRecept extends FRegistry
     protected $nk_customer_sample;
     protected $nk_customer_billing;
     protected $fk_report_contact;
-    protected $fk_report_delivery_opt;
+    protected $fk_report_delivery_type;
     protected $fk_user_receiver;
     protected $fk_user_ins;
     protected $fk_user_upd;
@@ -58,11 +58,11 @@ class ModRecept extends FRegistry
         $this->id_recept = new FItem(FItem::DATA_TYPE_INT, "id_recept", "ID recepción", "", false, true);
         $this->number = new FItem(FItem::DATA_TYPE_STRING, "number", "Folio recepción", "", true);
         $this->recept_datetime = new FItem(FItem::DATA_TYPE_DATETIME, "recept_datetime", "Fecha-hora recepción", "", true);
-        $this->recept_temperat = new FItem(FItem::DATA_TYPE_FLOAT, "recept_temperat", "Temp. recepción °C", "", true);
+        $this->recept_temperat_n = new FItem(FItem::DATA_TYPE_FLOAT, "recept_temperat_n", "Temp. recepción °C", "", false);
         $this->recept_process_days = new FItem(FItem::DATA_TYPE_INT, "recept_process_days", "Días proceso recepción", "", true);
         $this->recept_deadline = new FItem(FItem::DATA_TYPE_DATE, "recept_deadline", "Fecha límite recepción", "", true);
-        $this->recept_notes = new FItem(FItem::DATA_TYPE_STRING, "recept_notes", "Observaciones recepción", "", false);
         $this->recept_deviats = new FItem(FItem::DATA_TYPE_STRING, "recept_deviats", "Desviaciones recepción", "", false);
+        $this->recept_notes = new FItem(FItem::DATA_TYPE_STRING, "recept_notes", "Observaciones recepción", "", false);
         $this->service_type = new FItem(FItem::DATA_TYPE_STRING, "service_type", "Tipo servicio", "", true);
         $this->is_customer_custom = new FItem(FItem::DATA_TYPE_BOOL, "is_customer_custom", "Cliente personalizado", "", false);
         $this->customer_name = new FItem(FItem::DATA_TYPE_STRING, "customer_name", "Nombre cliente", "", false);
@@ -88,7 +88,7 @@ class ModRecept extends FRegistry
         $this->nk_customer_sample = new FItem(FItem::DATA_TYPE_INT, "nk_customer_sample", "Cliente muestra", "", false);
         $this->nk_customer_billing = new FItem(FItem::DATA_TYPE_INT, "nk_customer_billing", "Cliente facturación", "", false);
         $this->fk_report_contact = new FItem(FItem::DATA_TYPE_INT, "fk_report_contact", "Contacto IR", "", true);
-        $this->fk_report_delivery_opt = new FItem(FItem::DATA_TYPE_INT, "fk_report_delivery_opt", "Opción entrega IR", "", true);
+        $this->fk_report_delivery_type = new FItem(FItem::DATA_TYPE_INT, "fk_report_delivery_type", "Tipo entrega IR", "", true);
         $this->fk_user_receiver = new FItem(FItem::DATA_TYPE_INT, "fk_user_receiver", "Receptor", "", true);
         $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", "", false);
         $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", "", false);
@@ -98,11 +98,11 @@ class ModRecept extends FRegistry
         $this->items["id_recept"] = $this->id_recept;
         $this->items["number"] = $this->number;
         $this->items["recept_datetime"] = $this->recept_datetime;
-        $this->items["recept_temperat"] = $this->recept_temperat;
+        $this->items["recept_temperat_n"] = $this->recept_temperat_n;
         $this->items["recept_process_days"] = $this->recept_process_days;
         $this->items["recept_deadline"] = $this->recept_deadline;
-        $this->items["recept_notes"] = $this->recept_notes;
         $this->items["recept_deviats"] = $this->recept_deviats;
+        $this->items["recept_notes"] = $this->recept_notes;
         $this->items["service_type"] = $this->service_type;
         $this->items["is_customer_custom"] = $this->is_customer_custom;
         $this->items["customer_name"] = $this->customer_name;
@@ -128,7 +128,7 @@ class ModRecept extends FRegistry
         $this->items["nk_customer_sample"] = $this->nk_customer_sample;
         $this->items["nk_customer_billing"] = $this->nk_customer_billing;
         $this->items["fk_report_contact"] = $this->fk_report_contact;
-        $this->items["fk_report_delivery_opt"] = $this->fk_report_delivery_opt;
+        $this->items["fk_report_delivery_type"] = $this->fk_report_delivery_type;
         $this->items["fk_user_receiver"] = $this->fk_user_receiver;
         $this->items["fk_user_ins"] = $this->fk_user_ins;
         $this->items["fk_user_upd"] = $this->fk_user_upd;
@@ -136,8 +136,8 @@ class ModRecept extends FRegistry
         $this->items["ts_user_upd"] = $this->ts_user_upd;
 
         $this->number->setRangeLength(1, 25);
-        $this->recept_notes->setRangeLength(0, 500);
         $this->recept_deviats->setRangeLength(0, 500);
+        $this->recept_notes->setRangeLength(0, 500);
         $this->service_type->setRangeLength(1, 1);
         $this->customer_name->setRangeLength(0, 201);
         $this->customer_street->setRangeLength(0, 200);
@@ -189,11 +189,11 @@ class ModRecept extends FRegistry
             $this->id_recept->setValue($row["id_recept"]);
             $this->number->setValue($row["number"]);
             $this->recept_datetime->setValue($row["recept_datetime"]);
-            $this->recept_temperat->setValue($row["recept_temperat"]);
+            $this->recept_temperat_n->setValue($row["recept_temperat_n"]);
             $this->recept_process_days->setValue($row["recept_process_days"]);
             $this->recept_deadline->setValue($row["recept_deadline"]);
-            $this->recept_notes->setValue($row["recept_notes"]);
             $this->recept_deviats->setValue($row["recept_deviats"]);
+            $this->recept_notes->setValue($row["recept_notes"]);
             $this->service_type->setValue($row["service_type"]);
             $this->is_customer_custom->setValue($row["is_customer_custom"]);
             $this->customer_name->setValue($row["customer_name"]);
@@ -219,7 +219,7 @@ class ModRecept extends FRegistry
             $this->nk_customer_sample->setValue($row["nk_customer_sample"]);
             $this->nk_customer_billing->setValue($row["nk_customer_billing"]);
             $this->fk_report_contact->setValue($row["fk_report_contact"]);
-            $this->fk_report_delivery_opt->setValue($row["fk_report_delivery_opt"]);
+            $this->fk_report_delivery_type->setValue($row["fk_report_delivery_type"]);
             $this->fk_user_receiver->setValue($row["fk_user_receiver"]);
             $this->fk_user_ins->setValue($row["fk_user_ins"]);
             $this->fk_user_upd->setValue($row["fk_user_upd"]);
@@ -257,11 +257,11 @@ class ModRecept extends FRegistry
                 "id_recept, " .
                 "number, " .
                 "recept_datetime, " .
-                "recept_temperat, " .
+                "recept_temperat_n, " .
                 "recept_process_days, " .
                 "recept_deadline, " .
-                "recept_notes, " .
                 "recept_deviats, " .
+                "recept_notes, " .
                 "service_type, " .
                 "is_customer_custom, " .
                 "customer_name, " .
@@ -287,7 +287,7 @@ class ModRecept extends FRegistry
                 "nk_customer_sample, " .
                 "nk_customer_billing, " .
                 "fk_report_contact, " .
-                "fk_report_delivery_opt, " .
+                "fk_report_delivery_type, " .
                 "fk_user_receiver, " .
                 "fk_user_ins, " .
                 "fk_user_upd, " .
@@ -297,11 +297,11 @@ class ModRecept extends FRegistry
                 "0, " .
                 ":number, " .
                 ":recept_datetime, " .
-                ":recept_temperat, " .
+                ":recept_temperat_n, " .
                 ":recept_process_days, " .
                 ":recept_deadline, " .
-                ":recept_notes, " .
                 ":recept_deviats, " .
+                ":recept_notes, " .
                 ":service_type, " .
                 ":is_customer_custom, " .
                 ":customer_name, " .
@@ -327,7 +327,7 @@ class ModRecept extends FRegistry
                 ":nk_customer_sample, " .
                 ":nk_customer_billing, " .
                 ":fk_report_contact, " .
-                ":fk_report_delivery_opt, " .
+                ":fk_report_delivery_type, " .
                 ":fk_user_receiver, " .
                 ":fk_user, " .
                 "1, " .
@@ -338,11 +338,11 @@ class ModRecept extends FRegistry
             $statement = $userSession->getPdo()->prepare("UPDATE o_recept SET " .
                 "number = :number, " .
                 "recept_datetime = :recept_datetime, " .
-                "recept_temperat = :recept_temperat, " .
+                "recept_temperat_n = :recept_temperat_n, " .
                 "recept_process_days = :recept_process_days, " .
                 "recept_deadline = :recept_deadline, " .
-                "recept_notes = :recept_notes, " .
                 "recept_deviats = :recept_deviats, " .
+                "recept_notes = :recept_notes, " .
                 "service_type = :service_type, " .
                 "is_customer_custom = :is_customer_custom, " .
                 "customer_name = :customer_name, " .
@@ -368,7 +368,7 @@ class ModRecept extends FRegistry
                 "nk_customer_sample = :nk_customer_sample, " .
                 "nk_customer_billing = :nk_customer_billing, " .
                 "fk_report_contact = :fk_report_contact, " .
-                "fk_report_delivery_opt = :fk_report_delivery_opt, " .
+                "fk_report_delivery_type = :fk_report_delivery_type, " .
                 "fk_user_receiver = :fk_user_receiver, " .
                 //"fk_user_ins = :fk_user_ins, " .
                 "fk_user_upd = :fk_user, " .
@@ -380,11 +380,11 @@ class ModRecept extends FRegistry
         //$id_recept = $this->id_recept->getValue();
         $number = $this->number->getValue();
         $recept_datetime = $this->recept_datetime->getValue();
-        $recept_temperat = $this->recept_temperat->getValue();
+        $recept_temperat_n = $this->recept_temperat_n->getValue();
         $recept_process_days = $this->recept_process_days->getValue();
         $recept_deadline = $this->recept_deadline->getValue();
-        $recept_notes = $this->recept_notes->getValue();
         $recept_deviats = $this->recept_deviats->getValue();
+        $recept_notes = $this->recept_notes->getValue();
         $service_type = $this->service_type->getValue();
         $is_customer_custom = $this->is_customer_custom->getValue();
         $customer_name = $this->customer_name->getValue();
@@ -410,7 +410,7 @@ class ModRecept extends FRegistry
         $nk_customer_sample = $this->nk_customer_sample->getValue();
         $nk_customer_billing = $this->nk_customer_billing->getValue();
         $fk_report_contact = $this->fk_report_contact->getValue();
-        $fk_report_delivery_opt = $this->fk_report_delivery_opt->getValue();
+        $fk_report_delivery_type = $this->fk_report_delivery_type->getValue();
         $fk_user_receiver = $this->fk_user_receiver->getValue();
         $fk_user_ins = $this->fk_user_ins->getValue();
         $fk_user_upd = $this->fk_user_upd->getValue();
@@ -422,11 +422,11 @@ class ModRecept extends FRegistry
         //$statement->bindParam(":id_recept", $id_recept, \PDO::PARAM_INT);
         $statement->bindParam(":number", $number);
         $statement->bindParam(":recept_datetime", $recept_datetime);
-        $statement->bindParam(":recept_temperat", $recept_temperat);
+        $statement->bindParam(":recept_temperat_n", $recept_temperat_n);
         $statement->bindParam(":recept_process_days", $recept_process_days, \PDO::PARAM_INT);
         $statement->bindParam(":recept_deadline", $recept_deadline);
-        $statement->bindParam(":recept_notes", $recept_notes);
         $statement->bindParam(":recept_deviats", $recept_deviats);
+        $statement->bindParam(":recept_notes", $recept_notes);
         $statement->bindParam(":service_type", $service_type);
         $statement->bindParam(":is_customer_custom", $is_customer_custom, \PDO::PARAM_BOOL);
         $statement->bindParam(":customer_name", $customer_name);
@@ -452,7 +452,7 @@ class ModRecept extends FRegistry
         $statement->bindParam(":nk_customer_sample", $nk_customer_sample, \PDO::PARAM_INT);
         $statement->bindParam(":nk_customer_billing", $nk_customer_billing, \PDO::PARAM_INT);
         $statement->bindParam(":fk_report_contact", $fk_report_contact, \PDO::PARAM_INT);
-        $statement->bindParam(":fk_report_delivery_opt", $fk_report_delivery_opt, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_report_delivery_type", $fk_report_delivery_type, \PDO::PARAM_INT);
         $statement->bindParam(":fk_user_receiver", $fk_user_receiver, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_ins", $fk_user_ins, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_upd", $fk_user_upd, \PDO::PARAM_INT);

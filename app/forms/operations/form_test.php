@@ -16,7 +16,7 @@ use Fraphe\Model\FRegistry;
 use app\AppConsts;
 use app\AppUtils;
 use app\models\operations\ModTest;
-use app\models\operations\ModTestProcessOpt;
+use app\models\operations\ModTestProcessEntity;
 
 echo '<!DOCTYPE html>';
 echo '<html>';
@@ -61,9 +61,9 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         $childData["cost"] = floatval($_POST["po_cost"]);
         $childData["is_default"] = boolval($_POST["po_is_default"]);
 
-        $childProcessOpt = new ModTestProcessOpt();
-        $childProcessOpt->setData($childData);
-        $registry->getChildProcessOpt()[] = $childProcessOpt;
+        $childProcessEntity = new ModTestProcessEntity();
+        $childProcessEntity->setData($childData);
+        $registry->getChildProcessEntitys()[] = $childProcessEntity;
 
         try {
             $registry->setData($data);
@@ -152,35 +152,35 @@ echo '</div>';
 
 // child test process options:
 
-$childProcessOpt;
+$childProcessEntity;
 
-if (empty($registry->getChildProcessOpts())) {
-    $childProcessOpt = new ModTestProcessOpt();
+if (empty($registry->getChildProcessEntitys())) {
+    $childProcessEntity = new ModTestProcessEntity();
     $data = array();
     $data["is_default"] = true;
-    $childProcessOpt->setData($data);
+    $childProcessEntity->setData($data);
 }
 else {
-    $childProcessOpt = $registry->getChildProcessOpts()[0];
+    $childProcessEntity = $registry->getChildProcessEntitys()[0];
 }
 
 echo '<div class="form-group">';
-echo '<label for="po_process_days_min">' . $childProcessOpt->getItem("process_days_min")->getName() . ': *</label>';
-echo '<input type="text" class="form-control" name="po_process_days_min" value="' . $childProcessOpt->getDatum("process_days_min") . '">';
+echo '<label for="po_process_days_min">' . $childProcessEntity->getItem("process_days_min")->getName() . ': *</label>';
+echo '<input type="text" class="form-control" name="po_process_days_min" value="' . $childProcessEntity->getDatum("process_days_min") . '">';
 echo '</div>';
 
 echo '<div class="form-group">';
-echo '<label for="po_process_days_max">' . $childProcessOpt->getItem("process_days_max")->getName() . ': *</label>';
-echo '<input type="text" class="form-control" name="po_process_days_max" value="' . $childProcessOpt->getDatum("process_days_max") . '">';
+echo '<label for="po_process_days_max">' . $childProcessEntity->getItem("process_days_max")->getName() . ': *</label>';
+echo '<input type="text" class="form-control" name="po_process_days_max" value="' . $childProcessEntity->getDatum("process_days_max") . '">';
 echo '</div>';
 
 echo '<div class="form-group">';
-echo '<label for="po_cost">' . $childProcessOpt->getItem("cost")->getName() . ':</label>';
-echo '<input type="text" class="form-control" name="po_cost" value="' . $childProcessOpt->getDatum("cost") . '">';
+echo '<label for="po_cost">' . $childProcessEntity->getItem("cost")->getName() . ':</label>';
+echo '<input type="text" class="form-control" name="po_cost" value="' . $childProcessEntity->getDatum("cost") . '">';
 echo '</div>';
 
 echo '<div class="checkbox">';
-echo '<label><input type="checkbox" name="po_is_default" value="1"' . ($childProcessOpt->getDatum("is_default") ? " checked" : "") . '>' . $childProcessOpt->getItem("is_default")->getName() . '</label>';
+echo '<label><input type="checkbox" name="po_is_default" value="1"' . ($childProcessEntity->getDatum("is_default") ? " checked" : "") . '>' . $childProcessEntity->getItem("is_default")->getName() . '</label>';
 echo '</div>';
 
 // registry ID:
