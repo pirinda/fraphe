@@ -1,6 +1,8 @@
 <?php
 namespace Fraphe\Model;
 
+use Fraphe\Lib\FUtils;
+
 class FItem
 {
     public const DATA_TYPE_BOOL = 1;
@@ -76,11 +78,11 @@ class FItem
             case self::DATA_TYPE_DATETIME:
             case self::DATA_TYPE_TIME:
             case self::DATA_TYPE_TIMESTAMP:
-                $default = null;
+                $default = 0; // a timestamp
                 break;
 
             default:
-                throw new \Exception(__METHOD__ . ": Tipo de dato desconocido.");
+                throw new \Exception(__METHOD__ . ": Tipo de dato desconocido: $datatype.");
         }
 
         return $default;
@@ -109,11 +111,41 @@ class FItem
             case self::DATA_TYPE_DATETIME:
             case self::DATA_TYPE_TIME:
             case self::DATA_TYPE_TIMESTAMP:
-                $this->value = $value;
+                if (is_int($value)) {
+                    // already a timestamp
+                    $this->value = $value;
+                }
+                else if (is_string($value)) {
+                    switch ($this->dataType) {
+                        case self::DATA_TYPE_DATE:
+                            // parse timestamp from string value in format "yyyy-mm-dd"
+                            $this->value = FUtils::parseDbmsDate($value);
+                            break;
+                        case self::DATA_TYPE_DATETIME:
+                            // parse timestamp from string value in format "yyyy-mm-dd hh:mm:ss"
+                            $this->value = FUtils::parseDbmsDatetime($value);
+                            break;
+                        case self::DATA_TYPE_TIME:
+                            // parse timestamp from string value in format "hh:mm:ss"
+                            $this->value = FUtils::parseDbmsTime($value);
+                            break;
+                        case self::DATA_TYPE_TIMESTAMP:
+                            // parse timestamp from string value in format "yyyy-mm-dd hh:mm:ss"
+                            $this->value = FUtils::parseDbmsTimestamp($value);
+                            break;
+                        default:
+                    }
+                }
+                else if (is_object($value)) {
+                    throw new \Exception(__METHOD__ . ": Tipo de objeto fecha-hora no soportado: " . get_class($value) . ".");
+                }
+                else {
+                    throw new \Exception(__METHOD__ . ": Tipo de dato fecha-hora no soportado: " . gettype($value) . ".");
+                }
                 break;
 
             default:
-                throw new \Exception(__METHOD__ . ": Tipo de dato desconocido.");
+                throw new \Exception(__METHOD__ . ": Tipo de dato desconocido: $this->dataType.");
         }
     }
 
@@ -268,10 +300,10 @@ class FItem
                         throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser cero.");
                     }
                     else if (isset($this->valueMin) && is_int($this->valueMin) && $this->value < $this->valueMin) {
-                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser menor a " . $this->valueMin . ".");
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser menor a $this->valueMin.");
                     }
                     else if (isset($this->valueMax) && is_int($this->valueMax) && $this->value > $this->valueMax) {
-                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser mayor a " . $this->valueMax . ".");
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser mayor a $this->valueMax.");
                     }
                     break;
 
@@ -283,10 +315,10 @@ class FItem
                         throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser cero.");
                     }
                     else if (isset($this->valueMin) && is_float($this->valueMin) && $this->value < $this->valueMin) {
-                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser menor a " . $this->valueMin . ".");
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser menor a $this->valueMin.");
                     }
                     else if (isset($this->valueMax) && is_float($this->valueMax) && $this->value > $this->valueMax) {
-                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser mayor a " . $this->valueMax . ".");
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser mayor a $this->valueMax.");
                     }
                     break;
 
@@ -298,10 +330,10 @@ class FItem
                         throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede estar vacío.");
                     }
                     else if (isset($this->lengthMin) && is_int($this->lengthMin) && strlen($this->value) < $this->lengthMin) {
-                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede tener longitud menor a " . $this->lengthMin . ".");
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede tener longitud menor a $this->lengthMin.");
                     }
                     else if (isset($this->lengthMax) && is_int($this->lengthMax) && strlen($this->value) > $this->lengthMax) {
-                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede tener longitud mayor a " . $this->lengthMax . ".");
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede tener longitud mayor a $this->lengthMax.");
                     }
                     break;
 
@@ -309,22 +341,20 @@ class FItem
                 case self::DATA_TYPE_DATETIME:
                 case self::DATA_TYPE_TIME:
                 case self::DATA_TYPE_TIMESTAMP:
-                    //throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "tiene un tipo de dato no soportado aún.");
-                    break;  // useless
-                    /*
-                    if (!is_a("DateTime")) {
-                        throw new \Exception($this->composeItemName() . "debe ser fecha o fecha-hora.");
+                    if (!is_int($this->value)) {
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "debe ser número entero (timestamp).");
                     }
                     else if (!$this->canBeEmpty && empty($this->value)) {
-                        throw new \Exception($this->composeItemName() . "no puede estar vacío.");
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser cero (timestamp).");
                     }
-                    else if (isset($this->valueMin) && is_int($valueMin) && $this->value < $this->valueMin) {
-                        throw new \Exception($this->composeItemName() . "no puede ser anterior a " . $this->valueMin . ".");
+                    else if (isset($this->valueMin) && is_int($this->valueMin) && $this->value < $this->valueMin) {
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser menor a " . date("Y-m-d H:i:s", $this->valueMin) . " (timestamp: $this->valueMin).");
                     }
-                    else if (isset($this->valueMax) && is_int($valueMax) && $this->value > $this->valueMax) {
-                        throw new \Exception($this->composeItemName() . "no puede ser posterior a " . $this->valueMax . ".");
+                    else if (isset($this->valueMax) && is_int($this->valueMax) && $this->value > $this->valueMax) {
+                        throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser mayor a " . date("Y-m-d H:i:s", $this->valueMax) . " (timestamp: $this->valueMax).");
                     }
-                    */
+                    break;
+
                 default:
                     throw new \Exception(__METHOD__ . ": " . "Tipo de dato desconocido.");
             }

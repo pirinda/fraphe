@@ -6,58 +6,63 @@ abstract class AppConsts
     public const CC_CONFIG_SETTING = 101001;
     public const CC_COMPANY = 101011;
     public const CC_COMPANY_BRANCH = 101012;
-    public const CC_USER_TYPE = 101021;
-    public const CC_USER_ROLE = 101022;
-    public const CC_USER_ATTRIB = 101023;
-    public const CC_USER_JOB = 101025;
-    public const CC_USER = 101026;
-    public const CC_USER_USER_ROLE = 101027;
-    public const CC_USER_USER_ATTRIB = 101028;
-    public const CC_MARKET_SEGMENT = 101031;
-    public const CC_ENTITY_CLASS = 101041;
-    public const CC_ENTITY_TYPE = 101042;
-    public const CC_ENTITY = 101051;
-    public const CC_ENTITY_ENTITY_TYPE = 101056;
-    public const CC_ENTITY_IMAGE = 101058;
-    public const CC_ENTITY_ADDRESS = 101061;
-    public const CC_CONTACT_TYPE = 101071;
-    public const CC_CONTACT = 101076;
+    public const CC_USER_TYPE = 101101;
+    public const CC_USER_ROLE = 101102;
+    public const CC_USER_ATTRIB = 101106;
+    public const CC_USER_JOB = 101111;
+    public const CC_USER = 101121;
+    public const CC_USER_USER_ROLE = 101122;
+    public const CC_USER_USER_ATTRIB = 101126;
+    public const CC_MARKET_SEGMENT = 101201;
+    public const CC_ENTITY_CLASS = 101211;
+    public const CC_ENTITY_TYPE = 101212;
+    public const CC_ENTITY = 101221;
+    public const CC_ENTITY_ENTITY_TYPE = 101226;
+    public const CC_ENTITY_SAMPLING_IMG = 101231;
+    public const CC_ENTITY_ADDRESS = 101241;
+    public const CC_CONTACT_TYPE = 101251;
+    public const CC_CONTACT = 101256;
 
-    public const OC_PROCESS_AREA = 201011;
-    public const OC_SAMPLE_CLASS = 201021;
-    public const OC_SAMPLE_TYPE = 201022;
-    public const OC_SAMPLE_STATUS = 201025;
-    public const OC_SAMPLING_EQUIPT_TYPE = 201026;
-    public const OC_SAMPLING_EQUIPT = 201027;
-    public const OC_SAMPLING_METHOD = 201031;
-    public const OC_TESTING_METHOD = 201036;
-    public const OC_TEST_ACREDIT_ATTRIB = 201039;
-    public const OC_TEST = 201041;
-    public const OC_TEST_PROCESS_OPT = 201046;
-    public const OC_TEST_PROFILE = 201051;
-    public const OC_TEST_PROFILE_TEST = 201052;
-    public const OC_TEST_PACKAGE = 201061;
-    public const OC_TEST_PACKAGE_TEST = 201062;
-    public const OC_TEST_PACKAGE_TEST_PROFILE = 201063;
-    public const OC_CONTAINER_TYPE = 201071;
-    public const OC_CONTAINER_UNIT = 201072;
-    public const OC_REPORT_DELIVERY_OPT = 201081;
-    public const OC_REPORT_REISSUE_REASON = 201082;
-    public const OC_RESULT_UNIT = 201086;
-    public const OC_RESULT_UNIT_VALUE = 201087;
-    public const OC_RESULT_PERMISS_LIMIT = 201088;
-    public const OC_SAMPLING_NOTE = 201101;
-    public const OC_TESTING_NOTE = 201106;
-    public const OC_JOB_STATUS = 201121;
+    public const OC_PROCESS_AREA = 201001;
+    public const OC_SAMPLE_CLASS = 201101;
+    public const OC_SAMPLE_TYPE = 201102;
+    public const OC_SAMPLE_STATUS = 201111;
+    public const OC_SAMPLING_EQUIPT_TYPE = 201121;
+    public const OC_SAMPLING_EQUIPT = 201126;
+    public const OC_SAMPLING_METHOD = 201131;
+    public const OC_SAMPLING_NOTE = 201139;
+    public const OC_CONTAINER_TYPE = 201141;
+    public const OC_CONTAINER_UNIT = 201142;
+    public const OC_TEST_ACREDIT_ATTRIB = 201201;
+    public const OC_TEST = 201211;
+    public const OC_TEST_PROCESS_ENTITY = 201216;
+    public const OC_TEST_PROFILE = 201221;
+    public const OC_TEST_PROFILE_TEST = 201226;
+    public const OC_TEST_PACKAGE = 201231;
+    public const OC_TEST_PACKAGE_TEST = 201236;
+    public const OC_TEST_PACKAGE_TEST_PROFILE = 201237;
+    public const OC_TESTING_METHOD = 201241;
+    public const OC_TESTING_NOTE = 201249;
+    public const OC_RECEPT_STATUS = 201251;
+    public const OC_JOB_STATUS = 201261;
+    public const OC_REPORT_DELIVERY_TYPE = 201301;
+    public const OC_REPORT_REISSUE_CAUSE = 201306;
+    public const OC_REPORT_STATUS = 201311;
+    public const OC_RESULT_UNIT = 201321;
+    public const OC_RESULT_UNIT_VALUE = 201322;
+    public const OC_RESULT_PERMISS_LIMIT = 201326;
 
     public const O_SAMPLE = 202001;
     public const O_SAMPLE_TEST = 202006;
-    public const O_SAMPLE_IMAGE = 202008;
-    public const O_SAMPLE_STATUS_LOG = 202009;
-    public const O_RECEPT = 202011;
-    public const O_JOB = 202021;
-    public const O_JOB_TEST = 202026;
-    public const O_JOB_STATUS_LOG = 202029;
+    public const O_SAMPLE_STATUS_LOG = 202011;
+    public const O_SAMPLING_IMG = 202021;
+    public const O_RECEPT = 202101;
+    public const O_JOB = 202201;
+    public const O_JOB_TEST = 202206;
+    public const O_JOB_STATUS_LOG = 202211;
+    public const O_REPORT = 202501;
+    public const O_REPORT_TEST = 202506;
+    public const O_REPORT_STATUS_LOG = 202511;
 
     public static $tables = array(
         self::CC_CONFIG_SETTING => "cc_config_setting",
@@ -75,7 +80,7 @@ abstract class AppConsts
         self::CC_ENTITY_TYPE => "cc_entity_type",
         self::CC_ENTITY => "cc_entity",
         self::CC_ENTITY_ENTITY_TYPE => "cc_entity_entity_type",
-        self::CC_ENTITY_IMAGE => "cc_entity_image",
+        self::CC_ENTITY_SAMPLING_IMG => "cc_entity_sampling_img",
         self::CC_ENTITY_ADDRESS => "cc_entity_address",
         self::CC_CONTACT_TYPE => "cc_contact_type",
         self::CC_CONTACT => "cc_contact",
@@ -87,34 +92,39 @@ abstract class AppConsts
         self::OC_SAMPLING_EQUIPT_TYPE => "oc_sampling_equipt_type",
         self::OC_SAMPLING_EQUIPT => "oc_sampling_equipt",
         self::OC_SAMPLING_METHOD => "oc_sampling_method",
-        self::OC_TESTING_METHOD => "oc_testing_method",
+        self::OC_SAMPLING_NOTE => "oc_sampling_note",
+        self::OC_CONTAINER_TYPE => "oc_container_type",
+        self::OC_CONTAINER_UNIT => "oc_container_unit",
         self::OC_TEST_ACREDIT_ATTRIB => "oc_test_acredit_attrib",
         self::OC_TEST => "oc_test",
-        self::OC_TEST_PROCESS_OPT => "oc_test_process_opt",
+        self::OC_TEST_PROCESS_ENTITY => "oc_test_process_entity",
         self::OC_TEST_PROFILE => "oc_test_profile",
         self::OC_TEST_PROFILE_TEST => "oc_test_profile_test",
         self::OC_TEST_PACKAGE => "oc_test_package",
         self::OC_TEST_PACKAGE_TEST => "oc_test_package_test",
         self::OC_TEST_PACKAGE_TEST_PROFILE => "oc_test_package_test_profile",
-        self::OC_CONTAINER_TYPE => "oc_container_type",
-        self::OC_CONTAINER_UNIT => "oc_container_unit",
-        self::OC_REPORT_DELIVERY_OPT => "oc_report_delivery_type",
-        self::OC_REPORT_REISSUE_REASON => "oc_report_reissue_cause",
+        self::OC_TESTING_METHOD => "oc_testing_method",
+        self::OC_TESTING_NOTE => "oc_testing_note",
+        self::OC_RECEPT_STATUS => "oc_recept_status",
+        self::OC_JOB_STATUS => "oc_job_status",
+        self::OC_REPORT_DELIVERY_TYPE => "oc_report_delivery_type",
+        self::OC_REPORT_REISSUE_CAUSE => "oc_report_reissue_cause",
+        self::OC_REPORT_STATUS => "oc_report_status",
         self::OC_RESULT_UNIT => "oc_result_unit",
         self::OC_RESULT_UNIT_VALUE => "oc_result_unit_value",
         self::OC_RESULT_PERMISS_LIMIT => "oc_result_permiss_limit",
-        self::OC_SAMPLING_NOTE => "oc_sampling_note",
-        self::OC_TESTING_NOTE => "oc_testing_note",
-        self::OC_JOB_STATUS => "oc_job_status",
 
         self::O_SAMPLE => "o_sample",
         self::O_SAMPLE_TEST => "o_sample_test",
-        self::O_SAMPLE_IMAGE => "o_sample_image",
         self::O_SAMPLE_STATUS_LOG => "o_sample_status_log",
+        self::O_SAMPLING_IMG => "o_sampling_img",
         self::O_RECEPT => "o_recept",
         self::O_JOB => "o_job",
         self::O_JOB_TEST => "o_job_test",
         self::O_JOB_STATUS_LOG => "o_job_status_log",
+        self::O_REPORT => "o_report",
+        self::O_REPORT_TEST => "o_report_test",
+        self::O_REPORT_STATUS_LOG => "o_report_status_log",
     );
 
     public static $tableIds = array(
@@ -133,7 +143,7 @@ abstract class AppConsts
         self::CC_ENTITY_TYPE => "id_entity_type",
         self::CC_ENTITY => "id_entity",
         //
-        self::CC_ENTITY_IMAGE => "id_entity_image",
+        self::CC_ENTITY_SAMPLING_IMG => "id_entity_sampling_img",
         self::CC_ENTITY_ADDRESS => "id_entity_address",
         self::CC_CONTACT_TYPE => "id_contact_type",
         self::CC_CONTACT => "id_contact",
@@ -145,7 +155,9 @@ abstract class AppConsts
         self::OC_SAMPLING_EQUIPT_TYPE => "id_sampling_equipt_type",
         self::OC_SAMPLING_EQUIPT => "id_sampling_equipt",
         self::OC_SAMPLING_METHOD => "id_sampling_method",
-        self::OC_TESTING_METHOD => "id_testing_method",
+        self::OC_SAMPLING_NOTE => "id_sampling_note",
+        self::OC_CONTAINER_TYPE => "id_container_type",
+        self::OC_CONTAINER_UNIT => "id_container_unit",
         self::OC_TEST_ACREDIT_ATTRIB => "id_test_acredit_attrib",
         self::OC_TEST => "id_test",
         //
@@ -153,24 +165,28 @@ abstract class AppConsts
         //
         self::OC_TEST_PACKAGE => "id_test_package",
         //
-        self::OC_CONTAINER_TYPE => "id_container_type",
-        self::OC_CONTAINER_UNIT => "id_container_unit",
-        self::OC_REPORT_DELIVERY_OPT => "id_report_delivery_type",
-        self::OC_REPORT_REISSUE_REASON => "id_report_reissue_cause",
+        //
+        self::OC_TESTING_METHOD => "id_testing_method",
+        self::OC_TESTING_NOTE => "id_testing_note",
+        self::OC_RECEPT_STATUS => "id_recept_status",
+        self::OC_JOB_STATUS => "id_job_status",
+        self::OC_REPORT_DELIVERY_TYPE => "id_report_delivery_type",
+        self::OC_REPORT_REISSUE_CAUSE => "id_report_reissue_cause",
+        self::OC_REPORT_STATUS => "id_report_status",
         self::OC_RESULT_UNIT => "id_result_unit",
         self::OC_RESULT_UNIT_VALUE => "id_result_unit_value",
         self::OC_RESULT_PERMISS_LIMIT => "id_result_permiss_limit",
-        self::OC_SAMPLING_NOTE => "id_sampling_note",
-        self::OC_TESTING_NOTE => "id_testing_note",
-        self::OC_JOB_STATUS => "id_job_status",
 
         self::O_SAMPLE => "id_sample",
         //
-        self::O_SAMPLE_IMAGE => "id_sample_image",
         self::O_SAMPLE_STATUS_LOG => "id_sample_status_log",
+        self::O_SAMPLING_IMG => "id_sampling_img",
         self::O_RECEPT => "id_recept",
         self::O_JOB => "id_job",
         //
         self::O_JOB_STATUS_LOG => "id_job_status_log",
+        self::O_REPORT => "id_report",
+        //
+        self::O_REPORT_STATUS_LOG => "id_report_status_log",
     );
 }

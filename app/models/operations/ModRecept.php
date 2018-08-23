@@ -3,6 +3,7 @@ namespace app\models\operations;
 
 use Fraphe\App\FUserSession;
 use Fraphe\App\FGuiUtils;
+use Fraphe\Lib\FUtils;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
@@ -13,7 +14,8 @@ class ModRecept extends FRegistry
     protected $number;
     protected $recept_datetime;
     protected $recept_temperat_n;
-    protected $recept_process_days;
+    protected $process_days;
+    protected $process_deadline;
     protected $recept_deadline;
     protected $recept_deviats;
     protected $recept_notes;
@@ -29,12 +31,10 @@ class ModRecept extends FRegistry
     protected $customer_state_region;
     protected $customer_country;
     protected $customer_contact;
-    protected $is_def_sampling_image;
+    protected $is_def_sampling_img;
     protected $ref_chain_custody;
     protected $ref_request;
     protected $ref_agreet;
-    protected $is_scheduled;
-    protected $is_annulled;
     protected $is_system;
     protected $is_deleted;
     protected $fk_company_branch;
@@ -43,6 +43,7 @@ class ModRecept extends FRegistry
     protected $nk_customer_billing;
     protected $fk_report_contact;
     protected $fk_report_delivery_type;
+    protected $fk_recept_status;
     protected $fk_user_receiver;
     protected $fk_user_ins;
     protected $fk_user_upd;
@@ -59,7 +60,8 @@ class ModRecept extends FRegistry
         $this->number = new FItem(FItem::DATA_TYPE_STRING, "number", "Folio recepción", "", true);
         $this->recept_datetime = new FItem(FItem::DATA_TYPE_DATETIME, "recept_datetime", "Fecha-hora recepción", "", true);
         $this->recept_temperat_n = new FItem(FItem::DATA_TYPE_FLOAT, "recept_temperat_n", "Temp. recepción °C", "", false);
-        $this->recept_process_days = new FItem(FItem::DATA_TYPE_INT, "recept_process_days", "Días proceso recepción", "", true);
+        $this->process_days = new FItem(FItem::DATA_TYPE_INT, "process_days", "Días proceso", "", true);
+        $this->process_deadline = new FItem(FItem::DATA_TYPE_DATE, "process_deadline", "Fecha límite proceso", "", true);
         $this->recept_deadline = new FItem(FItem::DATA_TYPE_DATE, "recept_deadline", "Fecha límite recepción", "", true);
         $this->recept_deviats = new FItem(FItem::DATA_TYPE_STRING, "recept_deviats", "Desviaciones recepción", "", false);
         $this->recept_notes = new FItem(FItem::DATA_TYPE_STRING, "recept_notes", "Observaciones recepción", "", false);
@@ -71,16 +73,14 @@ class ModRecept extends FRegistry
         $this->customer_postcode = new FItem(FItem::DATA_TYPE_STRING, "customer_postcode", "Código postal", "", false);
         $this->customer_reference = new FItem(FItem::DATA_TYPE_STRING, "customer_reference", "Referencia", "", false);
         $this->customer_city = new FItem(FItem::DATA_TYPE_STRING, "customer_city", "Localidad", "", false);
-        $this->customer_county = new FItem(FItem::DATA_TYPE_STRING, "customer_county", "Municipio", "", true);
-        $this->customer_state_region = new FItem(FItem::DATA_TYPE_STRING, "customer_state_region", "Estado", "", true);
-        $this->customer_country = new FItem(FItem::DATA_TYPE_STRING, "customer_country", "País", "", true);
+        $this->customer_county = new FItem(FItem::DATA_TYPE_STRING, "customer_county", "Municipio", "", false);
+        $this->customer_state_region = new FItem(FItem::DATA_TYPE_STRING, "customer_state_region", "Estado", "", false);
+        $this->customer_country = new FItem(FItem::DATA_TYPE_STRING, "customer_country", "País", "", false);
         $this->customer_contact = new FItem(FItem::DATA_TYPE_STRING, "customer_contact", "Contacto", "", false);
-        $this->is_def_sampling_image = new FItem(FItem::DATA_TYPE_BOOL, "is_def_sampling_image", "Aplica imagen muestreo p/def.", "", false);
+        $this->is_def_sampling_img = new FItem(FItem::DATA_TYPE_BOOL, "is_def_sampling_img", "Aplica imagen muestreo x def.", "", false);
         $this->ref_chain_custody = new FItem(FItem::DATA_TYPE_STRING, "ref_chain_custody", "Ref. cadena custodia", "", false);
         $this->ref_request = new FItem(FItem::DATA_TYPE_STRING, "ref_request", "Ref. solicitud ensayos", "", false);
         $this->ref_agreet = new FItem(FItem::DATA_TYPE_STRING, "ref_agreet", "Ref. convenio ensayos", "", false);
-        $this->is_scheduled = new FItem(FItem::DATA_TYPE_BOOL, "is_scheduled", "Registro programado", "", false);
-        $this->is_annulled = new FItem(FItem::DATA_TYPE_BOOL, "is_annulled", "Registro anulado", "", false);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
         $this->fk_company_branch = new FItem(FItem::DATA_TYPE_INT, "fk_company_branch", "Sucursal empresa", "", true);
@@ -89,6 +89,7 @@ class ModRecept extends FRegistry
         $this->nk_customer_billing = new FItem(FItem::DATA_TYPE_INT, "nk_customer_billing", "Cliente facturación", "", false);
         $this->fk_report_contact = new FItem(FItem::DATA_TYPE_INT, "fk_report_contact", "Contacto IR", "", true);
         $this->fk_report_delivery_type = new FItem(FItem::DATA_TYPE_INT, "fk_report_delivery_type", "Tipo entrega IR", "", true);
+        $this->fk_recept_status = new FItem(FItem::DATA_TYPE_INT, "fk_recept_status", "Estatus recepción", "", true);
         $this->fk_user_receiver = new FItem(FItem::DATA_TYPE_INT, "fk_user_receiver", "Receptor", "", true);
         $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", "", false);
         $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", "", false);
@@ -99,7 +100,8 @@ class ModRecept extends FRegistry
         $this->items["number"] = $this->number;
         $this->items["recept_datetime"] = $this->recept_datetime;
         $this->items["recept_temperat_n"] = $this->recept_temperat_n;
-        $this->items["recept_process_days"] = $this->recept_process_days;
+        $this->items["process_days"] = $this->process_days;
+        $this->items["process_deadline"] = $this->process_deadline;
         $this->items["recept_deadline"] = $this->recept_deadline;
         $this->items["recept_deviats"] = $this->recept_deviats;
         $this->items["recept_notes"] = $this->recept_notes;
@@ -115,12 +117,10 @@ class ModRecept extends FRegistry
         $this->items["customer_state_region"] = $this->customer_state_region;
         $this->items["customer_country"] = $this->customer_country;
         $this->items["customer_contact"] = $this->customer_contact;
-        $this->items["is_def_sampling_image"] = $this->is_def_sampling_image;
+        $this->items["is_def_sampling_img"] = $this->is_def_sampling_img;
         $this->items["ref_chain_custody"] = $this->ref_chain_custody;
         $this->items["ref_request"] = $this->ref_request;
         $this->items["ref_agreet"] = $this->ref_agreet;
-        $this->items["is_scheduled"] = $this->is_scheduled;
-        $this->items["is_annulled"] = $this->is_annulled;
         $this->items["is_system"] = $this->is_system;
         $this->items["is_deleted"] = $this->is_deleted;
         $this->items["fk_company_branch"] = $this->fk_company_branch;
@@ -129,6 +129,7 @@ class ModRecept extends FRegistry
         $this->items["nk_customer_billing"] = $this->nk_customer_billing;
         $this->items["fk_report_contact"] = $this->fk_report_contact;
         $this->items["fk_report_delivery_type"] = $this->fk_report_delivery_type;
+        $this->items["fk_recept_status"] = $this->fk_recept_status;
         $this->items["fk_user_receiver"] = $this->fk_user_receiver;
         $this->items["fk_user_ins"] = $this->fk_user_ins;
         $this->items["fk_user_upd"] = $this->fk_user_upd;
@@ -139,12 +140,12 @@ class ModRecept extends FRegistry
         $this->recept_deviats->setRangeLength(0, 500);
         $this->recept_notes->setRangeLength(0, 500);
         $this->service_type->setRangeLength(1, 1);
-        $this->customer_name->setRangeLength(0, 201);
+        $this->customer_name->setRangeLength(1, 201);
         $this->customer_street->setRangeLength(0, 200);
         $this->customer_district->setRangeLength(0, 100);
-        $this->customer_postcode->setRangeLength(0, 15);
+        $this->customer_postcode->setRangeLength(1, 15);
         $this->customer_reference->setRangeLength(0, 100);
-        $this->customer_city->setRangeLength(0, 100);
+        $this->customer_city->setRangeLength(1, 50);
         $this->customer_county->setRangeLength(1, 50);
         $this->customer_state_region->setRangeLength(1, 50);
         $this->customer_country->setRangeLength(1, 3);
@@ -154,6 +155,22 @@ class ModRecept extends FRegistry
         $this->ref_agreet->setRangeLength(0, 25);
 
         $this->clearChildSamples();
+    }
+
+    private function generateNumber(FUserSession $userSession): string
+    {
+        $count = 0;
+        $date = FUtils::formatDbmsDate($this->recept_datetime->getValue());
+        $sql = "SELECT COUNT(*) AS _count FROM oc_recept WHERE DATE(recept_datetime) = '$date';";
+        $statement = $userSession->getPdo()->query($sql);
+        if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $count = intval($row["_count"]) + 1;
+        }
+
+        $nf = new \NumberFormatter($userSession->getLocLang(), \NumberFormatter::PATTERN_DECIMAL);
+        $nf->setAttribute(\NumberFormatter::MIN_INTEGER_DIGITS, 4); // TODO: paremeterize this formatting argument: 4!
+
+        return date("ymd", $this->recept_datetime->getValue()) & $nf->format($count); // TODO: parameterize this formatting argument: "ymd"!
     }
 
     public function &getChildSamples(): array
@@ -190,7 +207,8 @@ class ModRecept extends FRegistry
             $this->number->setValue($row["number"]);
             $this->recept_datetime->setValue($row["recept_datetime"]);
             $this->recept_temperat_n->setValue($row["recept_temperat_n"]);
-            $this->recept_process_days->setValue($row["recept_process_days"]);
+            $this->process_days->setValue($row["process_days"]);
+            $this->process_deadline->setValue($row["process_deadline"]);
             $this->recept_deadline->setValue($row["recept_deadline"]);
             $this->recept_deviats->setValue($row["recept_deviats"]);
             $this->recept_notes->setValue($row["recept_notes"]);
@@ -206,12 +224,10 @@ class ModRecept extends FRegistry
             $this->customer_state_region->setValue($row["customer_state_region"]);
             $this->customer_country->setValue($row["customer_country"]);
             $this->customer_contact->setValue($row["customer_contact"]);
-            $this->is_def_sampling_image->setValue($row["is_def_sampling_image"]);
+            $this->is_def_sampling_img->setValue($row["is_def_sampling_img"]);
             $this->ref_chain_custody->setValue($row["ref_chain_custody"]);
             $this->ref_request->setValue($row["ref_request"]);
             $this->ref_agreet->setValue($row["ref_agreet"]);
-            $this->is_scheduled->setValue($row["is_scheduled"]);
-            $this->is_annulled->setValue($row["is_annulled"]);
             $this->is_system->setValue($row["is_system"]);
             $this->is_deleted->setValue($row["is_deleted"]);
             $this->fk_company_branch->setValue($row["fk_company_branch"]);
@@ -220,6 +236,7 @@ class ModRecept extends FRegistry
             $this->nk_customer_billing->setValue($row["nk_customer_billing"]);
             $this->fk_report_contact->setValue($row["fk_report_contact"]);
             $this->fk_report_delivery_type->setValue($row["fk_report_delivery_type"]);
+            $this->fk_recept_status->setValue($row["fk_recept_status"]);
             $this->fk_user_receiver->setValue($row["fk_user_receiver"]);
             $this->fk_user_ins->setValue($row["fk_user_ins"]);
             $this->fk_user_upd->setValue($row["fk_user_upd"]);
@@ -253,12 +270,17 @@ class ModRecept extends FRegistry
         $statement;
 
         if ($this->isRegistryNew) {
+            // set data by system:
+            $this->recept_datetime->setValue(time());
+            $this->number->setValue(self::generateNumber($userSession));
+
             $statement = $userSession->getPdo()->prepare("INSERT INTO o_recept (" .
                 "id_recept, " .
                 "number, " .
                 "recept_datetime, " .
                 "recept_temperat_n, " .
-                "recept_process_days, " .
+                "process_days, " .
+                "process_deadline, " .
                 "recept_deadline, " .
                 "recept_deviats, " .
                 "recept_notes, " .
@@ -274,12 +296,10 @@ class ModRecept extends FRegistry
                 "customer_state_region, " .
                 "customer_country, " .
                 "customer_contact, " .
-                "is_def_sampling_image, " .
+                "is_def_sampling_img, " .
                 "ref_chain_custody, " .
                 "ref_request, " .
                 "ref_agreet, " .
-                "is_scheduled, " .
-                "is_annulled, " .
                 "is_system, " .
                 "is_deleted, " .
                 "fk_company_branch, " .
@@ -288,6 +308,7 @@ class ModRecept extends FRegistry
                 "nk_customer_billing, " .
                 "fk_report_contact, " .
                 "fk_report_delivery_type, " .
+                "fk_recept_status, " .
                 "fk_user_receiver, " .
                 "fk_user_ins, " .
                 "fk_user_upd, " .
@@ -298,7 +319,8 @@ class ModRecept extends FRegistry
                 ":number, " .
                 ":recept_datetime, " .
                 ":recept_temperat_n, " .
-                ":recept_process_days, " .
+                ":process_days, " .
+                ":process_deadline, " .
                 ":recept_deadline, " .
                 ":recept_deviats, " .
                 ":recept_notes, " .
@@ -314,12 +336,10 @@ class ModRecept extends FRegistry
                 ":customer_state_region, " .
                 ":customer_country, " .
                 ":customer_contact, " .
-                ":is_def_sampling_image, " .
+                ":is_def_sampling_img, " .
                 ":ref_chain_custody, " .
                 ":ref_request, " .
                 ":ref_agreet, " .
-                ":is_scheduled, " .
-                ":is_annulled, " .
                 ":is_system, " .
                 ":is_deleted, " .
                 ":fk_company_branch, " .
@@ -328,6 +348,7 @@ class ModRecept extends FRegistry
                 ":nk_customer_billing, " .
                 ":fk_report_contact, " .
                 ":fk_report_delivery_type, " .
+                ":fk_recept_status, " .
                 ":fk_user_receiver, " .
                 ":fk_user, " .
                 "1, " .
@@ -339,7 +360,8 @@ class ModRecept extends FRegistry
                 "number = :number, " .
                 "recept_datetime = :recept_datetime, " .
                 "recept_temperat_n = :recept_temperat_n, " .
-                "recept_process_days = :recept_process_days, " .
+                "process_days = :process_days, " .
+                "process_deadline = :process_deadline, " .
                 "recept_deadline = :recept_deadline, " .
                 "recept_deviats = :recept_deviats, " .
                 "recept_notes = :recept_notes, " .
@@ -355,12 +377,10 @@ class ModRecept extends FRegistry
                 "customer_state_region = :customer_state_region, " .
                 "customer_country = :customer_country, " .
                 "customer_contact = :customer_contact, " .
-                "is_def_sampling_image = :is_def_sampling_image, " .
+                "is_def_sampling_img = :is_def_sampling_img, " .
                 "ref_chain_custody = :ref_chain_custody, " .
                 "ref_request = :ref_request, " .
                 "ref_agreet = :ref_agreet, " .
-                "is_scheduled = :is_scheduled, " .
-                "is_annulled = :is_annulled, " .
                 "is_system = :is_system, " .
                 "is_deleted = :is_deleted, " .
                 "fk_company_branch = :fk_company_branch, " .
@@ -369,6 +389,7 @@ class ModRecept extends FRegistry
                 "nk_customer_billing = :nk_customer_billing, " .
                 "fk_report_contact = :fk_report_contact, " .
                 "fk_report_delivery_type = :fk_report_delivery_type, " .
+                "fk_recept_status = :fk_recept_status, " .
                 "fk_user_receiver = :fk_user_receiver, " .
                 //"fk_user_ins = :fk_user_ins, " .
                 "fk_user_upd = :fk_user, " .
@@ -379,10 +400,11 @@ class ModRecept extends FRegistry
 
         //$id_recept = $this->id_recept->getValue();
         $number = $this->number->getValue();
-        $recept_datetime = $this->recept_datetime->getValue();
+        $recept_datetime = FUtils::formatDbmsDatetime($this->recept_datetime->getValue());
         $recept_temperat_n = $this->recept_temperat_n->getValue();
-        $recept_process_days = $this->recept_process_days->getValue();
-        $recept_deadline = $this->recept_deadline->getValue();
+        $process_days = $this->process_days->getValue();
+        $process_deadline = FUtils::formatDbmsDate($this->process_deadline->getValue());
+        $recept_deadline = FUtils::formatDbmsDate($this->recept_deadline->getValue());
         $recept_deviats = $this->recept_deviats->getValue();
         $recept_notes = $this->recept_notes->getValue();
         $service_type = $this->service_type->getValue();
@@ -397,12 +419,10 @@ class ModRecept extends FRegistry
         $customer_state_region = $this->customer_state_region->getValue();
         $customer_country = $this->customer_country->getValue();
         $customer_contact = $this->customer_contact->getValue();
-        $is_def_sampling_image = $this->is_def_sampling_image->getValue();
+        $is_def_sampling_img = $this->is_def_sampling_img->getValue();
         $ref_chain_custody = $this->ref_chain_custody->getValue();
         $ref_request = $this->ref_request->getValue();
         $ref_agreet = $this->ref_agreet->getValue();
-        $is_scheduled = $this->is_scheduled->getValue();
-        $is_annulled = $this->is_annulled->getValue();
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();
         $fk_company_branch = $this->fk_company_branch->getValue();
@@ -411,6 +431,7 @@ class ModRecept extends FRegistry
         $nk_customer_billing = $this->nk_customer_billing->getValue();
         $fk_report_contact = $this->fk_report_contact->getValue();
         $fk_report_delivery_type = $this->fk_report_delivery_type->getValue();
+        $fk_recept_status = $this->fk_recept_status->getValue();
         $fk_user_receiver = $this->fk_user_receiver->getValue();
         $fk_user_ins = $this->fk_user_ins->getValue();
         $fk_user_upd = $this->fk_user_upd->getValue();
@@ -422,8 +443,14 @@ class ModRecept extends FRegistry
         //$statement->bindParam(":id_recept", $id_recept, \PDO::PARAM_INT);
         $statement->bindParam(":number", $number);
         $statement->bindParam(":recept_datetime", $recept_datetime);
-        $statement->bindParam(":recept_temperat_n", $recept_temperat_n);
-        $statement->bindParam(":recept_process_days", $recept_process_days, \PDO::PARAM_INT);
+        if (empty($recept_temperat_n)) {
+            $statement->bindValue(":recept_temperat_n", null, \PDO::PARAM_NULL);
+        }
+        else {
+            $statement->bindParam(":recept_temperat_n", $recept_temperat_n);
+        }
+        $statement->bindParam(":process_days", $process_days, \PDO::PARAM_INT);
+        $statement->bindParam(":process_deadline", $process_deadline);
         $statement->bindParam(":recept_deadline", $recept_deadline);
         $statement->bindParam(":recept_deviats", $recept_deviats);
         $statement->bindParam(":recept_notes", $recept_notes);
@@ -439,20 +466,29 @@ class ModRecept extends FRegistry
         $statement->bindParam(":customer_state_region", $customer_state_region);
         $statement->bindParam(":customer_country", $customer_country);
         $statement->bindParam(":customer_contact", $customer_contact);
-        $statement->bindParam(":is_def_sampling_image", $is_def_sampling_image, \PDO::PARAM_BOOL);
+        $statement->bindParam(":is_def_sampling_img", $is_def_sampling_img, \PDO::PARAM_BOOL);
         $statement->bindParam(":ref_chain_custody", $ref_chain_custody);
         $statement->bindParam(":ref_request", $ref_request);
         $statement->bindParam(":ref_agreet", $ref_agreet);
-        $statement->bindParam(":is_scheduled", $is_scheduled, \PDO::PARAM_BOOL);
-        $statement->bindParam(":is_annulled", $is_annulled, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
         $statement->bindParam(":fk_company_branch", $fk_company_branch, \PDO::PARAM_INT);
         $statement->bindParam(":fk_customer", $fk_customer, \PDO::PARAM_INT);
-        $statement->bindParam(":nk_customer_sample", $nk_customer_sample, \PDO::PARAM_INT);
-        $statement->bindParam(":nk_customer_billing", $nk_customer_billing, \PDO::PARAM_INT);
+        if (empty($nk_customer_sample)) {
+            $statement->bindValue(":nk_customer_sample", null, \PDO::PARAM_NULL);
+        }
+        else {
+            $statement->bindParam(":nk_customer_sample", $nk_customer_sample, \PDO::PARAM_INT);
+        }
+        if (empty($nk_customer_billing)) {
+            $statement->bindParam(":nk_customer_billing", null, \PDO::PARAM_NULL);
+        }
+        else {
+            $statement->bindParam(":nk_customer_billing", $nk_customer_billing, \PDO::PARAM_INT);
+        }
         $statement->bindParam(":fk_report_contact", $fk_report_contact, \PDO::PARAM_INT);
         $statement->bindParam(":fk_report_delivery_type", $fk_report_delivery_type, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_recept_status", $fk_recept_status, \PDO::PARAM_INT);
         $statement->bindParam(":fk_user_receiver", $fk_user_receiver, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_ins", $fk_user_ins, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_upd", $fk_user_upd, \PDO::PARAM_INT);
@@ -474,11 +510,18 @@ class ModRecept extends FRegistry
         }
 
         // save child samples:
+        $num = 0;
         foreach ($this->childSamples as $sample) {
+            // assure link to parent and set other data:
             $data = array();
             $data["nk_recept"] = $this->id;
-
+            $data["recept_sample"] = ++$num;
+            $data["recept_datetime_n"] = $this->recept_datetime;
+            $data["fk_user_receiver"] = $this->fk_user_receiver;
             $sample->setData($data);
+            $sample->setParentRecept($this);
+
+            // save child:
             $sample->save($userSession);
         }
     }

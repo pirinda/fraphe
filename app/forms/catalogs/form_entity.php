@@ -21,7 +21,7 @@ use app\models\ModConsts;
 use app\models\ModUtils;
 use app\models\catalogs\ModEntity;
 use app\models\catalogs\ModEntityEntityType;
-use app\models\catalogs\ModEntityImage;
+use app\models\catalogs\ModEntitySamplingImage;
 use app\models\catalogs\ModEntityAddress;
 use app\models\catalogs\ModContact;
 
@@ -36,7 +36,7 @@ $entityClass = 0;   // ModUtils::ENTITY_CLASS_...: 1=company; 2=customer; 3=prov
 $entityNature = 0;  // ModUtils::ENTITY_NATURE_...: 1=person; 2=organization
 $entity;
 $entityTypes;
-$entityImage;
+$entitySamplingImage;
 $entityAddress;
 $entityAddressCheckboxes = array("is_main", "is_recept", "is_process");
 $contact;
@@ -67,8 +67,8 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             if (!isset($entityTypes)) {
                 $entityTypes = ModEntity::createEntityTypes($entityClass);
             }
-            if (count($entity->getChildImages()) > 0) {
-                $entityImage = $entity->getChildImages()[0];
+            if (count($entity->getChildSamplingImages()) > 0) {
+                $entitySamplingImage = $entity->getChildSamplingImages()[0];
             }
             if (count($entity->getChildAddresses()) > 0) {
                 $entityAddress = $entity->getChildAddresses()[0];
@@ -82,7 +82,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $data = array();
             $data["fk_entity_class"] = $entityClass;
             $data["is_person"] = $entityNature == ModUtils::ENTITY_NATURE_PER;
-            $entity->setData($data);  // tailor registry
+            $entity->setData($data);  // tailors registry members aswell
         }
 
         if (!isset($entityAddress)) {
@@ -118,8 +118,8 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             if (!isset($entityTypes)) {
                 $entityTypes = ModEntity::createEntityTypes($entityClass);
             }
-            if (count($entity->getChildImages()) > 0) {
-                $entityImage = $entity->getChildImages()[0];
+            if (count($entity->getChildSamplingImages()) > 0) {
+                $entitySamplingImage = $entity->getChildSamplingImages()[0];
             }
             if (count($entity->getChildAddresses()) > 0) {
                 $entityAddress = $entity->getChildAddresses()[0];
@@ -158,7 +158,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         $data["billing_prefs"] = $_POST["billing_prefs"];
         $data["web_page"] = $_POST["web_page"];
         $data["notes"] = $_POST["notes"];
-        $data["is_def_sampling_image"] = empty($_POST["is_def_sampling_image"]) ? false : boolval($_POST["is_def_sampling_image"]);
+        $data["is_def_sampling_img"] = empty($_POST["is_def_sampling_img"]) ? false : boolval($_POST["is_def_sampling_img"]);
         //$data["is_system"] = $_POST["is_system"];
         //$data["is_deleted"] = $_POST["is_deleted"];
         $data["fk_entity_class"] = $entityClass;
@@ -179,15 +179,15 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         }
 
         // entity image:
-        if (!empty($_POST["load_def_sampling_image"]) && boolval($_POST["load_def_sampling_image"])) {
-            if (!isset($entityImage)) {
-                $entityImage = new ModEntityImage();
-                $entity->getChildImages()[0] = $entityImage;
+        if (!empty($_POST["load_def_sampling_img"]) && boolval($_POST["load_def_sampling_img"])) {
+            if (!isset($entitySamplingImage)) {
+                $entitySamplingImage = new ModEntitySamplingImage();
+                $entity->getChildSamplingImages()[0] = $entitySamplingImage;
             }
 
             $dataImage = array();
-            $dataImage["id_entity_image"] = intval($_POST[ModEntityImage::PREFIX . "id_entity_image"]);
-            $dataImage["def_sampling_image"] = $_POST[ModEntityImage::PREFIX . "def_sampling_image"];
+            $dataImage["id_entity_sampling_img"] = intval($_POST[ModEntitySamplingImage::PREFIX . "id_entity_sampling_img"]);
+            $dataImage["sampling_img"] = $_POST[ModEntitySamplingImage::PREFIX . "sampling_img"];
             //$data["is_system"] = $_POST["is_system"];
             //$data["is_deleted"] = $_POST["is_deleted"];
             //$data["fk_entity"] = $_POST["fk_entity"];
@@ -241,8 +241,8 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         }
 
         try {
-            if (!empty($_POST["load_def_sampling_image"]) && boolval($_POST["load_def_sampling_image"])) {
-                $entityImage->setData($dataImage);
+            if (!empty($_POST["load_def_sampling_img"]) && boolval($_POST["load_def_sampling_img"])) {
+                $entitySamplingImage->setData($dataImage);
             }
 
             $entityAddress->setData($dataAddress);
@@ -256,9 +256,9 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $entity->setData($data);
             $entity->save($userSession);
 
-            if (!empty($_POST["load_def_sampling_image"]) && boolval($_POST["load_def_sampling_image"])) {
+            if (!empty($_POST["load_def_sampling_img"]) && boolval($_POST["load_def_sampling_img"])) {
                 $targetFile = "../../img/entity/" . $entity->composeTargetFileDefSamplingImage(1);
-                FFiles::uploadFile($_FILES[ModEntityImage::PREFIX . "def_sampling_image_file"], $targetFile);
+                FFiles::uploadFile($_FILES[ModEntitySamplingImage::PREFIX . "def_sampling_img_file"], $targetFile);
             }
 
             header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/catalogs/view_entity.php?class=$entityClass");
@@ -355,18 +355,18 @@ if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
     $options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $entity->getDatum("nk_report_delivery_type"));
     echo $entity->getItem("nk_report_delivery_type")->composeHtmlSelect($options, 4, 8);
 
-    echo $entity->getItem("is_def_sampling_image")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 12);
+    echo $entity->getItem("is_def_sampling_img")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 12);
 
-    echo '<input type="hidden" name="' . ModEntityImage::PREFIX . 'id_entity_image" value="' . (!isset($entityImage) ? 0 : $entityImage->getId()) . '">';
+    echo '<input type="hidden" name="' . ModEntitySamplingImage::PREFIX . 'id_entity_sampling_img" value="' . (!isset($entitySamplingImage) ? 0 : $entitySamplingImage->getId()) . '">';
 
     echo '<div class="row">';
     echo '<div class="col-sm-4">';
-    echo '<label class="control-label small" for="">Imagen muestreo p/def.:</label>';
+    echo '<label class="control-label small" for="">Imagen muestreo x def.:</label>';
     echo '</div>';
     echo '<div class="col-sm-8 text-center small">';
     echo '<div class="thumbnail">';
     echo '<img src="' . $targetFile . '" alt="Sin imagen" width="150" height="100">';
-    echo '<p>' . (!isset($entityImage) ? "n/d" : $entityImage->getItem("def_sampling_image")->getValue()) . '</p>';
+    echo '<p>' . (!isset($entitySamplingImage) ? "n/d" : $entitySamplingImage->getItem("sampling_img")->getValue()) . '</p>';
     echo '</div>';
     echo '</div>';
     echo '</div>';
@@ -374,17 +374,17 @@ if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
     echo '<div class="form-group">';
     echo '<div class="col-sm-12">';
     echo '<div class="checkbox">';
-    echo '<label class="small"><input type="checkbox" name="load_def_sampling_image" id="load_def_sampling_image" onclick="switchInputFile();" value="1">Subir nueva imagen muestreo p/def.</label>';
+    echo '<label class="small"><input type="checkbox" name="load_def_sampling_img" id="load_def_sampling_img" onclick="switchInputFile();" value="1">Subir nueva imagen muestreo x def.</label>';
     echo '</div>';
     echo '</div>';
     echo '</div>';
 
     echo '<div class="form-group">';
     echo '<div class="col-sm-4">';
-    echo '<label class="control-label small" for="' . ModEntityImage::PREFIX . 'def_sampling_image_file">Imagen muestreo p/def.:</label>';
+    echo '<label class="control-label small" for="' . ModEntitySamplingImage::PREFIX . 'def_sampling_img_file">Imagen muestreo x def.:</label>';
     echo '</div>';
     echo '<div class="col-sm-8">';
-    echo '<input type="file" class="form-control input-sm" name="' . ModEntityImage::PREFIX . 'def_sampling_image_file" id="' . ModEntityImage::PREFIX . 'def_sampling_image_file" disabled>';
+    echo '<input type="file" class="form-control input-sm" name="' . ModEntitySamplingImage::PREFIX . 'def_sampling_img_file" id="' . ModEntitySamplingImage::PREFIX . 'def_sampling_img_file" disabled>';
     echo '</div>';
     echo '</div>';
 }
@@ -535,11 +535,11 @@ echo FApp::composeFooter();
 echo <<<SCRIPT
 <script>
 function switchInputFile() {
-    if (document.getElementById("load_def_sampling_image").checked) {
-        document.getElementById("image_def_sampling_image_file").removeAttribute("disabled");
+    if (document.getElementById("load_def_sampling_img").checked) {
+        document.getElementById("image_def_sampling_img_file").removeAttribute("disabled");
     }
     else {
-        document.getElementById("image_def_sampling_image_file").setAttribute("disabled", "");
+        document.getElementById("image_def_sampling_img_file").setAttribute("disabled", "");
     }
 }
 function showContactIcons(id_prefix) {

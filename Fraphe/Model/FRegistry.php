@@ -53,7 +53,7 @@ abstract class FRegistry
      * Returns: nothing.
      * Throws: Exception if expected data are not available.
      */
-     public function tailor()
+     public function tailorMembers()
      {
 
      }
@@ -119,7 +119,7 @@ abstract class FRegistry
             $this->isRegistryModified = true;
         }
 
-        $this->tailor();    // tailor registry according to current data status and values
+        $this->tailorMembers(); // tailor registry members according to current data status and values
     }
 
     /* Gets registry data.

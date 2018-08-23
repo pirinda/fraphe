@@ -7,13 +7,16 @@ use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
 
-class ModSampleImage extends FRegistry
+class ModJobStatusLog extends FRegistry
 {
-    protected $id_sample_image;
-    protected $sampling_image;
+    protected $id_job_status_log;
+    protected $status_datetime;
+    protected $status_notes;
     protected $is_system;
     protected $is_deleted;
-    protected $fk_sample;
+    protected $fk_job;
+    protected $fk_job_status;
+    protected $fk_user_status;
     protected $fk_user_ins;
     protected $fk_user_upd;
     protected $ts_user_ins;
@@ -21,45 +24,54 @@ class ModSampleImage extends FRegistry
 
     function __construct()
     {
-        parent::__construct(AppConsts::O_SAMPLE_IMAGE, AppConsts::$tableIds[AppConsts::O_SAMPLE_IMAGE]);
+        parent::__construct(AppConsts::O_JOB_STATUS_LOG, AppConsts::$tableIds[AppConsts::O_JOB_STATUS_LOG]);
 
-        $this->id_sample_image = new FItem(FItem::DATA_TYPE_INT, "id_sample_image", "ID imagen muestra", "", false, true);
-        $this->sampling_image = new FItem(FItem::DATA_TYPE_STRING, "sampling_image", "Imagen muestreo", "", false);
+        $this->id_job_status_log = new FItem(FItem::DATA_TYPE_INT, "id_job_status_log", "ID cambio estatus muestra", "", false, true);
+        $this->status_datetime = new FItem(FItem::DATA_TYPE_DATETIME, "status_datetime", "Fecha-hora cambio estatus", "", true);
+        $this->status_notes = new FItem(FItem::DATA_TYPE_STRING, "status_notes", "Observaciones cambio estatus", "", false);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
-        $this->fk_sample = new FItem(FItem::DATA_TYPE_INT, "fk_sample", "Muestra", "", true);
+        $this->fk_job = new FItem(FItem::DATA_TYPE_INT, "fk_job", "Muestra", "", true);
+        $this->fk_job_status = new FItem(FItem::DATA_TYPE_INT, "fk_job_status", "Estatus muestra", "", true);
+        $this->fk_user_status = new FItem(FItem::DATA_TYPE_INT, "fk_user_status", "Usuario estatus", "", true);
         $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", "", false);
         $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", "", false);
         $this->ts_user_ins = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_ins", "Creado", "", false);
         $this->ts_user_upd = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_upd", "Modificado", "", false);
 
-        $this->items["id_sample_image"] = $this->id_sample_image;
-        $this->items["sampling_image"] = $this->sampling_image;
+        $this->items["id_job_status_log"] = $this->id_job_status_log;
+        $this->items["status_datetime"] = $this->status_datetime;
+        $this->items["status_notes"] = $this->status_notes;
         $this->items["is_system"] = $this->is_system;
         $this->items["is_deleted"] = $this->is_deleted;
-        $this->items["fk_sample"] = $this->fk_sample;
+        $this->items["fk_job"] = $this->fk_job;
+        $this->items["fk_job_status"] = $this->fk_job_status;
+        $this->items["fk_user_status"] = $this->fk_user_status;
         $this->items["fk_user_ins"] = $this->fk_user_ins;
         $this->items["fk_user_upd"] = $this->fk_user_upd;
         $this->items["ts_user_ins"] = $this->ts_user_ins;
         $this->items["ts_user_upd"] = $this->ts_user_upd;
 
-        $this->sampling_image->setRangeLength(0, 250);
+        $this->status_notes->setRangeLength(0, 500);
     }
 
     public function read(FUserSession $userSession, int $id, int $mode)
     {
         $this->initialize();
 
-        $sql = "SELECT * FROM o_sample_image WHERE id_sample_image = $id;";
+        $sql = "SELECT * FROM o_job_status_log WHERE id_job_status_log = $id;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->id = intval($row["id_sample_image"]);
+            $this->id = intval($row["id_job_status_log"]);
 
-            $this->id_sample_image->setValue($row["id_sample_image"]);
-            $this->sampling_image->setValue($row["sampling_image"]);
+            $this->id_job_status_log->setValue($row["id_job_status_log"]);
+            $this->status_datetime->setValue($row["status_datetime"]);
+            $this->status_notes->setValue($row["status_notes"]);
             $this->is_system->setValue($row["is_system"]);
             $this->is_deleted->setValue($row["is_deleted"]);
-            $this->fk_sample->setValue($row["fk_sample"]);
+            $this->fk_job->setValue($row["fk_job"]);
+            $this->fk_job_status->setValue($row["fk_job_status"]);
+            $this->fk_user_status->setValue($row["fk_user_status"]);
             $this->fk_user_ins->setValue($row["fk_user_ins"]);
             $this->fk_user_upd->setValue($row["fk_user_upd"]);
             $this->ts_user_ins->setValue($row["ts_user_ins"]);
@@ -80,45 +92,57 @@ class ModSampleImage extends FRegistry
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $userSession->getPdo()->prepare("INSERT INTO o_sample_image (" .
-                "id_sample_image, " .
-                "sampling_image, " .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO o_job_status_log (" .
+                "id_job_status_log, " .
+                "status_datetime, " .
+                "status_notes, " .
                 "is_system, " .
                 "is_deleted, " .
-                "fk_sample, " .
+                "fk_job, " .
+                "fk_job_status, " .
+                "fk_user_status, " .
                 "fk_user_ins, " .
                 "fk_user_upd, " .
                 "ts_user_ins, " .
                 "ts_user_upd) " .
                 "VALUES (" .
                 "0, " .
-                ":sampling_image, " .
+                ":status_datetime, " .
+                ":status_notes, " .
                 ":is_system, " .
                 ":is_deleted, " .
-                ":fk_sample, " .
+                ":fk_job, " .
+                ":fk_job_status, " .
+                ":fk_user_status, " .
                 ":fk_user, " .
                 "1, " .
                 "NOW(), " .
                 "NOW());");
         }
         else {
-            $statement = $userSession->getPdo()->prepare("UPDATE o_sample_image SET " .
-                "sampling_image = :sampling_image, " .
+            $statement = $userSession->getPdo()->prepare("UPDATE o_job_status_log SET " .
+                "status_datetime = :status_datetime, " .
+                "status_notes = :status_notes, " .
                 "is_system = :is_system, " .
                 "is_deleted = :is_deleted, " .
-                "fk_sample = :fk_sample, " .
+                "fk_job = :fk_job, " .
+                "fk_job_status = :fk_job_status, " .
+                "fk_user_status = :fk_user_status, " .
                 //"fk_user_ins = :fk_user_ins, " .
                 "fk_user_upd = :fk_user_upd, " .
                 //"ts_user_ins = NOW(), " .
                 "ts_user_upd = NOW() " .
-                "WHERE id_sample_image = :id;");
+                "WHERE id_job_status_log = :id;");
         }
 
-        //$id_sample_image = $this->id_sample_image->getValue();
-        $sampling_image = $this->sampling_image->getValue();
+        //$id_job_status_log = $this->id_job_status_log->getValue();
+        $status_datetime = FUtils::formatDbmsDatetime($this->status_datetime->getValue());
+        $status_notes = $this->status_notes->getValue();
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();
-        $fk_sample = $this->fk_sample->getValue();
+        $fk_job = $this->fk_job->getValue();
+        $fk_job_status = $this->fk_job_status->getValue();
+        $fk_user_status = $this->fk_user_status->getValue();
         $fk_user_ins = $this->fk_user_ins->getValue();
         $fk_user_upd = $this->fk_user_upd->getValue();
         //$ts_user_ins = $this->ts_user_ins->getValue();
@@ -126,11 +150,14 @@ class ModSampleImage extends FRegistry
 
         $fk_user = $userSession->getCurUser()->getId();
 
-        //$statement->bindParam(":id_sample_image", $id_sample_image, \PDO::PARAM_INT);
-        $statement->bindParam(":sampling_image", $sampling_image);
+        //$statement->bindParam(":id_job_status_log", $id_job_status_log, \PDO::PARAM_INT);
+        $statement->bindParam(":status_datetime", $status_datetime);
+        $statement->bindParam(":status_notes", $status_notes);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
-        $statement->bindParam(":fk_sample", $fk_sample, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_job", $fk_job, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_job_status", $fk_job_status, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_user_status", $fk_user_status, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_ins", $fk_user_ins, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_upd", $fk_user_upd, \PDO::PARAM_INT);
         //$statement->bindParam(":ts_user_ins", $ts_user_ins);

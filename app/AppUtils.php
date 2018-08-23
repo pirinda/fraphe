@@ -51,7 +51,7 @@ abstract class AppUtils
 
             // "code - name" sorted by ID + name:
             case AppConsts::OC_TEST_ACREDIT_ATTRIB:
-                $sql = "SELECT $tableId AS _val, CONCAT(code, ' - ', name) AS _opt FROM $table WHERE NOT is_deleted ORDER BY $tableId, name;";
+                $sql = "SELECT $tableId AS _val, CONCAT(code, ' - ', name) AS _opt FROM $table WHERE NOT is_deleted ORDER BY code, $tableId;";
                 break;
 
             // "name (code)" sorted by name + ID:

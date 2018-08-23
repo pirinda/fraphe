@@ -87,11 +87,11 @@ class ModTest extends FRegistry
 
         parent::validate($userSession);
 
-        foreach ($this->childProcessEntitys as $processOpt) {
+        foreach ($this->childProcessEntitys as $processEntity) {
             $ids = array();
             $ids["id_test"] = $this->isRegistryNew ? -1 : $this->id;    // bypass validation
-            $processOpt->setIds($ids);
-            $processOpt->validate($userSession);
+            $processEntity->setIds($ids);
+            $processEntity->validate($userSession);
         }
     }
 
@@ -127,16 +127,16 @@ class ModTest extends FRegistry
             $pdo = FGuiUtils::createPdo();
 
             // read child process options:
-            $sql = "SELECT id_test, id_entity FROM oc_test_process_opt WHERE id_test = $this->id ORDER BY id_test, id_entity;";
+            $sql = "SELECT id_test, id_entity FROM oc_test_process_entity WHERE id_test = $this->id ORDER BY id_test, id_entity;";
             $statement = $pdo->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                 $ids = array();
                 $ids["id_test"] = intval($row["id_test"]);
                 $ids["id_entity"] = intval($row["id_entity"]);
 
-                $processOpt = new ModTestProcessEntity();
-                $processOpt->retrieve($userSession, $ids, $mode);
-                $this->childProcessEntitys[] = $processOpt;
+                $processEntity = new ModTestProcessEntity();
+                $processEntity->retrieve($userSession, $ids, $mode);
+                $this->childProcessEntitys[] = $processEntity;
             }
         }
         else {
@@ -252,12 +252,14 @@ class ModTest extends FRegistry
         }
 
         // save child process options:
-        foreach ($this->childProcessEntitys as $processOpt) {
+        foreach ($this->childProcessEntitys as $processEntity) {
+            // assure link to parent:
             $ids = array();
             $ids["id_test"] = $this->id;
+            $processEntity->setIds($ids);
 
-            $processOpt->setIds($ids);
-            $processOpt->save($userSession);
+            // save child:
+            $processEntity->save($userSession);
         }
     }
 

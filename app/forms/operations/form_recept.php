@@ -144,7 +144,7 @@ echo $recept->getItem("fk_report_contact")->composeHtmlSelect($options, 4, 8);
 $options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $recept->getDatum("fk_report_delivery_type"), $params);
 echo $recept->getItem("fk_report_delivery_type")->composeHtmlSelect($options, 4, 8);
 
-echo $recept->getItem("is_def_sampling_image")->composeHtmlInput(FItem::INPUT_CHECKBOX, 4, 8);
+echo $recept->getItem("is_def_sampling_img")->composeHtmlInput(FItem::INPUT_CHECKBOX, 4, 8);
 
 echo '<div class="form-group">';
 echo '<div class="col-sm-4">';
@@ -262,7 +262,7 @@ echo $recept->getItem("fk_report_contact")->composeHtmlSelect($options, 4, 8);
 $options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $sample->getDatum("fk_report_delivery_type"), $params);
 echo $sample->getItem("fk_report_delivery_type")->composeHtmlSelect($options, 4, 8);
 
-echo $recept->getItem("is_def_sampling_image")->composeHtmlInput(FItem::INPUT_CHECKBOX, 4, 8);
+echo $recept->getItem("is_def_sampling_img")->composeHtmlInput(FItem::INPUT_CHECKBOX, 4, 8);
 
 echo '<div class="form-group">';
 echo '<div class="col-sm-4">';
@@ -346,7 +346,7 @@ echo <<<SCRIPT
 })();
 function changedCustomer(element) {
     var selects = ["nk_customer_sample", "fk_report_contact", "fk_report_delivery_type"];
-    var checkboxes = ["is_customer_custom", "is_def_sampling_image"];
+    var checkboxes = ["is_customer_custom", "is_def_sampling_img"];
 
     if (element.value == "0") {
         for (var select of selects) {
@@ -397,7 +397,7 @@ function loadCustomer() {
             document.getElementById("nk_customer_sample").innerHTML = customer.corp_members;
             document.getElementById("fk_report_contact").innerHTML = customer.contacts;
             document.getElementById("fk_report_delivery_type").value = customer.nk_report_delivery_type;
-            document.getElementById("is_def_sampling_image").checked = customer.is_def_sampling_image;
+            document.getElementById("is_def_sampling_img").checked = customer.is_def_sampling_img;
         }
     };
     var url = "form_recept_load_customer.php?id=" + document.getElementById("fk_customer").value;
