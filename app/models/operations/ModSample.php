@@ -9,9 +9,6 @@ use app\AppConsts;
 
 class ModSample extends FRegistry
 {
-    public const SERVICE_ORDINARY = "O";
-    public const SERVICE_URGENT = "U";
-
     protected $id_sample;
     protected $number;
     protected $name;
@@ -31,6 +28,9 @@ class ModSample extends FRegistry
     protected $recept_sample;
     protected $recept_datetime_n;
     protected $recept_temperat_n;
+    protected $process_days;
+    protected $process_start_date;
+    protected $process_deadline;
     protected $recept_deviats;
     protected $recept_notes;
     protected $service_type;
@@ -106,6 +106,9 @@ class ModSample extends FRegistry
         $this->recept_sample = new FItem(FItem::DATA_TYPE_INT, "recept_sample", "Núm. muestra recepción", "", true);
         $this->recept_datetime_n = new FItem(FItem::DATA_TYPE_DATETIME, "recept_datetime_n", "Fecha-hora recepción", "", false);
         $this->recept_temperat_n = new FItem(FItem::DATA_TYPE_FLOAT, "recept_temperat_n", "Temp. recepción °C", "", false);
+        $this->process_days = new FItem(FItem::DATA_TYPE_INT, "process_days", "Días proceso", "", true);
+        $this->process_start_date = new FItem(FItem::DATA_TYPE_DATE, "process_start_date", "Fecha inicio proceso", "", true);
+        $this->process_deadline = new FItem(FItem::DATA_TYPE_DATE, "process_deadline", "Fecha límite proceso", "", true);
         $this->recept_deviats = new FItem(FItem::DATA_TYPE_STRING, "recept_deviats", "Desviaciones recepción", "", false);
         $this->recept_notes = new FItem(FItem::DATA_TYPE_STRING, "recept_notes", "Observaciones recepción", "", false);
         $this->service_type = new FItem(FItem::DATA_TYPE_STRING, "service_type", "Tipo servicio", "", true);
@@ -171,6 +174,9 @@ class ModSample extends FRegistry
         $this->items["recept_sample"] = $this->recept_sample;
         $this->items["recept_datetime_n"] = $this->recept_datetime_n;
         $this->items["recept_temperat_n"] = $this->recept_temperat_n;
+        $this->items["process_days"] = $this->process_days;
+        $this->items["process_start_date"] = $this->process_start_date;
+        $this->items["process_deadline"] = $this->process_deadline;
         $this->items["recept_deviats"] = $this->recept_deviats;
         $this->items["recept_notes"] = $this->recept_notes;
         $this->items["service_type"] = $this->service_type;
@@ -246,11 +252,15 @@ class ModSample extends FRegistry
         $this->clearChildSamplingImages();
     }
 
-    private function generateNumber(): string
-    {
+    protected function validateParentRecept() {
         if (!isset($this->parentRecept)) {
             throw new \Exception("El objeto recepción no ha sido asignado.");
         }
+    }
+
+    protected function generateNumber(): string
+    {
+        $this->validateParentRecept();
 
         $nf = new \NumberFormatter($userSession->getLocLang(), \NumberFormatter::PATTERN_DECIMAL);
         $nf->setAttribute(\NumberFormatter::MIN_INTEGER_DIGITS, 3); // TODO: paremeterize this formatting argument: 4!
@@ -293,19 +303,14 @@ class ModSample extends FRegistry
         $this->parentRecept = $recept;
     }
 
-    public function computeSystemData()
-    {
-        if (!isset($this->parentRecept)) {
-            throw new \Exception("El objeto recepción no ha sido asignado.");
-        }
-
-        foreach ($this->childTests as $test) {
-
-        }
-    }
-
     public function validate(FUserSession $userSession)
     {
+        // compute data:
+
+        if ($this->isRegistryNew) {
+            $this->number->setValue($this->generateNumber());
+        }
+
         // validate registry:
 
         parent::validate($userSession);
@@ -356,6 +361,9 @@ class ModSample extends FRegistry
             $this->recept_sample->setValue($row["recept_sample"]);
             $this->recept_datetime_n->setValue($row["recept_datetime_n"]);
             $this->recept_temperat_n->setValue($row["recept_temperat_n"]);
+            $this->process_days->setValue($row["process_days"]);
+            $this->process_start_date->setValue($row["process_start_date"]);
+            $this->process_deadline->setValue($row["process_deadline"]);
             $this->recept_deviats->setValue($row["recept_deviats"]);
             $this->recept_notes->setValue($row["recept_notes"]);
             $this->service_type->setValue($row["service_type"]);
@@ -452,9 +460,6 @@ class ModSample extends FRegistry
         $statement;
 
         if ($this->isRegistryNew) {
-            // set data by system:
-            $this->number->setValue(self::generateNumber());
-
             $statement = $userSession->getPdo()->prepare("INSERT INTO o_sample (" .
                 "id_sample, " .
                 "number, " .
@@ -475,6 +480,9 @@ class ModSample extends FRegistry
                 "recept_sample, " .
                 "recept_datetime_n, " .
                 "recept_temperat_n, " .
+                "process_days, " .
+                "process_start_date, " .
+                "process_deadline, " .
                 "recept_deviats, " .
                 "recept_notes, " .
                 "service_type, " .
@@ -540,6 +548,9 @@ class ModSample extends FRegistry
                 ":recept_sample, " .
                 ":recept_datetime_n, " .
                 ":recept_temperat_n, " .
+                ":process_days, " .
+                ":process_start_date, " .
+                ":process_deadline, " .
                 ":recept_deviats, " .
                 ":recept_notes, " .
                 ":service_type, " .
@@ -606,6 +617,9 @@ class ModSample extends FRegistry
                 "recept_sample = :recept_sample, " .
                 "recept_datetime_n = :recept_datetime_n, " .
                 "recept_temperat_n = :recept_temperat_n, " .
+                "process_days = :process_days, " .
+                "process_start_date = :process_start_date, " .
+                "process_deadline = :process_deadline, " .
                 "recept_deviats = :recept_deviats, " .
                 "recept_notes = :recept_notes, " .
                 "service_type = :service_type, " .
@@ -673,6 +687,9 @@ class ModSample extends FRegistry
         $recept_sample = $this->recept_sample->getValue();
         $recept_datetime_n = FUtils::formatDbmsDatetime($this->recept_datetime_n->getValue());
         $recept_temperat_n = $this->recept_temperat_n->getValue();
+        $process_days = $this->process_days->getValue();
+        $process_start_date = FUtils::formatDbmsDate($this->process_start_date->getValue());
+        $process_deadline = FUtils::formatDbmsDate($this->process_deadline->getValue());
         $recept_deviats = $this->recept_deviats->getValue();
         $recept_notes = $this->recept_notes->getValue();
         $service_type = $this->service_type->getValue();
@@ -770,6 +787,9 @@ class ModSample extends FRegistry
         else {
             $statement->bindParam(":recept_temperat_n", $recept_temperat_n);
         }
+        $statement->bindParam(":process_days", $process_days, \PDO::PARAM_INT);
+        $statement->bindParam(":process_start_date", $process_start_date);
+        $statement->bindParam(":process_deadline", $process_deadline);
         $statement->bindParam(":recept_deviats", $recept_deviats);
         $statement->bindParam(":recept_notes", $recept_notes);
         $statement->bindParam(":service_type", $service_type);

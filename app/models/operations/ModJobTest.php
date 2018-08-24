@@ -14,6 +14,7 @@ class ModJobTest extends FRelation
     protected $id_entity;
     protected $job_test;
     protected $process_days;
+    protected $process_start_date;
     protected $process_deadline;
     protected $ext_number;
     protected $ext_tracking_number;
@@ -36,6 +37,7 @@ class ModJobTest extends FRelation
         $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", "", false, true);
         $this->job_test = new FItem(FItem::DATA_TYPE_INT, "job_test", "Núm. ensayo orden trabajo", "", true);
         $this->process_days = new FItem(FItem::DATA_TYPE_INT, "process_days", "Días proceso", "", true);
+        $this->process_start_date = new FItem(FItem::DATA_TYPE_DATE, "process_start_date", "Fecha inicio proceso", "", true);
         $this->process_deadline = new FItem(FItem::DATA_TYPE_DATE, "process_deadline", "Fecha límite proceso", "", true);
         $this->ext_number = new FItem(FItem::DATA_TYPE_STRING, "ext_number", "Externos. Folio orden trabajo", "", false);
         $this->ext_tracking_number = new FItem(FItem::DATA_TYPE_STRING, "ext_tracking_number", "Externos. Núm. rastreo paquetería", "", false);
@@ -54,6 +56,7 @@ class ModJobTest extends FRelation
         $this->items["id_entity"] = $this->id_entity;
         $this->items["job_test"] = $this->job_test;
         $this->items["process_days"] = $this->process_days;
+        $this->items["process_start_date"] = $this->process_start_date;
         $this->items["process_deadline"] = $this->process_deadline;
         $this->items["ext_number"] = $this->ext_number;
         $this->items["ext_tracking_number"] = $this->ext_tracking_number;
@@ -94,6 +97,7 @@ class ModJobTest extends FRelation
             $this->id_entity->setValue($row["id_entity"]);
             $this->job_test->setValue($row["job_test"]);
             $this->process_days->setValue($row["process_days"]);
+            $this->process_start_date->setValue($row["process_start_date"]);
             $this->process_deadline->setValue($row["process_deadline"]);
             $this->ext_number->setValue($row["ext_number"]);
             $this->ext_tracking_number->setValue($row["ext_tracking_number"]);
@@ -128,6 +132,7 @@ class ModJobTest extends FRelation
                 "id_entity, " .
                 "job_test, " .
                 "process_days, " .
+                "process_start_date, " .
                 "process_deadline, " .
                 "ext_number, " .
                 "ext_tracking_number, " .
@@ -146,6 +151,7 @@ class ModJobTest extends FRelation
                 ":id_entity, " .
                 ":job_test, " .
                 ":process_days, " .
+                ":process_start_date, " .
                 ":process_deadline, " .
                 ":ext_number, " .
                 ":ext_tracking_number, " .
@@ -163,6 +169,7 @@ class ModJobTest extends FRelation
             $statement = $userSession->getPdo()->prepare("UPDATE o_job_test SET " .
                 "job_test = :job_test, " .
                 "process_days = :process_days, " .
+                "process_start_date = :process_start_date, " .
                 "process_deadline = :process_deadline, " .
                 "ext_number = :ext_number, " .
                 "ext_tracking_number = :ext_tracking_number, " .
@@ -183,6 +190,7 @@ class ModJobTest extends FRelation
         $id_entity = $this->id_entity->getValue();
         $job_test = $this->job_test->getValue();
         $process_days = $this->process_days->getValue();
+        $process_start_date = FUtils::formatDbmsDate($this->process_start_date->getValue());
         $process_deadline = FUtils::formatDbmsDate($this->process_deadline->getValue());
         $ext_number = $this->ext_number->getValue();
         $ext_tracking_number = $this->ext_tracking_number->getValue();
@@ -201,6 +209,7 @@ class ModJobTest extends FRelation
         $statement->bindParam(":id_entity", $id_entity, \PDO::PARAM_INT);
         $statement->bindParam(":job_test", $job_test, \PDO::PARAM_INT);
         $statement->bindParam(":process_days", $process_days, \PDO::PARAM_INT);
+        $statement->bindParam(":process_start_date", $process_start_date);
         $statement->bindParam(":process_deadline", $process_deadline);
         $statement->bindParam(":ext_number", $ext_number);
         $statement->bindParam(":ext_tracking_number", $ext_tracking_number);

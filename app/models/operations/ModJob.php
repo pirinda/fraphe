@@ -13,6 +13,7 @@ class ModJob extends FRegistry
     protected $number;
     protected $job_date;
     protected $process_days;
+    protected $process_start_date;
     protected $process_deadline;
     protected $is_system;
     protected $is_deleted;
@@ -37,6 +38,7 @@ class ModJob extends FRegistry
         $this->number = new FItem(FItem::DATA_TYPE_STRING, "number", "Folio orden trabajo", "", true);
         $this->job_date = new FItem(FItem::DATA_TYPE_DATE, "job_date", "Fecha orden trabajo", "", true);
         $this->process_days = new FItem(FItem::DATA_TYPE_INT, "process_days", "Días proceso", "", true);
+        $this->process_start_date = new FItem(FItem::DATA_TYPE_DATE, "process_start_date", "Fecha inicio proceso", "", true);
         $this->process_deadline = new FItem(FItem::DATA_TYPE_DATE, "process_deadline", "Fecha límite proceso", "", true);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
@@ -54,6 +56,7 @@ class ModJob extends FRegistry
         $this->items["number"] = $this->number;
         $this->items["job_date"] = $this->job_date;
         $this->items["process_days"] = $this->process_days;
+        $this->items["process_start_date"] = $this->process_start_date;
         $this->items["process_deadline"] = $this->process_deadline;
         $this->items["is_system"] = $this->is_system;
         $this->items["is_deleted"] = $this->is_deleted;
@@ -125,6 +128,7 @@ class ModJob extends FRegistry
             $this->number->setValue($row["number"]);
             $this->job_date->setValue($row["job_date"]);
             $this->process_days->setValue($row["process_days"]);
+            $this->process_start_date->setValue($row["process_start_date"]);
             $this->process_deadline->setValue($row["process_deadline"]);
             $this->is_system->setValue($row["is_system"]);
             $this->is_deleted->setValue($row["is_deleted"]);
@@ -184,6 +188,7 @@ class ModJob extends FRegistry
                 "number, " .
                 "job_date, " .
                 "process_days, " .
+                "process_start_date, " .
                 "process_deadline, " .
                 "is_system, " .
                 "is_deleted, " .
@@ -201,6 +206,7 @@ class ModJob extends FRegistry
                 ":number, " .
                 ":job_date, " .
                 ":process_days, " .
+                ":process_start_date, " .
                 ":process_deadline, " .
                 ":is_system, " .
                 ":is_deleted, " .
@@ -219,6 +225,7 @@ class ModJob extends FRegistry
                 "number = :number, " .
                 "job_date = :job_date, " .
                 "process_days = :process_days, " .
+                "process_start_date = :process_start_date, " .
                 "process_deadline = :process_deadline, " .
                 "is_system = :is_system, " .
                 "is_deleted = :is_deleted, " .
@@ -238,6 +245,7 @@ class ModJob extends FRegistry
         $number = $this->number->getValue();
         $job_date = FUtils::formatDbmsDate($this->job_date->getValue());
         $process_days = $this->process_days->getValue();
+        $process_start_date = FUtils::formatDbmsDate($this->process_start_date->getValue());
         $process_deadline = FUtils::formatDbmsDate($this->process_deadline->getValue());
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();
@@ -257,6 +265,7 @@ class ModJob extends FRegistry
         $statement->bindParam(":number", $number);
         $statement->bindParam(":job_date", $job_date);
         $statement->bindParam(":process_days", $process_days, \PDO::PARAM_INT);
+        $statement->bindParam(":process_start_date", $process_start_date);
         $statement->bindParam(":process_deadline", $process_deadline);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);

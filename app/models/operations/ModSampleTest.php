@@ -16,6 +16,7 @@ class ModSampleTest extends FRelation
     protected $process_days_min;
     protected $process_days_max;
     protected $process_days;
+    protected $process_start_date;
     protected $process_deadline;
     protected $cost;
     protected $is_system;
@@ -37,6 +38,7 @@ class ModSampleTest extends FRelation
         $this->process_days_min = new FItem(FItem::DATA_TYPE_INT, "process_days_min", "Días mínimos proceso", "", true);
         $this->process_days_max = new FItem(FItem::DATA_TYPE_INT, "process_days_max", "Días máximos proceso", "", true);
         $this->process_days = new FItem(FItem::DATA_TYPE_INT, "process_days", "Días proceso", "", true);
+        $this->process_start_date = new FItem(FItem::DATA_TYPE_DATE, "process_start_date", "Fecha inicio proceso", "", true);
         $this->process_deadline = new FItem(FItem::DATA_TYPE_DATE, "process_deadline", "Fecha límite proceso", "", true);
         $this->cost = new FItem(FItem::DATA_TYPE_FLOAT, "cost", "Costo", "", false);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
@@ -54,6 +56,7 @@ class ModSampleTest extends FRelation
         $this->items["process_days_min"] = $this->process_days_min;
         $this->items["process_days_max"] = $this->process_days_max;
         $this->items["process_days"] = $this->process_days;
+        $this->items["process_start_date"] = $this->process_start_date;
         $this->items["process_deadline"] = $this->process_deadline;
         $this->items["cost"] = $this->cost;
         $this->items["is_system"] = $this->is_system;
@@ -90,6 +93,7 @@ class ModSampleTest extends FRelation
             $this->process_days_min->setValue($row["process_days_min"]);
             $this->process_days_max->setValue($row["process_days_max"]);
             $this->process_days->setValue($row["process_days"]);
+            $this->process_start_date->setValue($row["process_start_date"]);
             $this->process_deadline->setValue($row["process_deadline"]);
             $this->cost->setValue($row["cost"]);
             $this->is_system->setValue($row["is_system"]);
@@ -123,6 +127,7 @@ class ModSampleTest extends FRelation
                 "process_days_min, " .
                 "process_days_max, " .
                 "process_days, " .
+                "process_start_date, " .
                 "process_deadline, " .
                 "cost, " .
                 "is_system, " .
@@ -140,6 +145,7 @@ class ModSampleTest extends FRelation
                 ":process_days_min, " .
                 ":process_days_max, " .
                 ":process_days, " .
+                ":process_start_date, " .
                 ":process_deadline, " .
                 ":cost, " .
                 ":is_system, " .
@@ -156,6 +162,7 @@ class ModSampleTest extends FRelation
                 "process_days_min = :process_days_min, " .
                 "process_days_max = :process_days_max, " .
                 "process_days = :process_days, " .
+                "process_start_date = :process_start_date, " .
                 "process_deadline = :process_deadline, " .
                 "cost = :cost, " .
                 "is_system = :is_system, " .
@@ -175,6 +182,7 @@ class ModSampleTest extends FRelation
         $process_days_min = $this->process_days_min->getValue();
         $process_days_max = $this->process_days_max->getValue();
         $process_days = $this->process_days->getValue();
+        $process_start_date = FUtils::formatDbmsDate($this->process_start_date->getValue());
         $process_deadline = FUtils::formatDbmsDate($this->process_deadline->getValue());
         $cost = $this->cost->getValue();
         $is_system = $this->is_system->getValue();
@@ -192,6 +200,7 @@ class ModSampleTest extends FRelation
         $statement->bindParam(":process_days_min", $process_days_min, \PDO::PARAM_INT);
         $statement->bindParam(":process_days_max", $process_days_max, \PDO::PARAM_INT);
         $statement->bindParam(":process_days", $process_days, \PDO::PARAM_INT);
+        $statement->bindParam(":process_start_date", $process_start_date);
         $statement->bindParam(":process_deadline", $process_deadline);
         $statement->bindParam(":cost", $cost);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);

@@ -10,11 +10,15 @@ use app\AppConsts;
 
 class ModRecept extends FRegistry
 {
+    public const SERVICE_ORDINARY = "O";
+    public const SERVICE_URGENT = "U";
+
     protected $id_recept;
     protected $number;
     protected $recept_datetime;
     protected $recept_temperat_n;
     protected $process_days;
+    protected $process_start_date;
     protected $process_deadline;
     protected $recept_deadline;
     protected $recept_deviats;
@@ -61,6 +65,7 @@ class ModRecept extends FRegistry
         $this->recept_datetime = new FItem(FItem::DATA_TYPE_DATETIME, "recept_datetime", "Fecha-hora recepción", "", true);
         $this->recept_temperat_n = new FItem(FItem::DATA_TYPE_FLOAT, "recept_temperat_n", "Temp. recepción °C", "", false);
         $this->process_days = new FItem(FItem::DATA_TYPE_INT, "process_days", "Días proceso", "", true);
+        $this->process_start_date = new FItem(FItem::DATA_TYPE_DATE, "process_start_date", "Fecha inicio proceso", "", true);
         $this->process_deadline = new FItem(FItem::DATA_TYPE_DATE, "process_deadline", "Fecha límite proceso", "", true);
         $this->recept_deadline = new FItem(FItem::DATA_TYPE_DATE, "recept_deadline", "Fecha límite recepción", "", true);
         $this->recept_deviats = new FItem(FItem::DATA_TYPE_STRING, "recept_deviats", "Desviaciones recepción", "", false);
@@ -101,6 +106,7 @@ class ModRecept extends FRegistry
         $this->items["recept_datetime"] = $this->recept_datetime;
         $this->items["recept_temperat_n"] = $this->recept_temperat_n;
         $this->items["process_days"] = $this->process_days;
+        $this->items["process_start_date"] = $this->process_start_date;
         $this->items["process_deadline"] = $this->process_deadline;
         $this->items["recept_deadline"] = $this->recept_deadline;
         $this->items["recept_deviats"] = $this->recept_deviats;
@@ -157,8 +163,9 @@ class ModRecept extends FRegistry
         $this->clearChildSamples();
     }
 
-    private function generateNumber(FUserSession $userSession): string
+    protected function generateNumber(FUserSession $userSession): string
     {
+        // get count of receptions:
         $count = 0;
         $date = FUtils::formatDbmsDate($this->recept_datetime->getValue());
         $sql = "SELECT COUNT(*) AS _count FROM oc_recept WHERE DATE(recept_datetime) = '$date';";
@@ -167,10 +174,34 @@ class ModRecept extends FRegistry
             $count = intval($row["_count"]) + 1;
         }
 
+        // create number formatter:
         $nf = new \NumberFormatter($userSession->getLocLang(), \NumberFormatter::PATTERN_DECIMAL);
         $nf->setAttribute(\NumberFormatter::MIN_INTEGER_DIGITS, 4); // TODO: paremeterize this formatting argument: 4!
 
+        // generate number:
         return date("ymd", $this->recept_datetime->getValue()) & $nf->format($count); // TODO: parameterize this formatting argument: "ymd"!
+    }
+
+    protected function computeStartDate()
+    {
+        $extraDays = 0;
+        $receptDate = FUtils::extratDate($this->recept_datetime->getValue());
+        $date = getdate($receptDate);
+        if ($date["wday"] == 0) { // Sunday
+            $extraDays += 1;
+        }
+        else {
+            if ($this->service_type->getValue() == self::SERVICE_ORDINARY) {
+                if ($date["wday"] == 6) { // Saturday
+                    $extraDays += 2;
+                }
+                else if ($date["hours"] >= 14) { // 14:00
+                    $extraDays += 1;
+                }
+            }
+        }
+
+        $this->process_start_date->setValue();
     }
 
     public function &getChildSamples(): array
@@ -185,6 +216,14 @@ class ModRecept extends FRegistry
 
     public function validate(FUserSession $userSession)
     {
+        // compute data:
+
+        if ($this->isRegistryNew) {
+            $this->recept_datetime->setValue(time());
+            $this->number->setValue($this->generateNumber($userSession));
+
+        }
+
         // validate registry:
 
         parent::validate($userSession);
@@ -208,6 +247,7 @@ class ModRecept extends FRegistry
             $this->recept_datetime->setValue($row["recept_datetime"]);
             $this->recept_temperat_n->setValue($row["recept_temperat_n"]);
             $this->process_days->setValue($row["process_days"]);
+            $this->process_start_date->setValue($row["process_start_date"]);
             $this->process_deadline->setValue($row["process_deadline"]);
             $this->recept_deadline->setValue($row["recept_deadline"]);
             $this->recept_deviats->setValue($row["recept_deviats"]);
@@ -270,16 +310,13 @@ class ModRecept extends FRegistry
         $statement;
 
         if ($this->isRegistryNew) {
-            // set data by system:
-            $this->recept_datetime->setValue(time());
-            $this->number->setValue(self::generateNumber($userSession));
-
             $statement = $userSession->getPdo()->prepare("INSERT INTO o_recept (" .
                 "id_recept, " .
                 "number, " .
                 "recept_datetime, " .
                 "recept_temperat_n, " .
                 "process_days, " .
+                "process_start_date, " .
                 "process_deadline, " .
                 "recept_deadline, " .
                 "recept_deviats, " .
@@ -320,6 +357,7 @@ class ModRecept extends FRegistry
                 ":recept_datetime, " .
                 ":recept_temperat_n, " .
                 ":process_days, " .
+                ":process_start_date, " .
                 ":process_deadline, " .
                 ":recept_deadline, " .
                 ":recept_deviats, " .
@@ -361,6 +399,7 @@ class ModRecept extends FRegistry
                 "recept_datetime = :recept_datetime, " .
                 "recept_temperat_n = :recept_temperat_n, " .
                 "process_days = :process_days, " .
+                "process_start_date = :process_start_date, " .
                 "process_deadline = :process_deadline, " .
                 "recept_deadline = :recept_deadline, " .
                 "recept_deviats = :recept_deviats, " .
@@ -403,6 +442,7 @@ class ModRecept extends FRegistry
         $recept_datetime = FUtils::formatDbmsDatetime($this->recept_datetime->getValue());
         $recept_temperat_n = $this->recept_temperat_n->getValue();
         $process_days = $this->process_days->getValue();
+        $process_start_date = FUtils::formatDbmsDate($this->process_start_date->getValue());
         $process_deadline = FUtils::formatDbmsDate($this->process_deadline->getValue());
         $recept_deadline = FUtils::formatDbmsDate($this->recept_deadline->getValue());
         $recept_deviats = $this->recept_deviats->getValue();
@@ -450,6 +490,7 @@ class ModRecept extends FRegistry
             $statement->bindParam(":recept_temperat_n", $recept_temperat_n);
         }
         $statement->bindParam(":process_days", $process_days, \PDO::PARAM_INT);
+        $statement->bindParam(":process_start_date", $process_start_date);
         $statement->bindParam(":process_deadline", $process_deadline);
         $statement->bindParam(":recept_deadline", $recept_deadline);
         $statement->bindParam(":recept_deviats", $recept_deviats);

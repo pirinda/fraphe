@@ -71,4 +71,9 @@ abstract class FUtils
         $dt = DateTime::createFromFormat("Y-m-d H:i:s", $time);
         return $dt->getTimestamp();
     }
+
+    public static function extratDate(int $timestamp): int
+    {
+        return self::parseDbmsDate(self::formatDbmsDate($timestamp));
+    }
 }

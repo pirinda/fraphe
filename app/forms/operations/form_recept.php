@@ -37,7 +37,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         }
         else {
             $data = array();
-            $data["service_type"] = ModSample::SERVICE_ORDINARY;
+            $data["service_type"] = ModRecept::SERVICE_ORDINARY;
             $recept->setData($data);
         }
 
