@@ -88,7 +88,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         if (!isset($entityAddress)) {
             $entityAddress = new ModEntityAddress();
             $entityAddress->getItem("name")->setValue("Matriz");
-            $entityAddress->getItem("country")->setValue("MEX");
+            $entityAddress->getItem("country")->setValue("MEX"); // TODO: parameterize this configurable value!
             $entityAddress->getItem("is_main")->setValue(true);
             $entity->getChildAddresses()[0] = $entityAddress;
         }
@@ -129,7 +129,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         if (!isset($entityAddress)) {
             $entityAddress = new ModEntityAddress();
             $entityAddress->getItem("name")->setValue("Matriz");
-            $entityAddress->getItem("country")->setValue("MEX");
+            $entityAddress->getItem("country")->setValue("MEX"); // TODO: parameterize this configurable value!
             $entityAddress->getItem("is_main")->setValue(true);
             $entity->getChildAddresses()[0] = $entityAddress;
         }
@@ -187,7 +187,8 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
             $dataImage = array();
             $dataImage["id_entity_sampling_img"] = intval($_POST[ModEntitySamplingImage::PREFIX . "id_entity_sampling_img"]);
-            $dataImage["sampling_img"] = $_POST[ModEntitySamplingImage::PREFIX . "sampling_img"];
+            //$dataImage["sampling_img"] = $_POST[ModEntitySamplingImage::PREFIX . "def_sampling_img_file"]; XXX!!!
+            $dataImage["sampling_img"] = $_FILES[ModEntitySamplingImage::PREFIX . "def_sampling_img_file"]["name"];
             //$data["is_system"] = $_POST["is_system"];
             //$data["is_deleted"] = $_POST["is_deleted"];
             //$data["fk_entity"] = $_POST["fk_entity"];
@@ -352,7 +353,7 @@ if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
     $options = AppUtils::getSelectOptions($userSession, AppConsts::CC_ENTITY, $entity->getDatum("nk_entity_agent"), $params);
     echo $entity->getItem("nk_entity_agent")->composeHtmlSelect($options, 4, 8);
 
-    $options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $entity->getDatum("nk_report_delivery_type"));
+    $options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_TYPE, $entity->getDatum("nk_report_delivery_type"));
     echo $entity->getItem("nk_report_delivery_type")->composeHtmlSelect($options, 4, 8);
 
     echo $entity->getItem("is_def_sampling_img")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 12);

@@ -24,7 +24,7 @@ class ModEntitySamplingImage extends FRegistry
 
     function __construct()
     {
-        parent::__construct(AppConsts::CC_ENTITY_IMAGE, AppConsts::$tableIds[AppConsts::CC_ENTITY_IMAGE]);
+        parent::__construct(AppConsts::CC_ENTITY_SAMPLING_IMG, AppConsts::$tableIds[AppConsts::CC_ENTITY_SAMPLING_IMG]);
 
         $this->id_entity_sampling_img = new FItem(FItem::DATA_TYPE_INT, "id_entity_sampling_img", "ID imagen entidad", "", false, true);
         $this->sampling_img = new FItem(FItem::DATA_TYPE_STRING, "sampling_img", "Imagen muestreo", "", true);

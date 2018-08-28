@@ -121,7 +121,7 @@ class ModSample extends FRegistry
         $this->customer_city = new FItem(FItem::DATA_TYPE_STRING, "customer_city", "Localidad", "", false);
         $this->customer_county = new FItem(FItem::DATA_TYPE_STRING, "customer_county", "Municipio", "", false);
         $this->customer_state_region = new FItem(FItem::DATA_TYPE_STRING, "customer_state_region", "Estado", "", false);
-        $this->customer_country = new FItem(FItem::DATA_TYPE_STRING, "customer_country", "País", "", false);
+        $this->customer_country = new FItem(FItem::DATA_TYPE_STRING, "customer_country", "País", "ISO 3166", false);
         $this->customer_contact = new FItem(FItem::DATA_TYPE_STRING, "customer_contact", "Contacto", "", false);
         $this->is_def_sampling_img = new FItem(FItem::DATA_TYPE_BOOL, "is_def_sampling_img", "Aplica imagen muestreo x def.", "", false);
         $this->ref_chain_custody = new FItem(FItem::DATA_TYPE_STRING, "ref_chain_custody", "Ref. cadena custodia", "", false);
@@ -252,9 +252,24 @@ class ModSample extends FRegistry
         $this->clearChildSamplingImages();
     }
 
+    public function setParentRecept(ModRecept $recept)
+    {
+        $this->parentRecept = $recept;
+    }
+
+    public function setProcessStartDate(int $startDate)
+    {
+        $this->process_start_date->setValue($startDate);
+
+        // propagate process start date:
+        foreach ($this->childTests as $test) {
+            $test->getItem("process_start_date")->setValue($startDate);
+        }
+    }
+
     protected function validateParentRecept() {
         if (!isset($this->parentRecept)) {
-            throw new \Exception("El objeto recepción no ha sido asignado.");
+            throw new \Exception("El objeto 'recepción' no ha sido asignado.");
         }
     }
 
@@ -266,6 +281,38 @@ class ModSample extends FRegistry
         $nf->setAttribute(\NumberFormatter::MIN_INTEGER_DIGITS, 3); // TODO: paremeterize this formatting argument: 4!
 
         return $this->parentRecept->getDatum("number") . "-" . $nf->format($this->recept_sample->getValue());
+    }
+
+    public function computeProcessDays()
+    {
+        $maxDays = 0;
+        $minStartDate; // unset
+        $maxDeadline = 0;
+
+        foreach ($this->childTests as $test) {
+            $test->computeProcessDays();
+
+            if ($test->getDatum("process_days") > $maxDays) {
+                $maxDays = $test->getDatum("process_days");
+            }
+
+            if (!isset($minStartDate)) {
+                $minStartDate = $test->getDatum("process_start_date");
+            }
+            else {
+                if ($test->getDatum("process_start_date") < $minStartDate) {
+                    $minStartDate = $test->getDatum("process_start_date");
+                }
+            }
+
+            if ($test->getDatum("process_deadline") > $maxDeadline) {
+                $maxDeadline = $test->getDatum("process_deadline");
+            }
+        }
+
+        $this->process_days->setValue($maxDays);
+        $this->process_start_date->setValue($minStartDate);
+        $this->process_deadline->setValue($maxDeadline);
     }
 
     public function &getChildTests(): array
@@ -298,11 +345,6 @@ class ModSample extends FRegistry
         $this->childSamplingImages = array();
     }
 
-    public function setParentRecept(ModRecept $recept)
-    {
-        $this->parentRecept = $recept;
-    }
-
     public function validate(FUserSession $userSession)
     {
         // compute data:
@@ -310,6 +352,8 @@ class ModSample extends FRegistry
         if ($this->isRegistryNew) {
             $this->number->setValue($this->generateNumber());
         }
+
+        $this->computeProcessDays();
 
         // validate registry:
 
@@ -881,11 +925,17 @@ class ModSample extends FRegistry
         }
 
         // save child sample tests:
+        $num = 0;
         foreach ($this->childTests as $test) {
             // assure link to parent:
             $ids = array();
             $ids["id_sample"] = $this->id;
             $test->setIds($ids);
+
+            // set system data:
+            $data = array();
+            $data["sample_test"] = ++$num;
+            $test->setData($data);
 
             // save child:
             $test->save($userSession);

@@ -80,7 +80,7 @@ class ModRecept extends FRegistry
         $this->customer_city = new FItem(FItem::DATA_TYPE_STRING, "customer_city", "Localidad", "", false);
         $this->customer_county = new FItem(FItem::DATA_TYPE_STRING, "customer_county", "Municipio", "", false);
         $this->customer_state_region = new FItem(FItem::DATA_TYPE_STRING, "customer_state_region", "Estado", "", false);
-        $this->customer_country = new FItem(FItem::DATA_TYPE_STRING, "customer_country", "País", "", false);
+        $this->customer_country = new FItem(FItem::DATA_TYPE_STRING, "customer_country", "País", "ISO 3166", false);
         $this->customer_contact = new FItem(FItem::DATA_TYPE_STRING, "customer_contact", "Contacto", "", false);
         $this->is_def_sampling_img = new FItem(FItem::DATA_TYPE_BOOL, "is_def_sampling_img", "Aplica imagen muestreo x def.", "", false);
         $this->ref_chain_custody = new FItem(FItem::DATA_TYPE_STRING, "ref_chain_custody", "Ref. cadena custodia", "", false);
@@ -182,10 +182,16 @@ class ModRecept extends FRegistry
         return date("ymd", $this->recept_datetime->getValue()) & $nf->format($count); // TODO: parameterize this formatting argument: "ymd"!
     }
 
+    /* Computes process start date.
+     * NOTE: this method is called by computeProcessDays().
+     */
     protected function computeStartDate()
     {
+        // TODO: parameterize configurable variables of this method!
+
+        // compute extra days:
         $extraDays = 0;
-        $receptDate = FUtils::extratDate($this->recept_datetime->getValue());
+        $receptDate = FUtils::extractDate($this->recept_datetime->getValue());
         $date = getdate($receptDate);
         if ($date["wday"] == 0) { // Sunday
             $extraDays += 1;
@@ -201,7 +207,63 @@ class ModRecept extends FRegistry
             }
         }
 
-        $this->process_start_date->setValue();
+        // compute process start date:
+        $startDate;
+        if ($extraDays == 0) {
+            $startDate = $receptDate;
+        }
+        else {
+            $dt = new \DateTime();
+            $dt->setTimestamp($receptDate);
+            $dt->add(new \DateInterval("P" . $extraDys . "D"));
+            $startDate = $dt->getTimestamp();
+        }
+
+        $this->process_start_date->setValue($startDate);
+
+        // propagate process start date:
+        foreach ($this->childSamples as $sample) {
+            $sample->setProcessStartDate($startDate);
+        }
+    }
+
+    protected function computeProcessDays()
+    {
+        $this->computeStartDate();
+
+        $maxDays = 0;
+        $minStartDate; // unset
+        $maxDeadline = 0;
+
+        foreach ($this->childSamples as $sample) {
+            $sample->computeProcessDays();
+
+            if ($sample->getDatum("process_days") > $maxDays) {
+                $maxDays = $sample->getDatum("process_days");
+            }
+
+            if (!isset($minStartDate)) {
+                $minStartDate = $sample->getDatum("process_start_date");
+            }
+            else {
+                if ($sample->getDatum("process_start_date") < $minStartDate) {
+                    $minStartDate = $sample->getDatum("process_start_date");
+                }
+            }
+
+            if ($sample->getDatum("process_deadline") > $maxDeadline) {
+                $maxDeadline = $sample->getDatum("process_deadline");
+            }
+        }
+
+        $this->process_days->setValue($maxDays);
+        $this->process_start_date->setValue($minStartDate);
+        $this->process_deadline->setValue($maxDeadline);
+
+        // add additional process days for reporting and report validation:
+        $dt = new \DateTime(FUtils::formatDbmsDate($maxDeadline));
+        $dt->add(new \DateInterval("P2D")); // TODO: parameterize this configurable variable!
+        $this->recept_deadline->setValue($dt->getTimestamp());
     }
 
     public function &getChildSamples(): array
@@ -221,8 +283,13 @@ class ModRecept extends FRegistry
         if ($this->isRegistryNew) {
             $this->recept_datetime->setValue(time());
             $this->number->setValue($this->generateNumber($userSession));
-
         }
+
+        foreach ($this->childSamples as $sample) {
+            $sample->setModelTestProcessEntity($this);
+        }
+
+        $this->computeProcessDays();
 
         // validate registry:
 
@@ -553,14 +620,13 @@ class ModRecept extends FRegistry
         // save child samples:
         $num = 0;
         foreach ($this->childSamples as $sample) {
-            // assure link to parent and set other data:
+            // assure link to parent and set system data:
             $data = array();
             $data["nk_recept"] = $this->id;
             $data["recept_sample"] = ++$num;
-            $data["recept_datetime_n"] = $this->recept_datetime;
-            $data["fk_user_receiver"] = $this->fk_user_receiver;
+            $data["recept_datetime_n"] = $this->recept_datetime->getValue();
+            $data["fk_user_receiver"] = $this->fk_user_receiver->getValue();
             $sample->setData($data);
-            $sample->setParentRecept($this);
 
             // save child:
             $sample->save($userSession);

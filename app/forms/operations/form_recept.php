@@ -141,7 +141,7 @@ $options = array();
 $options[] = AppUtils::composeSelectOption();
 echo $recept->getItem("fk_report_contact")->composeHtmlSelect($options, 4, 8);
 
-$options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $recept->getDatum("fk_report_delivery_type"), $params);
+$options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_TYPE, $recept->getDatum("fk_report_delivery_type"), $params);
 echo $recept->getItem("fk_report_delivery_type")->composeHtmlSelect($options, 4, 8);
 
 echo $recept->getItem("is_def_sampling_img")->composeHtmlInput(FItem::INPUT_CHECKBOX, 4, 8);
@@ -251,15 +251,15 @@ echo $sample->getItem("date_sell_by_n")->composeHtmlInput(FItem::INPUT_DATE, 4, 
 $options = AppUtils::getSelectOptions($userSession, AppConsts::OC_CONTAINER_TYPE, $sample->getDatum("fk_container_type"), $params);
 echo $sample->getItem("fk_container_type")->composeHtmlSelect($options, 4, 8);
 
-$sample->getItem("recept_datetime")->setGuiReadOnly(true);
-echo $sample->getItem("recept_datetime")->composeHtmlInput(FItem::INPUT_DATETIME, 4, 6);
+$sample->getItem("recept_datetime_n")->setGuiReadOnly(true);
+echo $sample->getItem("recept_datetime_n")->composeHtmlInput(FItem::INPUT_DATETIME, 4, 6);
 echo $sample->getItem("recept_temperat_n")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4);
 
 $options = array();
 $options[] = AppUtils::composeSelectOption();
 echo $recept->getItem("fk_report_contact")->composeHtmlSelect($options, 4, 8);
 
-$options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_OPT, $sample->getDatum("fk_report_delivery_type"), $params);
+$options = AppUtils::getSelectOptions($userSession, AppConsts::OC_REPORT_DELIVERY_TYPE, $sample->getDatum("fk_report_delivery_type"), $params);
 echo $sample->getItem("fk_report_delivery_type")->composeHtmlSelect($options, 4, 8);
 
 echo $recept->getItem("is_def_sampling_img")->composeHtmlInput(FItem::INPUT_CHECKBOX, 4, 8);
@@ -291,8 +291,14 @@ echo $sample->getItem("sampling_guide")->composeHtmlInput(FItem::INPUT_NUMBER, 4
 $options = AppUtils::getSelectOptions($userSession, AppConsts::OC_SAMPLING_METHOD, $sample->getDatum("fk_sampling_method"), $params);
 echo $sample->getItem("fk_sampling_method")->composeHtmlSelect($options, 4, 8);
 
-$options = AppUtils::getSelectOptions($userSession, AppConsts::OC_SAMPLING_EQUIPT, $sample->getDatum("nk_sampling_equipt"), $params);
-echo $sample->getItem("nk_sampling_equipt")->composeHtmlSelect($options, 4, 8);
+$options = AppUtils::getSelectOptions($userSession, AppConsts::OC_SAMPLING_EQUIPT, $sample->getDatum("nk_sampling_equipt_1"), $params);
+echo $sample->getItem("nk_sampling_equipt_1")->composeHtmlSelect($options, 4, 8);
+
+$options = AppUtils::getSelectOptions($userSession, AppConsts::OC_SAMPLING_EQUIPT, $sample->getDatum("nk_sampling_equipt_2"), $params);
+echo $sample->getItem("nk_sampling_equipt_2")->composeHtmlSelect($options, 4, 8);
+
+$options = AppUtils::getSelectOptions($userSession, AppConsts::OC_SAMPLING_EQUIPT, $sample->getDatum("nk_sampling_equipt_3"), $params);
+echo $sample->getItem("nk_sampling_equipt_3")->composeHtmlSelect($options, 4, 8);
 
 echo $sample->getItem("sampling_notes")->composeHtmlTextArea(4, 8, 1);
 echo $sample->getItem("sampling_deviats")->composeHtmlTextArea(4, 8, 1);

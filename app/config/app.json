@@ -1,7 +1,7 @@
 {
-  "appName":"LIMS 1.0",
-  "appVendor":"CEDIMI Laboratorios",
-  "appMode":"DEV",
+  "appName":"SYS 1.0",
+  "appVendor":"Empresa",
+  "appMode":"PROD",
   "appCatalogs":["catalogs"],
   "dbHost":"localhost",
   "dbPort":"3306",

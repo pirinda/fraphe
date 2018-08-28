@@ -38,7 +38,7 @@ abstract class FUtils
             return null;
         }
 
-        $dt = DateTime::createFromFormat("Y-m-d", $time);
+        $dt = \DateTime::createFromFormat("Y-m-d", $time);
         return $dt->getTimestamp();
     }
 
@@ -48,7 +48,7 @@ abstract class FUtils
             return null;
         }
 
-        $dt = DateTime::createFromFormat("Y-m-d H:i:s", $time);
+        $dt = \DateTime::createFromFormat("Y-m-d H:i:s", $time);
         return $dt->getTimestamp();
     }
 
@@ -58,7 +58,7 @@ abstract class FUtils
             return null;
         }
 
-        $dt = DateTime::createFromFormat("H:i:s", $time);
+        $dt = \DateTime::createFromFormat("H:i:s", $time);
         return $dt->getTimestamp();
     }
 
@@ -68,12 +68,13 @@ abstract class FUtils
             return null;
         }
 
-        $dt = DateTime::createFromFormat("Y-m-d H:i:s", $time);
+        $dt = \DateTime::createFromFormat("Y-m-d H:i:s", $time);
         return $dt->getTimestamp();
     }
 
-    public static function extratDate(int $timestamp): int
+    public static function extractDate(int $timestamp): int
     {
-        return self::parseDbmsDate(self::formatDbmsDate($timestamp));
+        $dt = new \DateTime(self::formatDbmsDate($timestamp));
+        return $dt->getTimestamp();
     }
 }

@@ -2,6 +2,7 @@
 namespace app\models\catalogs;
 
 use Fraphe\App\FUserSession;
+use Fraphe\Lib\FUtils;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use Fraphe\Model\FRelation;
@@ -71,6 +72,49 @@ class ModSampleTest extends FRelation
         $this->ids["id_sample"] = 0;
         $this->ids["id_test"] = 0;
         $this->ids["id_entity"] = 0;
+    }
+
+    /* Sets registry's data from model of test process entity.
+     * Pretended to be used by front-end.
+     */
+    public function setModelTestProcessEntity(ModTestProcessEntity $testProcessEntity)
+    {
+        $this->id_test->setValue($testProcessEntity->getDatum("id_test"));
+        $this->id_entity->setValue($testProcessEntity->getDatum("id_entity"));
+        $this->process_days_min->setValue($testProcessEntity->getDatum("process_days_min"));
+        $this->process_days_max->setValue($testProcessEntity->getDatum("process_days_max"));
+        $this->fk_process_area->setValue($testProcessEntity->getDbmsFkProcessArea());
+    }
+
+    /* Computes process days and deadline.
+     * NOTE: 'entity ID' and 'process start date' must be set.
+     */
+    public function computeProcessDays()
+    {
+        // validate required data:
+        $this->id_entity->validate();
+        $this->process_start_date->validate();
+
+        // compute process days:
+        $processDays = $this->process_days_max->getValue();
+        if ($this->id_entity->getValue() != 1) { // 1 is system's company
+            $processDays += 5; // TODO: parameterize this configurable variable!
+        }
+        $this->process_days->setValue($processDays);
+
+        // compute process deadline:
+        $dt = new \DateTime(FUtils::formatDbmsDate($this->process_start_date->getValue()));
+        $dt->add(new \DateInterval("P" . $processDays . "D"));
+        $this->process_deadline->setValue($dt->getTimestamp()); // TODO: improve deadline computation!
+    }
+
+    public function validate(FUserSession $userSession)
+    {
+        // compute data:
+        $this->computeProcessDays();
+
+        // validate registry:
+        parent::validate($userSession);
     }
 
     public function retrieve(FUserSession $userSession, array $ids, int $mode)

@@ -21,14 +21,12 @@ abstract class AppUtils
 
         switch ($catalog) {
             // "name" sorted by ID + name:
-            case AppConsts::CC_MARKET_SEGMENT:
             case AppConsts::CC_ENTITY_CLASS:
             case AppConsts::CC_ENTITY_TYPE:
             case AppConsts::CC_CONTACT_TYPE:
-            case AppConsts::OC_PROCESS_AREA:
             case AppConsts::OC_SAMPLE_CLASS:
             case AppConsts::OC_SAMPLE_TYPE:
-            case AppConsts::OC_REPORT_DELIVERY_OPT:
+            case AppConsts::OC_REPORT_DELIVERY_TYPE:
                 $sql = "SELECT $tableId AS _val, name AS _opt FROM $table WHERE NOT is_deleted ORDER BY $tableId, name;";
                 break;
 
@@ -39,22 +37,32 @@ abstract class AppUtils
                 $sql = "SELECT $tableId AS _val, name AS _opt FROM $table WHERE NOT is_deleted ORDER BY name, $tableId;";
                 break;
 
-            // "name" sorted by name + ID:
-            case AppConsts::OC_SAMPLING_EQUIPT:
-                $sql = "SELECT $tableId AS _val, CONCAT(name, ' (', code, ')') AS _opt FROM $table WHERE NOT is_deleted ORDER BY name, $tableId;";
+            // "name" sorted by sorting + ID:
+            case AppConsts::CC_MARKET_SEGMENT:
+                $sql = "SELECT $tableId AS _val, name AS _opt FROM $table WHERE NOT is_deleted ORDER BY sorting, $tableId;";
                 break;
 
-            // "name" sorted by code + ID:
+            // "name (code)" sorted by name + code + ID:
+            case AppConsts::OC_SAMPLING_EQUIPT:
+                $sql = "SELECT $tableId AS _val, CONCAT(name, ' (', code, ')') AS _opt FROM $table WHERE NOT is_deleted ORDER BY name, code, $tableId;";
+                break;
+
+            // "name (code)" sorted by sorting + ID:
+            case AppConsts::OC_PROCESS_AREA:
+                $sql = "SELECT $tableId AS _val, CONCAT(name, ' (', code, ')') AS _opt FROM $table WHERE NOT is_deleted ORDER BY sorting, $tableId;";
+                break;
+
+            // "code" sorted by code + ID:
             case AppConsts::OC_CONTAINER_UNIT:
                 $sql = "SELECT $tableId AS _val, code AS _opt FROM $table WHERE NOT is_deleted ORDER BY code, $tableId;";
                 break;
 
-            // "code - name" sorted by ID + name:
+            // "code - name" sorted by code + name + ID:
             case AppConsts::OC_TEST_ACREDIT_ATTRIB:
-                $sql = "SELECT $tableId AS _val, CONCAT(code, ' - ', name) AS _opt FROM $table WHERE NOT is_deleted ORDER BY code, $tableId;";
+                $sql = "SELECT $tableId AS _val, CONCAT(code, ' - ', name) AS _opt FROM $table WHERE NOT is_deleted ORDER BY code, name, $tableId;";
                 break;
 
-            // "name (code)" sorted by name + ID:
+            // "name [alias] (code)" sorted by name + alias + code + ID:
             // $params keys that must be supplied: fk_entity_class
             //$ params keys that can be supplied: entity_type or entity_type_n (from 1 to n)
             case AppConsts::CC_ENTITY:
@@ -86,7 +94,7 @@ abstract class AppUtils
                 if (!empty($sqlType)) {
                     $sql .= "INNER JOIN " . AppConsts::$tables[AppConsts::CC_ENTITY_ENTITY_TYPE] . " AS et ON et.id_entity = e.id_entity AND et.id_entity_type IN (" . $sqlType . ") ";
                 }
-                $sql .= "WHERE NOT e.is_deleted AND e.fk_entity_class = " . strval($params["fk_entity_class"]) . " " . $sqlCorp . "ORDER BY e.name, e.code, e.$tableId;";
+                $sql .= "WHERE NOT e.is_deleted AND e.fk_entity_class = " . strval($params["fk_entity_class"]) . " " . $sqlCorp . "ORDER BY e.name, e.alias, e.code, e.$tableId;";
                 break;
 
             default:

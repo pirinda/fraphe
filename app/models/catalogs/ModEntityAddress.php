@@ -51,7 +51,7 @@ class ModEntityAddress extends FRegistry
         $this->city = new FItem(FItem::DATA_TYPE_STRING, "city", "Localidad", "", true);
         $this->county = new FItem(FItem::DATA_TYPE_STRING, "county", "Municipio", "", true);
         $this->state_region = new FItem(FItem::DATA_TYPE_STRING, "state_region", "Estado", "", true);
-        $this->country = new FItem(FItem::DATA_TYPE_STRING, "country", "País", "", true);
+        $this->country = new FItem(FItem::DATA_TYPE_STRING, "country", "País", "ISO 3166", true);
         $this->location = new FItem(FItem::DATA_TYPE_STRING, "location", "Ubicación", "latitud, longitud", false);
         $this->business_hr = new FItem(FItem::DATA_TYPE_STRING, "business_hr", "Horario atención", "", false);
         $this->notes = new FItem(FItem::DATA_TYPE_STRING, "notes", "Notas", "", false);

@@ -22,9 +22,11 @@ class ModTestProcessEntity extends FRelation
     protected $ts_user_ins;
     protected $ts_user_upd;
 
+    protected $dbmsFkProcessArea;
+
     function __construct()
     {
-        parent::__construct(AppConsts::OC_TEST_PROCESS_OPT);
+        parent::__construct(AppConsts::OC_TEST_PROCESS_ENTITY);
 
         $this->id_test = new FItem(FItem::DATA_TYPE_INT, "id_test", "ID ensayo", "", false, true);
         $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", "", false, true);
@@ -57,6 +59,11 @@ class ModTestProcessEntity extends FRelation
         $this->ids["id_entity"] = 0;
     }
 
+    public function getDbmsFkProcessArea()
+    {
+        return $this->dbmsFkProcessArea;
+    }
+
     public function retrieve(FUserSession $userSession, array $ids, int $mode)
     {
         $this->initialize();
@@ -87,6 +94,16 @@ class ModTestProcessEntity extends FRelation
         }
         else {
             throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
+        }
+
+        // read DBMS complementary data:
+        $sql = "SELECT fk_process_area FROM oc_test WHERE id_test = $id_test;";
+        $statement = $userSession->getPdo()->query($sql);
+        if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $this->dbmsFkProcessArea = intval($row["fk_process_area"]);
+        }
+        else {
+            throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_DEP_NOT_FOUND);
         }
     }
 
