@@ -32,9 +32,9 @@ echo '<body>';
 echo FAppNavbar::compose("catalogs");
 
 $userSession = FGuiUtils::createUserSession();
+$entity = new ModEntity();
 $entityClass = 0;   // ModUtils::ENTITY_CLASS_...: 1=company; 2=customer; 3=provider
 $entityNature = 0;  // ModUtils::ENTITY_NATURE_...: 1=person; 2=organization
-$entity;
 $entityTypes;
 $entitySamplingImage;
 $entityAddress;
@@ -55,9 +55,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $entityNature = intval($_GET["nature"]);
         }
 
-        // retrieve registry:
-
-        $entity = new ModEntity();
+        // read registry:
 
         if (!empty($_GET[FRegistry::ID])) {
             $entity->read($userSession, intval($_GET[FRegistry::ID]), FRegistry::MODE_WRITE);
@@ -77,7 +75,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $targetFile = "../../img/entity/" . $entity->composeTargetFileDefSamplingImage(1);
         }
         else {
-            // registry creation:
+            // registry creation to taylor entity object:
 
             $data = array();
             $data["fk_entity_class"] = $entityClass;
@@ -106,9 +104,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $entityNature = intval($_POST["nature"]);
         }
 
-        // retrieve registry:
-
-        $entity = new ModEntity();
+        // read registry:
 
         if (!empty($_POST[FRegistry::ID])) {
             $entity->read($userSession, intval($_POST[FRegistry::ID]), FRegistry::MODE_WRITE);

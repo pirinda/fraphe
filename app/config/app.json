@@ -1,7 +1,7 @@
 {
   "appName":"SYS 1.0",
   "appVendor":"Empresa",
-  "appMode":"PROD",
+  "appMode":"DEV",
   "appCatalogs":["catalogs"],
   "dbHost":"localhost",
   "dbPort":"3306",

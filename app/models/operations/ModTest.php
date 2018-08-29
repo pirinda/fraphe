@@ -83,27 +83,26 @@ class ModTest extends FRegistry
 
     public function setDefaultChildProcessEntity(ModTestProcessEntity $defaultProcessEntity)
     {
-        // clear is default flag in children:
+        // clear "is default" flag in children:
         foreach ($this->childProcessEntitys as $processEntity) {
             $processEntity->getItem("is_default")->setValue(false);
         }
 
-        // assure is default flag in supplied entity:
+        // assure "is default" flag is set in supplied entity:
         $defaultProcessEntity->getItem("is_default")->setValue(true);
 
-        // set default child:
+        // replace or append default child:
         $found = false;
         $len = count($this->childProcessEntitys);
-        for ($idx = 0; $idx < $len; $idx++) {
-            if ($this->childProcessEntitys[$idx]->getDatum("id_test") == $defaultProcessEntity->getDatum("id_test") &&
-            $this->childProcessEntitys[$idx]->getDatum("id_entity") == $defaultProcessEntity->getDatum("id_entity")) {
-                $this->childProcessEntitys[$idx] = $defaultProcessEntity;
+        for ($i = 0; $i < $len; $i++) {
+            if ($this->childProcessEntitys[$i]->compareIds($defaultProcessEntity->getIds())) {
+                $this->childProcessEntitys[$i] = $defaultProcessEntity; // replace
                 $found = true;
                 break;
             }
         }
         if (!$found) {
-            $this->childProcessEntitys[] = $defaultProcessEntity;
+            $this->childProcessEntitys[] = $defaultProcessEntity; // append
         }
     }
 

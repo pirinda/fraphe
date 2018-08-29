@@ -116,6 +116,28 @@ abstract class FRelation extends FRegistry
         throw new \Exception(__METHOD__ . ": La relación no tiene ID, sino un conjunto de IDs.");
     }
 
+    /* Compare relation IDs with supplied ones.
+     * Param $ids: associative array of relation IDs in the key=id format to be compared.
+     * Returns: true if supplied relation IDs are equal to this registry's.
+     * Throws: Exception if something fails.
+     */
+    public function compareIds(array $ids): bool
+    {
+        // validate keys:
+        foreach ($ids as $key => $id) {
+            $this->validateItemKey($key);
+            if (!is_int($id)) {
+                throw new \Exception(__METHOD__ . ": El ID '$key' debe ser número entero: $id es '" . gettype($id) . "'.");
+            }
+        }
+
+        if (count($this->ids) != count($ids)) {
+            throw new \Exception(__METHOD__ . ": El número de ID es distinta: este objeto tiene " . count($this->ids) . ", los suministrados son " . count($ids) . ".");
+        }
+
+        return empty(array_diff_assoc($this->ids, $ids)); // true when empty, that is, when no differences are found
+    }
+
     public function read(FUserSession $userSession, int $id, int $mode)
     {
         throw new \Exception(__METHOD__ . ": Método no disponible para relaciones.");
