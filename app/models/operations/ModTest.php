@@ -81,6 +81,46 @@ class ModTest extends FRegistry
         $this->childProcessEntitys = array();
     }
 
+    public function setDefaultChildProcessEntity(ModTestProcessEntity $defaultProcessEntity)
+    {
+        // clear is default flag in children:
+        foreach ($this->childProcessEntitys as $processEntity) {
+            $processEntity->getItem("is_default")->setValue(false);
+        }
+
+        // assure is default flag in supplied entity:
+        $defaultProcessEntity->getItem("is_default")->setValue(true);
+
+        // set default child:
+        $found = false;
+        $len = count($this->childProcessEntitys);
+        for ($idx = 0; $idx < $len; $idx++) {
+            if ($this->childProcessEntitys[$idx]->getDatum("id_test") == $defaultProcessEntity->getDatum("id_test") &&
+            $this->childProcessEntitys[$idx]->getDatum("id_entity") == $defaultProcessEntity->getDatum("id_entity")) {
+                $this->childProcessEntitys[$idx] = $defaultProcessEntity;
+                $found = true;
+                break;
+            }
+        }
+        if (!$found) {
+            $this->childProcessEntitys[] = $defaultProcessEntity;
+        }
+    }
+
+    public function getDefaultChildProcessEntity()
+    {
+        $defaultProcessEntity = null;
+
+        foreach ($this->childProcessEntitys as $processEntity) {
+            if ($processEntity->getDatum("is_default")) {
+                $defaultProcessEntity = $processEntity;
+                break;
+            }
+        }
+
+        return $defaultProcessEntity;
+    }
+
     public function validate(FUserSession $userSession)
     {
         // validate registry:

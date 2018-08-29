@@ -9,6 +9,8 @@ use app\AppConsts;
 
 class ModTestProcessEntity extends FRelation
 {
+    public const PREFIX = "process_entity_";
+
     protected $id_test;
     protected $id_entity;
     protected $process_days_min;

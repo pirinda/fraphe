@@ -89,7 +89,7 @@ abstract class AppUtils
                 }
 
 
-                $sql = "SELECT e.$tableId AS _val, CONCAT(e.name, IF(e.alias = '', '', CONCAT(', \"', e.alias, '\",')), ' (', e.code, ')') AS _opt ";
+                $sql = "SELECT e.$tableId AS _val, CONCAT(e.name, IF(e.alias = '', '', CONCAT(', ', e.alias, ',')), ' (', e.code, ')') AS _opt ";
                 $sql .= "FROM $table AS e ";
                 if (!empty($sqlType)) {
                     $sql .= "INNER JOIN " . AppConsts::$tables[AppConsts::CC_ENTITY_ENTITY_TYPE] . " AS et ON et.id_entity = e.id_entity AND et.id_entity_type IN (" . $sqlType . ") ";

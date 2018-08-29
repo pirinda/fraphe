@@ -155,7 +155,9 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         $data["is_person"] = $entityNature == ModUtils::ENTITY_NATURE_PER;
         $data["is_credit"] = empty($_POST["is_credit"]) ? false : boolval($_POST["is_credit"]);
         $data["credit_days"] = intval($_POST["credit_days"]);
-        $data["billing_prefs"] = $_POST["billing_prefs"];
+        if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
+            $data["billing_prefs"] = $_POST["billing_prefs"];
+        }
         $data["web_page"] = $_POST["web_page"];
         $data["notes"] = $_POST["notes"];
         $data["is_def_sampling_img"] = empty($_POST["is_def_sampling_img"]) ? false : boolval($_POST["is_def_sampling_img"]);
@@ -327,7 +329,11 @@ else {
 echo $entity->getItem("alias")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
 echo $entity->getItem("is_credit")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 12);
 echo $entity->getItem("credit_days")->composeHtmlInput(FItem::INPUT_NUMBER, 4, 4);
-echo $entity->getItem("billing_prefs")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
+
+if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
+    echo $entity->getItem("billing_prefs")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
+}
+
 echo $entity->getItem("web_page")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8);
 echo $entity->getItem("notes")->composeHtmlTextArea(4, 8, 1);
 
