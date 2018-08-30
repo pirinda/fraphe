@@ -52,12 +52,6 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
         if (!empty($_POST[FRegistry::ID])) {
             $test->read($userSession, intval($_POST[FRegistry::ID]), FRegistry::MODE_WRITE);
-            $testProcessEntity = $test->getDefaultChildProcessEntity();
-        }
-
-        if (!isset($testProcessEntity)) {
-            $testProcessEntity = new ModTestProcessEntity();
-            $test->setDefaultChildProcessEntity($testProcessEntity);
         }
 
         // recover registry data:
@@ -77,6 +71,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
         // default test process entity:
         $dataProcessEntity = array();
+        $dataProcessEntity["id_test"] = $test->getId();
         switch ($_POST[ModTestProcessEntity::PREFIX]) {
             case "company":
                 $dataProcessEntity["id_entity"] = 1;    // this company itself
@@ -92,24 +87,12 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         $dataProcessEntity["is_default"] = true;
 
         try {
-            foreach ($test->getChildProcessEntitys() as $processEntity) {
-                FDevUtils::printVar("original process entity", $processEntity->getData());
-            }
-            FDevUtils::printVar("original default test process entity", $testProcessEntity->getData());
-            FDevUtils::printVar("data for default test process entity", $dataProcessEntity);
+            $testProcessEntity = new ModTestProcessEntity();
             $testProcessEntity->setData($dataProcessEntity);
-            FDevUtils::printVar("new default test process entity", $testProcessEntity->getData());
-            foreach ($test->getChildProcessEntitys() as $processEntity) {
-                FDevUtils::printVar("original process entity after modification", $processEntity->getData());
-            }
             $test->setDefaultChildProcessEntity($testProcessEntity);
-            foreach ($test->getChildProcessEntitys() as $processEntity) {
-                FDevUtils::printVar("new process entity", $processEntity->getData());
-            }
-
             $test->setData($data);
             $test->save($userSession);
-            //header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/operations/view_test.php");
+            header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/operations/view_test.php");
         }
         catch (Exception $e) {
             $errmsg = $e->getMessage();

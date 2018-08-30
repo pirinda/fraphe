@@ -29,7 +29,7 @@ FROM cc_market_segment AS c
 INNER JOIN cc_user AS ui ON c.fk_user_ins = ui.id_user
 INNER JOIN cc_user AS uu ON c.fk_user_upd = uu.id_user
 WHERE NOT c.is_deleted
-ORDER BY c.name, c.id_market_segment;
+ORDER BY c.sorting, c.id_market_segment;
 SQL;
 
 echo '<table class="table table-striped">';

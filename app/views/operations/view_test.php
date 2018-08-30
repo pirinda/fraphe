@@ -25,23 +25,26 @@ echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/f
 $sql = <<<SQL
 SELECT c.name AS c_name, c.code AS c_code, c.id_test AS c_id,
 c.ts_user_ins AS c_ts_user_ins, c.ts_user_upd AS c_ts_user_upd,
+pa.code AS pa_code,
 sc.name AS sc_name,
 tm.name AS tm_name,
 taa.code AS taa_code,
 ui.name AS ui_name, uu.name AS uu_name
 FROM oc_test AS c
+INNER JOIN oc_process_area AS pa ON c.fk_process_area = pa.id_process_area
 INNER JOIN oc_sample_class AS sc ON c.fk_sample_class = sc.id_sample_class
 INNER JOIN oc_testing_method AS tm ON c.fk_testing_method = tm.id_testing_method
 INNER JOIN oc_test_acredit_attrib AS taa ON c.fk_test_acredit_attrib = taa.id_test_acredit_attrib
 INNER JOIN cc_user AS ui ON c.fk_user_ins = ui.id_user
 INNER JOIN cc_user AS uu ON c.fk_user_upd = uu.id_user
 WHERE NOT c.is_deleted
-ORDER BY c.name, c.id_test;
+ORDER BY pa.sorting, pa.id_process_area, c.name, c.code, c.id_test;
 SQL;
 
 echo '<table class="table table-striped">';
 echo '<thead>';
 echo '<tr>';
+echo '<th>Área proceso</th>';
 echo '<th>Nombre</th>';
 echo '<th>Código</th>';
 echo '<th>Clase muestra</th>';
@@ -59,6 +62,7 @@ echo '<tbody>';
 $pdo = FGuiUtils::createPdo();
 foreach ($pdo->query($sql) as $row) {
     echo '<tr>';
+    echo '<td>' . $row['pa_code'] . '</td>';
     echo '<td>' . $row['c_name'] . '</td>';
     echo '<td>' . $row['c_code'] . '</td>';
     echo '<td>' . $row['sc_name'] . '</td>';

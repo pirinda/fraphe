@@ -52,7 +52,7 @@
                         "href":"app/views.php?view=testPackage"
                     },
                     "testingMethod":{
-                        "submenu":"Métodos ensayos",
+                        "submenu":"Métodos ensayo",
                         "href":"app/views/operations/view_testing_method.php"
                     },
                     "samplingMethod":{
@@ -98,7 +98,7 @@
                 "href":"menu=recept",
                 "submenus":{
                     "recept":{
-                        "submenu":"Recepción",
+                        "submenu":"Recepciones muestras",
                         "href":"app/views/operations/view_recept.php"
                     }
                 }
