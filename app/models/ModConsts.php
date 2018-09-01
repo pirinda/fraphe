@@ -62,4 +62,48 @@ abstract class ModConsts
     public const CC_CONTACT_TYPE_MKT = 8;
     public const CC_CONTACT_TYPE_BILL = 9;
     public const CC_CONTACT_TYPE_COLL = 10;
+
+    public const CC_USER_ROLE_RECEPT = 1;
+    public const CC_USER_ROLE_SAMPLING = 2;
+    public const CC_USER_ROLE_PROCESS = 3;
+    public const CC_USER_ROLE_REPORT = 4;
+    public const CC_USER_ROLE_QUALITY = 5;
+    public const CC_USER_ROLE_MARKETING = 6;
+    public const CC_USER_ROLE_DIRECTION = 7;
+
+    public const CC_USER_ATTRIB_SIGN_SAMPLING = 1;
+    public const CC_USER_ATTRIB_SIGN_PROCESSING = 2;
+    
+    public const OC_SAMPLE_STATUS_SAMPLING = 1;
+    public const OC_SAMPLE_STATUS_RECEPT = 2;
+    public const OC_SAMPLE_STATUS_PROCESS = 3;
+    public const OC_SAMPLE_STATUS_PROCESSING = 4;
+    public const OC_SAMPLE_STATUS_GUARD = 5;
+    public const OC_SAMPLE_STATUS_DISCARTED = 6;
+    public const OC_SAMPLE_STATUS_CANCELLED = 9;
+
+    public const OC_RECEPT_STATUS_NEW = 1;
+    public const OC_RECEPT_STATUS_PROCESSING = 2;
+    public const OC_RECEPT_STATUS_CANCELLED = 9;
+
+    public const OC_JOB_STATUS_PENDING = 1;
+    public const OC_JOB_STATUS_PROCESSING = 2;
+    public const OC_JOB_STATUS_FINISHED = 3;
+    public const OC_JOB_STATUS_CANCELLED = 9;
+
+    public const OC_REPORT_DELIVERY_TYPE_E = 1;
+    public const OC_REPORT_DELIVERY_TYPE_E_PRINT_RECEPT = 2;
+    public const OC_REPORT_DELIVERY_TYPE_E_PRINT_PLACE = 3;
+    public const OC_REPORT_DELIVERY_TYPE_PRINT_RECEPT = 4;
+    public const OC_REPORT_DELIVERY_TYPE_PRINT_PLACE = 5;
+
+    public const OC_REPORT_STATUS_PENDING = 1;
+    public const OC_REPORT_STATUS_PROCESSING = 2;
+    public const OC_REPORT_STATUS_FINISHED = 3;
+    public const OC_REPORT_STATUS_VERIFIED = 4;
+    public const OC_REPORT_STATUS_VALIDATED = 5;
+    public const OC_REPORT_STATUS_RELEASED = 6;
+    public const OC_REPORT_STATUS_DELIVERED = 7;
+    public const OC_REPORT_STATUS_CANCELLED = 9;
+
 }

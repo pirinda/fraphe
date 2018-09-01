@@ -9,6 +9,7 @@ class FUserSession
     private $locTimeZone;
     private $curUser;
     private $curUserLoginTs;
+    private $companyBranch;
     private $pdo;
 
     public function __construct(FUser $curUser, \DateTime $curUserLoginTs, \PDO $pdo)
@@ -19,6 +20,7 @@ class FUserSession
         $this->locTimeZone = "America/Mexico_City";
         $this->curUser = $curUser;
         $this->curUserLoginTs = $curUserLoginTs;
+        $this->companyBranch = 1;
         $this->pdo = $pdo;
     }
 
@@ -50,6 +52,11 @@ class FUserSession
     public function getCurUserLoginTs(): \DateTime
     {
         return $this->curUserLoginTs;
+    }
+
+    public function getCompanyBranch(): int
+    {
+        return $this->companyBranch;
     }
 
     public function getPdo(): \PDO

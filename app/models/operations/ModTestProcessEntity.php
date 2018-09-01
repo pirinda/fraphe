@@ -32,8 +32,8 @@ class ModTestProcessEntity extends FRelation
 
         $this->id_test = new FItem(FItem::DATA_TYPE_INT, "id_test", "ID ensayo", "", false, true);
         $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", "", false, true);
-        $this->process_days_min = new FItem(FItem::DATA_TYPE_INT, "process_days_min", "Días mínimos proceso", "", true);
-        $this->process_days_max = new FItem(FItem::DATA_TYPE_INT, "process_days_max", "Días máximos proceso", "", true);
+        $this->process_days_min = new FItem(FItem::DATA_TYPE_INT, "process_days_min", "Días mínimos proceso", "", false);
+        $this->process_days_max = new FItem(FItem::DATA_TYPE_INT, "process_days_max", "Días máximos proceso", "", false);
         $this->cost = new FItem(FItem::DATA_TYPE_FLOAT, "cost", "Costo", "", false);
         $this->is_default = new FItem(FItem::DATA_TYPE_BOOL, "is_default", "Predeterminado", "", false);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);

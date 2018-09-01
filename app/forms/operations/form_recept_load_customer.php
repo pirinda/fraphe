@@ -1,11 +1,12 @@
 <?php
+//------------------------------------------------------------------------------
 // start session:
 if (!isset($_SESSION)) {
     session_start();
 }
-
 // bootstrap Fraphe:
 require $_SESSION["rootDir"] . "Fraphe" . DIRECTORY_SEPARATOR . "fraphe.php";
+//------------------------------------------------------------------------------
 
 use Fraphe\App\FGuiUtils;
 use Fraphe\Model\FRegistry;
@@ -50,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         $json .= '"contacts":"' . addslashes($contacts) . '", ';
 
         // get customers's corporate members:
-        $corpMembers = AppUtils::composeSelectOption();
+        $corpMembers = '';
         if ($entity->isChildEntityType(ModConsts::CC_ENTITY_TYPE_CUST_CORP)) {
             $params = array();
             $params["fk_entity_class"] = ModConsts::CC_ENTITY_CLASS_CUST;
@@ -59,6 +60,9 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
             foreach ($options as $option) {
                 $corpMembers .= $option;
             }
+        }
+        if (empty($corpMembers)) {
+            $corpMembers = AppUtils::composeSelectOption();
         }
         $json .= '"' . ModEntity::PARAM_CORP_MEMBERS . '":"' . addslashes($corpMembers) . '"';
     }

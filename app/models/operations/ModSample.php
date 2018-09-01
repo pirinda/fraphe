@@ -10,30 +10,32 @@ use app\AppConsts;
 class ModSample extends FRegistry
 {
     protected $id_sample;
-    protected $number;
-    protected $name;
-    protected $lot;
-    protected $date_manuf_n;
-    protected $date_sell_by_n;
-    protected $quantity_original;
-    protected $quantity;
+    protected $sample_num;
+    protected $sample_name;
+    protected $sample_lot;
+    protected $sample_date_mfg_n;
+    protected $sample_date_sell_by_n;
+    protected $sample_quantity;
+    protected $sample_quantity_orig;
+    protected $sample_child;
+    protected $sample_released;
     protected $is_sampling_company;
-    protected $sampling_guide;
-    protected $sampling_area;
     protected $sampling_datetime_n;
     protected $sampling_temperat_n;
+    protected $sampling_area;
+    protected $sampling_guide;
     protected $sampling_deviats;
     protected $sampling_notes;
     protected $sampling_imgs;
     protected $recept_sample;
     protected $recept_datetime_n;
     protected $recept_temperat_n;
-    protected $process_days;
-    protected $process_start_date;
-    protected $process_deadline;
     protected $recept_deviats;
     protected $recept_notes;
     protected $service_type;
+    protected $process_days;
+    protected $process_start_date;
+    protected $process_deadline;
     protected $is_customer_custom;
     protected $customer_name;
     protected $customer_street;
@@ -49,8 +51,6 @@ class ModSample extends FRegistry
     protected $ref_chain_custody;
     protected $ref_request;
     protected $ref_agreet;
-    protected $sample_child;
-    protected $sample_released;
     protected $is_system;
     protected $is_deleted;
     protected $fk_company_branch;
@@ -88,30 +88,32 @@ class ModSample extends FRegistry
         parent::__construct(AppConsts::O_SAMPLE, AppConsts::$tableIds[AppConsts::O_SAMPLE]);
 
         $this->id_sample = new FItem(FItem::DATA_TYPE_INT, "id_sample", "ID muestra", "", false, true);
-        $this->number = new FItem(FItem::DATA_TYPE_STRING, "number", "Folio muestra", "", true);
-        $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre muestra", "", true);
-        $this->lot = new FItem(FItem::DATA_TYPE_STRING, "lot", "Lote muestra", "", false);
-        $this->date_manuf_n = new FItem(FItem::DATA_TYPE_DATE, "date_manuf_n", "Fecha producción", "", false);
-        $this->date_sell_by_n = new FItem(FItem::DATA_TYPE_DATE, "date_sell_by_n", "Fecha caducidad", "", false);
-        $this->quantity_original = new FItem(FItem::DATA_TYPE_FLOAT, "quantity_original", "Cantidad muestra original", "", true);
-        $this->quantity = new FItem(FItem::DATA_TYPE_FLOAT, "quantity", "Cantidad muestra", "", true);
+        $this->sample_num = new FItem(FItem::DATA_TYPE_STRING, "sample_num", "Folio muestra", "", true);
+        $this->sample_name = new FItem(FItem::DATA_TYPE_STRING, "sample_name", "Nombre muestra", "", true);
+        $this->sample_lot = new FItem(FItem::DATA_TYPE_STRING, "sample_lot", "Lote muestra", "", false);
+        $this->sample_date_mfg_n = new FItem(FItem::DATA_TYPE_DATE, "sample_date_mfg_n", "Fecha producción", "", false);
+        $this->sample_date_sell_by_n = new FItem(FItem::DATA_TYPE_DATE, "sample_date_sell_by_n", "Fecha caducidad", "", false);
+        $this->sample_quantity = new FItem(FItem::DATA_TYPE_FLOAT, "sample_quantity", "Cantidad muestra", "", true);
+        $this->sample_quantity_orig = new FItem(FItem::DATA_TYPE_FLOAT, "sample_quantity_orig", "Cantidad muestra original", "", true);
+        $this->sample_child = new FItem(FItem::DATA_TYPE_INT, "sample_child", "Núm. muestra hijo", "", true);
+        $this->sample_released = new FItem(FItem::DATA_TYPE_STRING, "sample_released", "Muestra liberada", "", false);
         $this->is_sampling_company = new FItem(FItem::DATA_TYPE_INT, "is_sampling_company", "Muestreo propio", "", true);
-        $this->sampling_guide = new FItem(FItem::DATA_TYPE_INT, "sampling_guide", "Núm. guía muestreo", "", false);
-        $this->sampling_area = new FItem(FItem::DATA_TYPE_STRING, "sampling_area", "Área muestreo", "", false);
         $this->sampling_datetime_n = new FItem(FItem::DATA_TYPE_DATETIME, "sampling_datetime_n", "Fecha-hora muestreo", "", false);
         $this->sampling_temperat_n = new FItem(FItem::DATA_TYPE_FLOAT, "sampling_temperat_n", "Temp. muestreo °C", "", false);
+        $this->sampling_area = new FItem(FItem::DATA_TYPE_STRING, "sampling_area", "Área muestreo", "", false);
+        $this->sampling_guide = new FItem(FItem::DATA_TYPE_INT, "sampling_guide", "Núm. guía muestreo", "", false);
         $this->sampling_deviats = new FItem(FItem::DATA_TYPE_STRING, "sampling_deviats", "Desviaciones muestreo", "", false);
         $this->sampling_notes = new FItem(FItem::DATA_TYPE_STRING, "sampling_notes", "Observaciones muestreo", "", false);
         $this->sampling_imgs = new FItem(FItem::DATA_TYPE_INT, "sampling_imgs", "Imágenes muestreo", "", true);
         $this->recept_sample = new FItem(FItem::DATA_TYPE_INT, "recept_sample", "Núm. muestra recepción", "", true);
         $this->recept_datetime_n = new FItem(FItem::DATA_TYPE_DATETIME, "recept_datetime_n", "Fecha-hora recepción", "", false);
         $this->recept_temperat_n = new FItem(FItem::DATA_TYPE_FLOAT, "recept_temperat_n", "Temp. recepción °C", "", false);
-        $this->process_days = new FItem(FItem::DATA_TYPE_INT, "process_days", "Días proceso", "", true);
-        $this->process_start_date = new FItem(FItem::DATA_TYPE_DATE, "process_start_date", "Fecha inicio proceso", "", true);
-        $this->process_deadline = new FItem(FItem::DATA_TYPE_DATE, "process_deadline", "Fecha límite proceso", "", true);
         $this->recept_deviats = new FItem(FItem::DATA_TYPE_STRING, "recept_deviats", "Desviaciones recepción", "", false);
         $this->recept_notes = new FItem(FItem::DATA_TYPE_STRING, "recept_notes", "Observaciones recepción", "", false);
         $this->service_type = new FItem(FItem::DATA_TYPE_STRING, "service_type", "Tipo servicio", "", true);
+        $this->process_days = new FItem(FItem::DATA_TYPE_INT, "process_days", "Días proceso", "", false);
+        $this->process_start_date = new FItem(FItem::DATA_TYPE_DATE, "process_start_date", "Fecha inicio proceso", "", true);
+        $this->process_deadline = new FItem(FItem::DATA_TYPE_DATE, "process_deadline", "Fecha límite proceso", "", true);
         $this->is_customer_custom = new FItem(FItem::DATA_TYPE_BOOL, "is_customer_custom", "Cliente personalizado", "", false);
         $this->customer_name = new FItem(FItem::DATA_TYPE_STRING, "customer_name", "Nombre cliente", "", false);
         $this->customer_street = new FItem(FItem::DATA_TYPE_STRING, "customer_street", "Calle y número", "", false);
@@ -127,8 +129,6 @@ class ModSample extends FRegistry
         $this->ref_chain_custody = new FItem(FItem::DATA_TYPE_STRING, "ref_chain_custody", "Ref. cadena custodia", "", false);
         $this->ref_request = new FItem(FItem::DATA_TYPE_STRING, "ref_request", "Ref. solicitud ensayos", "", false);
         $this->ref_agreet = new FItem(FItem::DATA_TYPE_STRING, "ref_agreet", "Ref. convenio ensayos", "", false);
-        $this->sample_child = new FItem(FItem::DATA_TYPE_INT, "sample_child", "Núm. muestra hijo", "", true);
-        $this->sample_released = new FItem(FItem::DATA_TYPE_STRING, "sample_released", "Muestra liberada", "", false);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
         $this->fk_company_branch = new FItem(FItem::DATA_TYPE_INT, "fk_company_branch", "Sucursal empresa", "", true);
@@ -156,30 +156,32 @@ class ModSample extends FRegistry
         $this->ts_user_upd = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_upd", "Modificado", "", false);
 
         $this->items["id_sample"] = $this->id_sample;
-        $this->items["number"] = $this->number;
-        $this->items["name"] = $this->name;
-        $this->items["lot"] = $this->lot;
-        $this->items["date_manuf_n"] = $this->date_manuf_n;
-        $this->items["date_sell_by_n"] = $this->date_sell_by_n;
-        $this->items["quantity_original"] = $this->quantity_original;
-        $this->items["quantity"] = $this->quantity;
+        $this->items["sample_num"] = $this->sample_num;
+        $this->items["sample_name"] = $this->sample_name;
+        $this->items["sample_lot"] = $this->sample_lot;
+        $this->items["sample_date_mfg_n"] = $this->sample_date_mfg_n;
+        $this->items["sample_date_sell_by_n"] = $this->sample_date_sell_by_n;
+        $this->items["sample_quantity"] = $this->sample_quantity;
+        $this->items["sample_quantity_orig"] = $this->sample_quantity_orig;
+        $this->items["sample_child"] = $this->sample_child;
+        $this->items["sample_released"] = $this->sample_released;
         $this->items["is_sampling_company"] = $this->is_sampling_company;
-        $this->items["sampling_guide"] = $this->sampling_guide;
-        $this->items["sampling_area"] = $this->sampling_area;
         $this->items["sampling_datetime_n"] = $this->sampling_datetime_n;
         $this->items["sampling_temperat_n"] = $this->sampling_temperat_n;
+        $this->items["sampling_area"] = $this->sampling_area;
+        $this->items["sampling_guide"] = $this->sampling_guide;
         $this->items["sampling_deviats"] = $this->sampling_deviats;
         $this->items["sampling_notes"] = $this->sampling_notes;
         $this->items["sampling_imgs"] = $this->sampling_imgs;
         $this->items["recept_sample"] = $this->recept_sample;
         $this->items["recept_datetime_n"] = $this->recept_datetime_n;
         $this->items["recept_temperat_n"] = $this->recept_temperat_n;
-        $this->items["process_days"] = $this->process_days;
-        $this->items["process_start_date"] = $this->process_start_date;
-        $this->items["process_deadline"] = $this->process_deadline;
         $this->items["recept_deviats"] = $this->recept_deviats;
         $this->items["recept_notes"] = $this->recept_notes;
         $this->items["service_type"] = $this->service_type;
+        $this->items["process_days"] = $this->process_days;
+        $this->items["process_start_date"] = $this->process_start_date;
+        $this->items["process_deadline"] = $this->process_deadline;
         $this->items["is_customer_custom"] = $this->is_customer_custom;
         $this->items["customer_name"] = $this->customer_name;
         $this->items["customer_street"] = $this->customer_street;
@@ -195,8 +197,6 @@ class ModSample extends FRegistry
         $this->items["ref_chain_custody"] = $this->ref_chain_custody;
         $this->items["ref_request"] = $this->ref_request;
         $this->items["ref_agreet"] = $this->ref_agreet;
-        $this->items["sample_child"] = $this->sample_child;
-        $this->items["sample_released"] = $this->sample_released;
         $this->items["is_system"] = $this->is_system;
         $this->items["is_deleted"] = $this->is_deleted;
         $this->items["fk_company_branch"] = $this->fk_company_branch;
@@ -223,9 +223,10 @@ class ModSample extends FRegistry
         $this->items["ts_user_ins"] = $this->ts_user_ins;
         $this->items["ts_user_upd"] = $this->ts_user_upd;
 
-        $this->number->setRangeLength(1, 25);
-        $this->name->setRangeLength(1, 100);
-        $this->lot->setRangeLength(0, 50);
+        $this->sample_num->setRangeLength(1, 25);
+        $this->sample_name->setRangeLength(1, 100);
+        $this->sample_lot->setRangeLength(0, 50);
+        $this->sample_released->setRangeLength(0, 1);
         $this->sampling_area->setRangeLength(1, 100);
         $this->sampling_deviats->setRangeLength(0, 500);
         $this->sampling_notes->setRangeLength(0, 500);
@@ -245,7 +246,6 @@ class ModSample extends FRegistry
         $this->ref_chain_custody->setRangeLength(0, 25);
         $this->ref_request->setRangeLength(0, 25);
         $this->ref_agreet->setRangeLength(0, 25);
-        $this->sample_released->setRangeLength(0, 1);
 
         $this->clearChildTests();
         $this->clearChildStatusLogs();
@@ -255,16 +255,6 @@ class ModSample extends FRegistry
     public function setParentRecept(ModRecept $recept)
     {
         $this->parentRecept = $recept;
-    }
-
-    public function setProcessStartDate(int $startDate)
-    {
-        $this->process_start_date->setValue($startDate);
-
-        // propagate process start date:
-        foreach ($this->childTests as $test) {
-            $test->getItem("process_start_date")->setValue($startDate);
-        }
     }
 
     protected function validateParentRecept() {
@@ -280,14 +270,24 @@ class ModSample extends FRegistry
         $nf = new \NumberFormatter($userSession->getLocLang(), \NumberFormatter::PATTERN_DECIMAL);
         $nf->setAttribute(\NumberFormatter::MIN_INTEGER_DIGITS, 3); // TODO: paremeterize this formatting argument: 4!
 
-        return $this->parentRecept->getDatum("number") . "-" . $nf->format($this->recept_sample->getValue());
+        return $this->parentRecept->getDatum("recept_num") . "-" . $nf->format($this->recept_sample->getValue());
+    }
+
+    public function setProcessStartDate(int $startDate)
+    {
+        $this->process_start_date->setValue($startDate);
+
+        // propagate process start date:
+        foreach ($this->childTests as $test) {
+            $test->getItem("process_start_date")->setValue($startDate);
+        }
     }
 
     public function computeProcessDays()
     {
         $maxDays = 0;
-        $minStartDate; // unset
-        $maxDeadline = 0;
+        $minStartDate = $this->process_start_date->getValue();  // must be already set
+        $maxDeadline = $this->process_start_date->getValue();   // must be already set
 
         foreach ($this->childTests as $test) {
             $test->computeProcessDays();
@@ -387,30 +387,32 @@ class ModSample extends FRegistry
             $this->id = intval($row["id_sample"]);
 
             $this->id_sample->setValue($row["id_sample"]);
-            $this->number->setValue($row["number"]);
-            $this->name->setValue($row["name"]);
-            $this->lot->setValue($row["lot"]);
-            $this->date_manuf_n->setValue($row["date_manuf_n"]);
-            $this->date_sell_by_n->setValue($row["date_sell_by_n"]);
-            $this->quantity_original->setValue($row["quantity_original"]);
-            $this->quantity->setValue($row["quantity"]);
+            $this->sample_num->setValue($row["sample_num"]);
+            $this->sample_name->setValue($row["sample_name"]);
+            $this->sample_lot->setValue($row["sample_lot"]);
+            $this->sample_date_mfg_n->setValue($row["sample_date_mfg_n"]);
+            $this->sample_date_sell_by_n->setValue($row["sample_date_sell_by_n"]);
+            $this->sample_quantity->setValue($row["sample_quantity"]);
+            $this->sample_quantity_orig->setValue($row["sample_quantity_orig"]);
+            $this->sample_child->setValue($row["sample_child"]);
+            $this->sample_released->setValue($row["sample_released"]);
             $this->is_sampling_company->setValue($row["is_sampling_company"]);
-            $this->sampling_guide->setValue($row["sampling_guide"]);
-            $this->sampling_area->setValue($row["sampling_area"]);
             $this->sampling_datetime_n->setValue($row["sampling_datetime_n"]);
             $this->sampling_temperat_n->setValue($row["sampling_temperat_n"]);
+            $this->sampling_area->setValue($row["sampling_area"]);
+            $this->sampling_guide->setValue($row["sampling_guide"]);
             $this->sampling_deviats->setValue($row["sampling_deviats"]);
             $this->sampling_notes->setValue($row["sampling_notes"]);
             $this->sampling_imgs->setValue($row["sampling_imgs"]);
             $this->recept_sample->setValue($row["recept_sample"]);
             $this->recept_datetime_n->setValue($row["recept_datetime_n"]);
             $this->recept_temperat_n->setValue($row["recept_temperat_n"]);
-            $this->process_days->setValue($row["process_days"]);
-            $this->process_start_date->setValue($row["process_start_date"]);
-            $this->process_deadline->setValue($row["process_deadline"]);
             $this->recept_deviats->setValue($row["recept_deviats"]);
             $this->recept_notes->setValue($row["recept_notes"]);
             $this->service_type->setValue($row["service_type"]);
+            $this->process_days->setValue($row["process_days"]);
+            $this->process_start_date->setValue($row["process_start_date"]);
+            $this->process_deadline->setValue($row["process_deadline"]);
             $this->is_customer_custom->setValue($row["is_customer_custom"]);
             $this->customer_name->setValue($row["customer_name"]);
             $this->customer_street->setValue($row["customer_street"]);
@@ -426,8 +428,6 @@ class ModSample extends FRegistry
             $this->ref_chain_custody->setValue($row["ref_chain_custody"]);
             $this->ref_request->setValue($row["ref_request"]);
             $this->ref_agreet->setValue($row["ref_agreet"]);
-            $this->sample_child->setValue($row["sample_child"]);
-            $this->sample_released->setValue($row["sample_released"]);
             $this->is_system->setValue($row["is_system"]);
             $this->is_deleted->setValue($row["is_deleted"]);
             $this->fk_company_branch->setValue($row["fk_company_branch"]);
@@ -506,30 +506,32 @@ class ModSample extends FRegistry
         if ($this->isRegistryNew) {
             $statement = $userSession->getPdo()->prepare("INSERT INTO o_sample (" .
                 "id_sample, " .
-                "number, " .
-                "name, " .
-                "lot, " .
-                "date_manuf_n, " .
-                "date_sell_by_n, " .
-                "quantity_original, " .
-                "quantity, " .
+                "sample_num, " .
+                "sample_name, " .
+                "sample_lot, " .
+                "sample_date_mfg_n, " .
+                "sample_date_sell_by_n, " .
+                "sample_quantity, " .
+                "sample_quantity_orig, " .
+                "sample_child, " .
+                "sample_released, " .
                 "is_sampling_company, " .
-                "sampling_guide, " .
-                "sampling_area, " .
                 "sampling_datetime_n, " .
                 "sampling_temperat_n, " .
+                "sampling_area, " .
+                "sampling_guide, " .
                 "sampling_deviats, " .
                 "sampling_notes, " .
                 "sampling_imgs, " .
                 "recept_sample, " .
                 "recept_datetime_n, " .
                 "recept_temperat_n, " .
-                "process_days, " .
-                "process_start_date, " .
-                "process_deadline, " .
                 "recept_deviats, " .
                 "recept_notes, " .
                 "service_type, " .
+                "process_days, " .
+                "process_start_date, " .
+                "process_deadline, " .
                 "is_customer_custom, " .
                 "customer_name, " .
                 "customer_street, " .
@@ -545,8 +547,6 @@ class ModSample extends FRegistry
                 "ref_chain_custody, " .
                 "ref_request, " .
                 "ref_agreet, " .
-                "sample_child, " .
-                "sample_released, " .
                 "is_system, " .
                 "is_deleted, " .
                 "fk_company_branch, " .
@@ -574,30 +574,32 @@ class ModSample extends FRegistry
                 "ts_user_upd) " .
                 "VALUES (" .
                 "0, " .
-                ":number, " .
-                ":name, " .
-                ":lot, " .
-                ":date_manuf_n, " .
-                ":date_sell_by_n, " .
-                ":quantity_original, " .
-                ":quantity, " .
+                ":sample_num, " .
+                ":sample_name, " .
+                ":sample_lot, " .
+                ":sample_date_mfg_n, " .
+                ":sample_date_sell_by_n, " .
+                ":sample_quantity, " .
+                ":sample_quantity_orig, " .
+                ":sample_child, " .
+                ":sample_released, " .
                 ":is_sampling_company, " .
-                ":sampling_guide, " .
-                ":sampling_area, " .
                 ":sampling_datetime_n, " .
                 ":sampling_temperat_n, " .
+                ":sampling_area, " .
+                ":sampling_guide, " .
                 ":sampling_deviats, " .
                 ":sampling_notes, " .
                 ":sampling_imgs, " .
                 ":recept_sample, " .
                 ":recept_datetime_n, " .
                 ":recept_temperat_n, " .
-                ":process_days, " .
-                ":process_start_date, " .
-                ":process_deadline, " .
                 ":recept_deviats, " .
                 ":recept_notes, " .
                 ":service_type, " .
+                ":process_days, " .
+                ":process_start_date, " .
+                ":process_deadline, " .
                 ":is_customer_custom, " .
                 ":customer_name, " .
                 ":customer_street, " .
@@ -613,8 +615,6 @@ class ModSample extends FRegistry
                 ":ref_chain_custody, " .
                 ":ref_request, " .
                 ":ref_agreet, " .
-                ":sample_child, " .
-                ":sample_released, " .
                 ":is_system, " .
                 ":is_deleted, " .
                 ":fk_company_branch, " .
@@ -643,30 +643,32 @@ class ModSample extends FRegistry
         }
         else {
             $statement = $userSession->getPdo()->prepare("UPDATE o_sample SET " .
-                "number = :number, " .
-                "name = :name, " .
-                "lot = :lot, " .
-                "date_manuf_n = :date_manuf_n, " .
-                "date_sell_by_n = :date_sell_by_n, " .
-                "quantity_original = :quantity_original, " .
-                "quantity = :quantity, " .
+                "sample_num = :sample_num, " .
+                "sample_name = :sample_name, " .
+                "sample_lot = :sample_lot, " .
+                "sample_date_mfg_n = :sample_date_mfg_n, " .
+                "sample_date_sell_by_n = :sample_date_sell_by_n, " .
+                "sample_quantity = :sample_quantity, " .
+                "sample_quantity_orig = :sample_quantity_orig, " .
+                "sample_child = :sample_child, " .
+                "sample_released = :sample_released, " .
                 "is_sampling_company = :is_sampling_company, " .
-                "sampling_guide = :sampling_guide, " .
-                "sampling_area = :sampling_area, " .
                 "sampling_datetime_n = :sampling_datetime_n, " .
                 "sampling_temperat_n = :sampling_temperat_n, " .
+                "sampling_area = :sampling_area, " .
+                "sampling_guide = :sampling_guide, " .
                 "sampling_deviats = :sampling_deviats, " .
                 "sampling_notes = :sampling_notes, " .
                 "sampling_imgs = :sampling_imgs, " .
                 "recept_sample = :recept_sample, " .
                 "recept_datetime_n = :recept_datetime_n, " .
                 "recept_temperat_n = :recept_temperat_n, " .
-                "process_days = :process_days, " .
-                "process_start_date = :process_start_date, " .
-                "process_deadline = :process_deadline, " .
                 "recept_deviats = :recept_deviats, " .
                 "recept_notes = :recept_notes, " .
                 "service_type = :service_type, " .
+                "process_days = :process_days, " .
+                "process_start_date = :process_start_date, " .
+                "process_deadline = :process_deadline, " .
                 "is_customer_custom = :is_customer_custom, " .
                 "customer_name = :customer_name, " .
                 "customer_street = :customer_street, " .
@@ -682,8 +684,6 @@ class ModSample extends FRegistry
                 "ref_chain_custody = :ref_chain_custody, " .
                 "ref_request = :ref_request, " .
                 "ref_agreet = :ref_agreet, " .
-                "sample_child = :sample_child, " .
-                "sample_released = :sample_released, " .
                 "is_system = :is_system, " .
                 "is_deleted = :is_deleted, " .
                 "fk_company_branch = :fk_company_branch, " .
@@ -713,30 +713,32 @@ class ModSample extends FRegistry
         }
 
         //$id_sample = $this->id_sample->getValue();
-        $number = $this->number->getValue();
-        $name = $this->name->getValue();
-        $lot = $this->lot->getValue();
-        $date_manuf_n = FUtils::formatDbmsDate($this->date_manuf_n->getValue());
-        $date_sell_by_n = FUtils::formatDbmsDate($this->date_sell_by_n->getValue());
-        $quantity_original = $this->quantity_original->getValue();
-        $quantity = $this->quantity->getValue();
+        $sample_num = $this->sample_num->getValue();
+        $sample_name = $this->sample_name->getValue();
+        $sample_lot = $this->sample_lot->getValue();
+        $sample_date_mfg_n = FUtils::formatDbmsDate($this->sample_date_mfg_n->getValue());
+        $sample_date_sell_by_n = FUtils::formatDbmsDate($this->sample_date_sell_by_n->getValue());
+        $sample_quantity = $this->sample_quantity->getValue();
+        $sample_quantity_orig = $this->sample_quantity_orig->getValue();
+        $sample_child = $this->sample_child->getValue();
+        $sample_released = $this->sample_released->getValue();
         $is_sampling_company = $this->is_sampling_company->getValue();
-        $sampling_guide = $this->sampling_guide->getValue();
-        $sampling_area = $this->sampling_area->getValue();
         $sampling_datetime_n = FUtils::formatDbmsDatetime($this->sampling_datetime_n->getValue());
         $sampling_temperat_n = $this->sampling_temperat_n->getValue();
+        $sampling_area = $this->sampling_area->getValue();
+        $sampling_guide = $this->sampling_guide->getValue();
         $sampling_deviats = $this->sampling_deviats->getValue();
         $sampling_notes = $this->sampling_notes->getValue();
         $sampling_imgs = $this->sampling_imgs->getValue();
         $recept_sample = $this->recept_sample->getValue();
         $recept_datetime_n = FUtils::formatDbmsDatetime($this->recept_datetime_n->getValue());
         $recept_temperat_n = $this->recept_temperat_n->getValue();
-        $process_days = $this->process_days->getValue();
-        $process_start_date = FUtils::formatDbmsDate($this->process_start_date->getValue());
-        $process_deadline = FUtils::formatDbmsDate($this->process_deadline->getValue());
         $recept_deviats = $this->recept_deviats->getValue();
         $recept_notes = $this->recept_notes->getValue();
         $service_type = $this->service_type->getValue();
+        $process_days = $this->process_days->getValue();
+        $process_start_date = FUtils::formatDbmsDate($this->process_start_date->getValue());
+        $process_deadline = FUtils::formatDbmsDate($this->process_deadline->getValue());
         $is_customer_custom = $this->is_customer_custom->getValue();
         $customer_name = $this->customer_name->getValue();
         $customer_street = $this->customer_street->getValue();
@@ -752,8 +754,6 @@ class ModSample extends FRegistry
         $ref_chain_custody = $this->ref_chain_custody->getValue();
         $ref_request = $this->ref_request->getValue();
         $ref_agreet = $this->ref_agreet->getValue();
-        $sample_child = $this->sample_child->getValue();
-        $sample_released = $this->sample_released->getValue();
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();
         $fk_company_branch = $this->fk_company_branch->getValue();
@@ -783,26 +783,26 @@ class ModSample extends FRegistry
         $fk_user = $userSession->getCurUser()->getId();
 
         //$statement->bindParam(":id_sample", $id_sample, \PDO::PARAM_INT);
-        $statement->bindParam(":number", $number);
-        $statement->bindParam(":name", $name);
-        $statement->bindParam(":lot", $lot);
-        if (empty($date_manuf_n)) {
-            $statement->bindValue(":date_manuf_n", null, \PDO::PARAM_NULL);
+        $statement->bindParam(":sample_num", $sample_num);
+        $statement->bindParam(":sample_name", $sample_name);
+        $statement->bindParam(":sample_lot", $sample_lot);
+        if (empty($sample_date_mfg_n)) {
+            $statement->bindValue(":sample_date_mfg_n", null, \PDO::PARAM_NULL);
         }
         else {
-            $statement->bindParam(":date_manuf_n", $date_manuf_n);
+            $statement->bindParam(":sample_date_mfg_n", $sample_date_mfg_n);
         }
-        if (empty($date_sell_by_n)) {
-            $statement->bindValue(":date_sell_by_n", null, \PDO::PARAM_NULL);
+        if (empty($sample_date_sell_by_n)) {
+            $statement->bindValue(":sample_date_sell_by_n", null, \PDO::PARAM_NULL);
         }
         else {
-            $statement->bindParam(":date_sell_by_n", $date_sell_by_n);
+            $statement->bindParam(":sample_date_sell_by_n", $sample_date_sell_by_n);
         }
-        $statement->bindParam(":quantity_original", $quantity_original);
-        $statement->bindParam(":quantity", $quantity);
+        $statement->bindParam(":sample_quantity", $sample_quantity);
+        $statement->bindParam(":sample_quantity_orig", $sample_quantity_orig);
+        $statement->bindParam(":sample_child", $sample_child, \PDO::PARAM_INT);
+        $statement->bindParam(":sample_released", $sample_released);
         $statement->bindParam(":is_sampling_company", $is_sampling_company, \PDO::PARAM_INT);
-        $statement->bindParam(":sampling_guide", $sampling_guide, \PDO::PARAM_INT);
-        $statement->bindParam(":sampling_area", $sampling_area);
         if (empty($sampling_datetime_n)) {
             $statement->bindValue(":sampling_datetime_n", null, \PDO::PARAM_NULL);
         }
@@ -815,6 +815,8 @@ class ModSample extends FRegistry
         else {
             $statement->bindParam(":sampling_temperat_n", $sampling_temperat_n);
         }
+        $statement->bindParam(":sampling_area", $sampling_area);
+        $statement->bindParam(":sampling_guide", $sampling_guide, \PDO::PARAM_INT);
         $statement->bindParam(":sampling_deviats", $sampling_deviats);
         $statement->bindParam(":sampling_notes", $sampling_notes);
         $statement->bindParam(":sampling_imgs", $sampling_imgs, \PDO::PARAM_INT);
@@ -831,12 +833,12 @@ class ModSample extends FRegistry
         else {
             $statement->bindParam(":recept_temperat_n", $recept_temperat_n);
         }
-        $statement->bindParam(":process_days", $process_days, \PDO::PARAM_INT);
-        $statement->bindParam(":process_start_date", $process_start_date);
-        $statement->bindParam(":process_deadline", $process_deadline);
         $statement->bindParam(":recept_deviats", $recept_deviats);
         $statement->bindParam(":recept_notes", $recept_notes);
         $statement->bindParam(":service_type", $service_type);
+        $statement->bindParam(":process_days", $process_days, \PDO::PARAM_INT);
+        $statement->bindParam(":process_start_date", $process_start_date);
+        $statement->bindParam(":process_deadline", $process_deadline);
         $statement->bindParam(":is_customer_custom", $is_customer_custom, \PDO::PARAM_BOOL);
         $statement->bindParam(":customer_name", $customer_name);
         $statement->bindParam(":customer_street", $customer_street);
@@ -852,8 +854,6 @@ class ModSample extends FRegistry
         $statement->bindParam(":ref_chain_custody", $ref_chain_custody);
         $statement->bindParam(":ref_request", $ref_request);
         $statement->bindParam(":ref_agreet", $ref_agreet);
-        $statement->bindParam(":sample_child", $sample_child, \PDO::PARAM_INT);
-        $statement->bindParam(":sample_released", $sample_released);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
         $statement->bindParam(":fk_company_branch", $fk_company_branch, \PDO::PARAM_INT);
@@ -875,7 +875,12 @@ class ModSample extends FRegistry
         $statement->bindParam(":fk_sample_class", $fk_sample_class, \PDO::PARAM_INT);
         $statement->bindParam(":fk_sample_type", $fk_sample_type, \PDO::PARAM_INT);
         $statement->bindParam(":fk_sample_status", $fk_sample_status, \PDO::PARAM_INT);
-        $statement->bindParam(":nk_sample_parent", $nk_sample_parent, \PDO::PARAM_INT);
+        if (empty($nk_sample_parent)) {
+            $statement->bindValue(":nk_sample_parent", null, \PDO::PARAM_NULL);
+        }
+        else {
+            $statement->bindParam(":nk_sample_parent", $nk_sample_parent, \PDO::PARAM_INT);
+        }
         $statement->bindParam(":fk_container_type", $fk_container_type, \PDO::PARAM_INT);
         $statement->bindParam(":fk_container_unit", $fk_container_unit, \PDO::PARAM_INT);
         $statement->bindParam(":fk_sampling_method", $fk_sampling_method, \PDO::PARAM_INT);

@@ -1,11 +1,12 @@
 <?php
+//------------------------------------------------------------------------------
 // start session:
 if (!isset($_SESSION)) {
     session_start();
 }
-
 // bootstrap Fraphe:
 require $_SESSION["rootDir"] . "Fraphe" . DIRECTORY_SEPARATOR . "fraphe.php";
+//------------------------------------------------------------------------------
 
 use Fraphe\App\FApp;
 use Fraphe\App\FAppConsts;
@@ -161,11 +162,11 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         //$data["is_deleted"] = $_POST["is_deleted"];
         $data["fk_entity_class"] = $entityClass;
         if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
-            $data["nk_market_segment"] = $_POST["nk_market_segment"];
-            $data["nk_entity_parent"] = $_POST["nk_entity_parent"];
-            $data["nk_entity_billing"] = $_POST["nk_entity_billing"];
-            $data["nk_entity_agent"] = $_POST["nk_entity_agent"];
-            $data["nk_report_delivery_type"] = $_POST["nk_report_delivery_type"];
+            $data["nk_market_segment"] = intval($_POST["nk_market_segment"]);
+            $data["nk_entity_parent"] = intval($_POST["nk_entity_parent"]);
+            $data["nk_entity_billing"] = intval($_POST["nk_entity_billing"]);
+            $data["nk_entity_agent"] = intval($_POST["nk_entity_agent"]);
+            $data["nk_report_delivery_type"] = intval($_POST["nk_report_delivery_type"]);
         }
 
         // entity types:
@@ -249,7 +250,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             foreach ($dataContacts as $dataContact) {
                 $contact = new ModContact();
                 $contact->setData($dataContact);
-                $entityAddress->getChildContacts()[0] = $contact;
+                $entityAddress->getChildContacts()[] = $contact;
             }
 
             $entity->setData($data);
@@ -508,9 +509,9 @@ for ($panel = 1; $panel <= 2; $panel++) {
         echo $contact->getItem("forename")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, $prefix);
         echo $contact->getItem("prefix")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4, $prefix);
         echo $contact->getItem("job")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, $prefix);
-        echo $contact->getItem("mail")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, $prefix);
         echo $contact->getItem("phone")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, $prefix);
         echo $contact->getItem("mobile")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, $prefix);
+        echo $contact->getItem("mail")->composeHtmlInput(FItem::INPUT_TEXT, 4, 8, $prefix);
         echo $contact->getItem("is_report")->composeHtmlInput(FItem::INPUT_CHECKBOX, 0, 12, $prefix);
         echo '<script>document.forms[0].elements["' . $prefix . 'is_report"].setAttribute("onclick", "showContactIcons(\'' . $prefix . '\')");</script>';
 

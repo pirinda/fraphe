@@ -379,7 +379,7 @@ class FItem
                 $html .= '<div class="col-sm-' . $lengthInput . '">';
                 $html .= '<input type="text" class="form-control input-sm" name="' . $key . '" id="' . $key . '" value="' . $this->value . '"' . $required . $placeholder . $maxLength .
                     ($this->guiReadOnly ? ' readonly' : '') .
-                    (!empty($this->guiEvents) ? ' ' . $this->guiEvents: '') . '>';
+                    (!empty($this->guiEvents) ? ' ' . $this->guiEvents : '') . '>';
                 $html .= '</div>';
                 $html .= '</div>';
                 break;
@@ -397,7 +397,7 @@ class FItem
                 $html .= '<div class="col-sm-' . $lengthInput . '">';
                 $html .= '<input type="number" class="form-control input-sm" name="' . ($this->isPk ? FRegistry::ID : $key) . '" id="' . ($this->isPk ? FRegistry::ID : $key) . '" value="' . $this->value . '"' . $required . $readonly . $placeholder . $min . $max .
                     ($this->guiReadOnly ? ' readonly' : '') .
-                    (!empty($this->guiEvents) ? ' ' . $this->guiEvents: '') . '>';
+                    (!empty($this->guiEvents) ? ' ' . $this->guiEvents : '') . '>';
                 $html .= '</div>';
                 $html .= '</div>';
                 break;
@@ -411,7 +411,7 @@ class FItem
                 $html .= '<div class="checkbox">';
                 $html .= '<label class="small"><input type="checkbox" name="' . $key . '" id="' . $key . '" value="1"' . ($this->value ? ' checked' : '') .
                     ($this->guiReadOnly ? ' readonly' : '') .
-                    (!empty($this->guiEvents) ? ' ' . $this->guiEvents: '') .
+                    (!empty($this->guiEvents) ? ' ' . $this->guiEvents : '') .
                     '>' . $this->name . '</label>';
                 $html .= '</div>';
                 $html .= '</div>';
@@ -426,9 +426,9 @@ class FItem
                 $html .= '<label class="control-label small" for="' . $key . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
                 $html .= '</div>';
                 $html .= '<div class="col-sm-' . $lengthInput . '">';
-                $html .= '<input type="date" class="form-control input-sm" name="' . $key . '" id="' . $key . '" value="' . $this->value . '"' . $required . $placeholder .
+                $html .= '<input type="date" class="form-control input-sm" name="' . $key . '" id="' . $key . '" value="' . (empty($this->value) ? '' : FUtils::formatDbmsDate($this->value)) . '"' . $required . $placeholder .
                     ($this->guiReadOnly ? ' readonly' : '') .
-                    (!empty($this->guiEvents) ? ' ' . $this->guiEvents: '') . '>';
+                    (!empty($this->guiEvents) ? ' ' . $this->guiEvents : '') . '>';
                 $html .= '</div>';
                 $html .= '</div>';
                 break;
@@ -441,9 +441,9 @@ class FItem
                 $html .= '<label class="control-label small" for="' . $key . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
                 $html .= '</div>';
                 $html .= '<div class="col-sm-' . $lengthInput . '">';
-                $html .= '<input type="datetime-local" class="form-control input-sm" name="' . $key . '" id="' . $key . '" value="' . $this->value . '"' . $required . $placeholder .
+                $html .= '<input type="datetime-local" class="form-control input-sm" name="' . $key . '" id="' . $key . '" value="' . (empty($this->value) ? '' : FUtils::formatDbmsDatetime($this->value)) . '"' . $required . $placeholder .
                     ($this->guiReadOnly ? ' readonly' : '') .
-                    (!empty($this->guiEvents) ? ' ' . $this->guiEvents: '') . '>';
+                    (!empty($this->guiEvents) ? ' ' . $this->guiEvents : '') . '>';
                 $html .= '</div>';
                 $html .= '</div>';
                 break;
@@ -475,7 +475,7 @@ class FItem
         $html .= '<div class="col-sm-' . $lengthInput . '">';
         $html .= '<textarea class="form-control input-sm" name="' . $key . '" id="' . $key . '" rows="' . $rows . '"' . $required . $placeholder . $maxLength .
             ($this->guiReadOnly ? ' readonly' : '') .
-            (!empty($this->guiEvents) ? ' ' . $this->guiEvents: '') .
+            (!empty($this->guiEvents) ? ' ' . $this->guiEvents : '') .
             '>' . $this->value . '</textarea>';
         $html .= '</div>';
         $html .= '</div>';
@@ -496,7 +496,7 @@ class FItem
         $html .= '<div class="col-sm-' . $lengthInput . '">';
         $html .= '<select class="form-control input-sm" name="' . $key . '" id="' . $key . '"' .
             ($this->guiReadOnly ? ' readonly' : '') .
-            (!empty($this->guiEvents) ? ' ' . $this->guiEvents: '') . '>';
+            (!empty($this->guiEvents) ? ' ' . $this->guiEvents : '') . '>';
         foreach ($options as $option) {
             $html .= $option;
         }

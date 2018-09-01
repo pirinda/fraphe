@@ -1,11 +1,12 @@
 <?php
+//------------------------------------------------------------------------------
 // start session:
 if (!isset($_SESSION)) {
     session_start();
 }
-
 // bootstrap Fraphe:
 require $_SESSION["rootDir"] . "Fraphe" . DIRECTORY_SEPARATOR . "fraphe.php";
+//------------------------------------------------------------------------------
 
 use Fraphe\App\FApp;
 use Fraphe\App\FAppConsts;
@@ -159,7 +160,7 @@ echo $testProcessEntity->getItem("id_entity")->composeHtmlSelect($options, 4, 8,
 
 echo $testProcessEntity->getItem("process_days_min")->composeHtmlInput(FItem::INPUT_NUMBER, 4, 4, ModTestProcessEntity::PREFIX);
 echo $testProcessEntity->getItem("process_days_max")->composeHtmlInput(FItem::INPUT_NUMBER, 4, 4, ModTestProcessEntity::PREFIX);
-echo $testProcessEntity->getItem("cost")->composeHtmlInput(FItem::INPUT_NUMBER, 4, 4, ModTestProcessEntity::PREFIX);
+echo $testProcessEntity->getItem("cost")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4, ModTestProcessEntity::PREFIX);
 
 echo '<br><button type="submit" class="btn btn-sm btn-primary">Guardar</button>';
 echo '&nbsp;<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_test.php" class="btn btn-sm btn-danger" role="button">Cancelar</a>';

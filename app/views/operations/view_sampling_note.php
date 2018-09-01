@@ -1,11 +1,12 @@
 <?php
+//------------------------------------------------------------------------------
 // start session:
 if (!isset($_SESSION)) {
     session_start();
 }
-
 // bootstrap Fraphe:
 require $_SESSION["rootDir"] . "Fraphe" . DIRECTORY_SEPARATOR . "fraphe.php";
+//------------------------------------------------------------------------------
 
 use Fraphe\App\FApp;
 use Fraphe\App\FAppConsts;
