@@ -26,8 +26,6 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         // get customer data:
         $registry = $entity;
         $json .= '"customer_name":"' . $registry->getDatum("name") . '", ';
-        $json .= '"is_def_sampling_img":' . ($registry->getDatum("is_def_sampling_img") ? 'true' : 'false') . ', ';
-        $json .= '"nk_report_delivery_type":' . $registry->getDatum("nk_report_delivery_type") . ', ';
 
         // get customer's address data:
         $registry = $entity->getChildAddresses()[0];
@@ -39,32 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         $json .= '"customer_county":"' . $registry->getDatum("county") . '", ';
         $json .= '"customer_state_region":"' . $registry->getDatum("state_region") . '", ';
         $json .= '"customer_country":"' . $registry->getDatum("country") . '", ';
-        $json .= '"customer_contact":"", ';
-
-        // get customer's contacts for reporting:
-        $contacts = AppUtils::composeSelectOption();
-        foreach ($registry->getChildContacts() as $contact) {
-            if ($contact->getDatum("is_report")) {
-                $contacts .= '<option value="' . $contact->getId() . '">' . $contact->getDatum("name") . '</option>';
-            }
-        }
-        $json .= '"contacts":"' . addslashes($contacts) . '", ';
-
-        // get customers's corporate members:
-        $corpMembers = '';
-        if ($entity->isChildEntityType(ModConsts::CC_ENTITY_TYPE_CUST_CORP)) {
-            $params = array();
-            $params["fk_entity_class"] = ModConsts::CC_ENTITY_CLASS_CUST;
-            $params[ModEntity::PARAM_CORP_MEMBERS] = $entity->getId();
-            $options = AppUtils::getSelectOptions($userSession, AppConsts::CC_ENTITY, 0, $params);
-            foreach ($options as $option) {
-                $corpMembers .= $option;
-            }
-        }
-        if (empty($corpMembers)) {
-            $corpMembers = AppUtils::composeSelectOption();
-        }
-        $json .= '"' . ModEntity::PARAM_CORP_MEMBERS . '":"' . addslashes($corpMembers) . '"';
+        $json .= '"customer_contact":""';
     }
     echo '{' . $json . '}';
 }

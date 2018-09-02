@@ -84,6 +84,23 @@ class ModContact extends FRegistry
         $this->mobile->setRangeLength(0, 100);
     }
 
+    public function composeContact():string
+    {
+        $prefix = $this->prefix->getValue();
+        $surname = $this->surname->getValue();
+        $forename = $this->forename->getValue();
+        $mail = $this->mail->getValue();
+        $phone = $this->phone->getValue();
+        $mobile = $this->mobile->getValue();
+
+        $contact = (empty($prefix) ? "" : $prefix . " ") . $forename . " " . $surname;
+        $contact .= empty($phone) ? "" : ", TEL. " . $phone;
+        $contact .= empty($mobile) ? "" : ", CEL. " . $mobile;
+        $contact .= empty($mail) ? "" : ", " . $mail;
+
+        return $contact;
+    }
+
     public function validate(FUserSession $userSession)
     {
         // compute data:

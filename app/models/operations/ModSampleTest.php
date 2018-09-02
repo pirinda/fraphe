@@ -103,7 +103,7 @@ class ModSampleTest extends FRelation
         $this->process_days->setValue($processDays);
 
         // compute process deadline:
-        $dt = new \DateTime(FUtils::formatDbmsDate($this->process_start_date->getValue()));
+        $dt = new \DateTime(FUtils::formatStdDate($this->process_start_date->getValue()));
         $dt->add(new \DateInterval("P" . $processDays . "D"));
         $this->process_deadline->setValue($dt->getTimestamp()); // TODO: improve deadline computation!
     }
@@ -226,8 +226,8 @@ class ModSampleTest extends FRelation
         $process_days_min = $this->process_days_min->getValue();
         $process_days_max = $this->process_days_max->getValue();
         $process_days = $this->process_days->getValue();
-        $process_start_date = FUtils::formatDbmsDate($this->process_start_date->getValue());
-        $process_deadline = FUtils::formatDbmsDate($this->process_deadline->getValue());
+        $process_start_date = FUtils::formatStdDate($this->process_start_date->getValue());
+        $process_deadline = FUtils::formatStdDate($this->process_deadline->getValue());
         $cost = $this->cost->getValue();
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();

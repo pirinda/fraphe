@@ -38,7 +38,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         // read registry:
 
         if (!empty($_GET[FRegistry::ID])) {
-            $test->read($userSession, intval($_GET[FRegistry::ID]), FRegistry::MODE_WRITE);
+            $test->read($userSession, intval($_GET[FRegistry::ID]), FRegistry::MODE_READ);
             $testProcessEntity = $test->getDefaultChildProcessEntity();
         }
 

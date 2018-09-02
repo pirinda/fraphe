@@ -19,7 +19,6 @@ use app\AppConsts;
 use app\AppUtils;
 use app\models\ModConsts;
 use app\models\operations\ModRecept;
-use app\models\operations\ModSample;
 
 echo '<!DOCTYPE html>';
 echo '<html>';
@@ -36,14 +35,13 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         // read registry:
 
         if (!empty($_GET[FRegistry::ID])) {
-            $recept->read($userSession, intval($_GET[FRegistry::ID]), FRegistry::MODE_WRITE);
+            $recept->read($userSession, intval($_GET[FRegistry::ID]), FRegistry::MODE_READ);
         }
         else {
             $data = array();
             $data["service_type"] = ModRecept::SERVICE_ORDINARY;
             $recept->setData($data);
         }
-
         break;
 
     case "POST":
@@ -75,7 +73,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         try {
             $recept->setData($data);
             $recept->save($userSession);
-            header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/operations/view_recept.php");
+            header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/forms/operations/form_recept_samples.php?id=" . $recept->getId());
         }
         catch (Exception $e) {
             $errmsg = $e->getMessage();
@@ -101,7 +99,7 @@ if (!empty($errmsg)) {
 // Input Form for Reception
 ////////////////////////////////////////////////////////////////////////////////
 
-echo '<form class="form-horizontal" method="post" action="' . FUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '" onsubmit="return validateForm()" enctype="multipart/form-data">';
+echo '<form class="form-horizontal" method="post" action="' . FUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '" onsubmit="return validateForm()">';
 
 // preserve registry ID in post:
 echo '<input type="hidden" name="' . FRegistry::ID . '" value="' . $recept->getId() . '">';
@@ -117,7 +115,7 @@ echo '<div class="row">';
 echo '<div class="col-sm-6">';
 
 echo '<div class="panel panel-default">';
-echo '<div class="panel-heading">Datos generales</div>';
+echo '<div class="panel-heading">Datos de la recepción</div>';
 echo '<div class="panel-body">';
 
 $recept->getItem("recept_num")->setGuiReadOnly(true);
@@ -144,6 +142,11 @@ echo '</div>';
 echo $recept->getItem("recept_notes")->composeHtmlTextArea(4, 8, 1);
 echo $recept->getItem("recept_deviats")->composeHtmlTextArea(4, 8, 1);
 
+$params = array();
+$params["id_user_role"] = ModConsts::CC_USER_ROLE_RECEPT;
+$options = AppUtils::getSelectOptions($userSession, AppConsts::CC_USER, $recept->getDatum("fk_user_receiver"), $params);
+echo $recept->getItem("fk_user_receiver")->composeHtmlSelect($options, 4, 8);
+
 echo '</div>';  //echo '<div class="panel-body">';
 echo '</div>';  //echo '<div class="panel panel-default">';
 
@@ -161,11 +164,6 @@ echo '<div class="panel-body">';
 echo $recept->getItem("ref_chain_custody")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4);
 echo $recept->getItem("ref_request")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4);
 echo $recept->getItem("ref_agreet")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4);
-
-$params = array();
-$params["id_user_role"] = ModConsts::CC_USER_ROLE_RECEPT;
-$options = AppUtils::getSelectOptions($userSession, AppConsts::CC_USER, $recept->getDatum("fk_user_receiver"), $params);
-echo $recept->getItem("fk_user_receiver")->composeHtmlSelect($options, 4, 8);
 
 echo '</div>';  //echo '<div class="panel-body">';
 echo '</div>';  //echo '<div class="panel panel-default">';

@@ -144,6 +144,60 @@ class ModEntityAddress extends FRegistry
         return $contact;
     }
 
+    public function &getChildContactReport()
+    {
+        $contact = null;
+
+        foreach ($this->childContacts as $child) {
+            if ($child->getDatum("is_report")) {
+                $contact = $child;
+                break;
+            }
+        }
+
+        return $contact;
+    }
+
+    public function composeAddress(): string
+    {
+        $street = $this->street->getValue();
+        $district = $this->district->getValue();
+        $postcode = $this->postcode->getValue();
+        $reference = $this->reference->getValue();
+        $city = $this->city->getValue();
+        $county = $this->county->getValue();
+        $state_region = $this->state_region->getValue();
+        $country = $this->country->getValue();
+
+        $address = "";
+        if (!empty($street)) {
+            $address .= (empty($address) ? "" : ", ") . $street;
+        }
+        if (!empty($district)) {
+            $address .= (empty($address) ? "" : ", ") . $district;
+        }
+        if (!empty($postcode)) {
+            $address .= (empty($address) ? "" : ", ") . $postcode;
+        }
+        if (!empty($reference)) {
+            $address .= (empty($address) ? "" : ", ") . $reference;
+        }
+        if (!empty($city)) {
+            $address .= (empty($address) ? "" : ", ") . $city;
+        }
+        if (!empty($county)) {
+            $address .= (empty($address) ? "" : ", ") . $county;
+        }
+        if (!empty($state_region)) {
+            $address .= (empty($address) ? "" : ", ") . $state_region;
+        }
+        if (!empty($country)) {
+            $address .= (empty($address) ? "" : ", ") . $country;
+        }
+
+        return $address;
+    }
+
     public function validate(FUserSession $userSession)
     {
         parent::validate($userSession);

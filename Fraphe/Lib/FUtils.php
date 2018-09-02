@@ -14,35 +14,41 @@ abstract class FUtils
 
     /** Format used: "Y-m-d".
       */
-    public static function formatDbmsDate(int $timestamp): string
+    public static function formatStdDate(int $timestamp): string
     {
         return !isset($timestamp) ? "" : date("Y-m-d", $timestamp);
     }
 
     /** Format used: "Y-m-d  H:i:s".
       */
-    public static function formatDbmsDatetime(int $timestamp): string
+    public static function formatStdDatetime(int $timestamp): string
     {
         return !isset($timestamp) ? "" : date("Y-m-d H:i:s", $timestamp);
     }
 
     /** Format used: " H:i:s".
       */
-    public static function formatDbmsTime(int $timestamp): string
+    public static function formatStdTime(int $timestamp): string
     {
         return !isset($timestamp) ? "" : date("H:i:s", $timestamp);
     }
 
-    /** Format used: "Y-m-d H:i:s". Same as formatDbmsDate().
+    /** Format used: "Y-m-d H:i:s". Same as formatStdDate().
       */
-    public static function formatDbmsTimestamp(int $timestamp): string
+    public static function formatStdTimestamp(int $timestamp): string
     {
-        return self::formatDbmsDatetime($timestamp);
+        return self::formatStdDatetime($timestamp);
     }
 
+    /** Format used: "Y-m-d  H:i:s".
+      */
+    public static function formatHtmlDatetime(int $timestamp): string
+    {
+        return !isset($timestamp) ? "" : date("Y-m-d\TH:i:s", $timestamp);
+    }
     /** Format used: "Y-m-d".
       */
-    public static function parseDbmsDate(string $time): int
+    public static function parseStdDate(string $time): int
     {
         if (!isset($time)) {
             return 0;
@@ -54,7 +60,7 @@ abstract class FUtils
 
     /** Format used: "Y-m-d H:i:s".
       */
-    public static function parseDbmsDatetime(string $time): int
+    public static function parseStdDatetime(string $time): int
     {
         if (!isset($time)) {
             return 0;
@@ -66,7 +72,7 @@ abstract class FUtils
 
     /** Format used: "H:i:s".
       */
-    public static function parseDbmsTime(string $time): int
+    public static function parseStdTime(string $time): int
     {
         if (!isset($time)) {
             return 0;
@@ -76,11 +82,23 @@ abstract class FUtils
         return $dt->getTimestamp();
     }
 
-    /** Format used: "Y-m-d H:i:s". Same as parseDbmsDatetime().
+    /** Format used: "Y-m-d H:i:s". Same as parseStdDatetime().
       */
-    public static function parseDbmsTimestamp(string $time): int
+    public static function parseStdTimestamp(string $time): int
     {
-        return self::parseDbmsDatetime($time);
+        return self::parseStdDatetime($time);
+    }
+
+    /** Format used: "Y-m-dTH:i".
+      */
+    public static function parseHtmlDatetime(string $time): int
+    {
+        if (!isset($time)) {
+            return 0;
+        }
+
+        $dt = \DateTime::createFromFormat("!Y-m-dTH:i", $time, new \DateTimeZone(date_default_timezone_get()));
+        return $dt->getTimestamp();
     }
 
     /** Format used: "Y-m-d".
@@ -91,7 +109,7 @@ abstract class FUtils
             return 0;
         }
 
-        $dt = new \DateTime(self::formatDbmsDate($timestamp));
+        $dt = new \DateTime(self::formatStdDate($timestamp));
         return $dt->getTimestamp();
     }
 
@@ -99,6 +117,6 @@ abstract class FUtils
       */
     public static function getLocalDatetime(): int
     {
-        return self::parseDbmsDatetime(date("Y-m-d H:i:s"));
+        return self::parseStdDatetime(date("Y-m-d H:i:s"));
     }
 }

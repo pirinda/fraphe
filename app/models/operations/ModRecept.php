@@ -7,6 +7,7 @@ use Fraphe\Lib\FUtils;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
+use app\models\catalogs\ModEntity;
 
 class ModRecept extends FRegistry
 {
@@ -109,7 +110,7 @@ class ModRecept extends FRegistry
     {
         // get count of receptions:
         $count = 0;
-        $date = FUtils::formatDbmsDate($this->recept_datetime->getValue());
+        $date = FUtils::formatStdDate($this->recept_datetime->getValue());
         $sql = "SELECT COUNT(*) AS _count FROM o_recept WHERE DATE(recept_datetime) = '$date';";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
@@ -203,7 +204,7 @@ class ModRecept extends FRegistry
         $this->process_deadline->setValue($maxDeadline);
 
         // add additional process days for reporting and report validation:
-        $dt = new \DateTime(FUtils::formatDbmsDate($maxDeadline));
+        $dt = new \DateTime(FUtils::formatStdDate($maxDeadline));
         $dt->add(new \DateInterval("P2D")); // TODO: parameterize this configurable variable!
         $this->recept_deadline->setValue($dt->getTimestamp());
     }
@@ -216,6 +217,37 @@ class ModRecept extends FRegistry
     public function clearChildSamples()
     {
         $this->childSamples = array();
+    }
+
+    public function createSample(FUserSession $userSession): ModSample
+    {
+        $data = array();
+
+        $data["recept_datetime_n"] = $this->recept_datetime->getValue();
+        $data["recept_deviats"] = $this->recept_deviats->getValue();
+        $data["recept_notes"] = $this->recept_notes->getValue();
+        $data["service_type"] = $this->service_type->getValue();
+        $data["process_start_date"] = $this->process_start_date->getValue();
+        $data["ref_chain_custody"] = $this->ref_chain_custody->getValue();
+        $data["ref_request"] = $this->ref_request->getValue();
+        $data["ref_agreet"] = $this->ref_agreet->getValue();
+        $data["nk_recept"] = $this->id;
+        $data["fk_user_receiver"] = $this->fk_user_receiver->getValue();
+
+        $customer = new ModEntity();
+        $customer->read($userSession, $this->fk_customer->getValue(), FRegistry::MODE_READ);
+        $contact = $customer->getChildAddresses()[0]->getChildContactReport();
+
+        $data["is_def_sampling_img"] = $customer->getDatum("is_def_sampling_img");
+        $data["fk_customer"] = $customer->getId();
+        $data["nk_customer_billing"] = $customer->getDatum("nk_entity_billing");
+        $data["fk_report_contact"] = empty($contact) ? 0 : $contact->getId();
+        $data["fk_report_delivery_type"] = $customer->getDatum("nk_report_delivery_type");
+
+        $sample = new ModSample();
+        $sample->setData($data);
+
+        return $sample;
     }
 
     public function validate(FUserSession $userSession)
@@ -383,11 +415,11 @@ class ModRecept extends FRegistry
 
         //$id_recept = $this->id_recept->getValue();
         $recept_num = $this->recept_num->getValue();
-        $recept_datetime = FUtils::formatDbmsDatetime($this->recept_datetime->getValue());
+        $recept_datetime = FUtils::formatStdDatetime($this->recept_datetime->getValue());
         $process_days = $this->process_days->getValue();
-        $process_start_date = FUtils::formatDbmsDate($this->process_start_date->getValue());
-        $process_deadline = FUtils::formatDbmsDate($this->process_deadline->getValue());
-        $recept_deadline = FUtils::formatDbmsDate($this->recept_deadline->getValue());
+        $process_start_date = FUtils::formatStdDate($this->process_start_date->getValue());
+        $process_deadline = FUtils::formatStdDate($this->process_deadline->getValue());
+        $recept_deadline = FUtils::formatStdDate($this->recept_deadline->getValue());
         $recept_deviats = $this->recept_deviats->getValue();
         $recept_notes = $this->recept_notes->getValue();
         $service_type = $this->service_type->getValue();

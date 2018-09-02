@@ -243,10 +243,10 @@ class ModJob extends FRegistry
 
         //$id_job = $this->id_job->getValue();
         $number = $this->number->getValue();
-        $job_date = FUtils::formatDbmsDate($this->job_date->getValue());
+        $job_date = FUtils::formatStdDate($this->job_date->getValue());
         $process_days = $this->process_days->getValue();
-        $process_start_date = FUtils::formatDbmsDate($this->process_start_date->getValue());
-        $process_deadline = FUtils::formatDbmsDate($this->process_deadline->getValue());
+        $process_start_date = FUtils::formatStdDate($this->process_start_date->getValue());
+        $process_deadline = FUtils::formatStdDate($this->process_deadline->getValue());
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();
         $fk_company_branch = $this->fk_company_branch->getValue();

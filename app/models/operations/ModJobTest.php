@@ -190,12 +190,12 @@ class ModJobTest extends FRelation
         $id_entity = $this->id_entity->getValue();
         $job_test = $this->job_test->getValue();
         $process_days = $this->process_days->getValue();
-        $process_start_date = FUtils::formatDbmsDate($this->process_start_date->getValue());
-        $process_deadline = FUtils::formatDbmsDate($this->process_deadline->getValue());
+        $process_start_date = FUtils::formatStdDate($this->process_start_date->getValue());
+        $process_deadline = FUtils::formatStdDate($this->process_deadline->getValue());
         $ext_number = $this->ext_number->getValue();
         $ext_tracking_number = $this->ext_tracking_number->getValue();
-        $ext_result_deadline_n = FUtils::formatDbmsDate($this->ext_result_deadline_n->getValue());
-        $ext_result_released_n = FUtils::formatDbmsDate($this->ext_result_released_n->getValue());
+        $ext_result_deadline_n = FUtils::formatStdDate($this->ext_result_deadline_n->getValue());
+        $ext_result_released_n = FUtils::formatStdDate($this->ext_result_released_n->getValue());
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();
         $fk_job_test_status = $this->fk_job_test_status->getValue();

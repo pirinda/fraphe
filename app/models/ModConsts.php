@@ -73,7 +73,7 @@ abstract class ModConsts
 
     public const CC_USER_ATTRIB_SIGN_SAMPLING = 1;
     public const CC_USER_ATTRIB_SIGN_PROCESSING = 2;
-    
+
     public const OC_SAMPLE_STATUS_SAMPLING = 1;
     public const OC_SAMPLE_STATUS_RECEPT = 2;
     public const OC_SAMPLE_STATUS_PROCESS = 3;
@@ -81,6 +81,8 @@ abstract class ModConsts
     public const OC_SAMPLE_STATUS_GUARD = 5;
     public const OC_SAMPLE_STATUS_DISCARTED = 6;
     public const OC_SAMPLE_STATUS_CANCELLED = 9;
+
+    public const OC_SAMPLING_METHOD_CUSTOMER = 1;
 
     public const OC_RECEPT_STATUS_NEW = 1;
     public const OC_RECEPT_STATUS_PROCESSING = 2;

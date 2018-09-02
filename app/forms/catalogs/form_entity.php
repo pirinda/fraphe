@@ -59,7 +59,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         // read registry:
 
         if (!empty($_GET[FRegistry::ID])) {
-            $entity->read($userSession, intval($_GET[FRegistry::ID]), FRegistry::MODE_WRITE);
+            $entity->read($userSession, intval($_GET[FRegistry::ID]), FRegistry::MODE_READ);
             $entityClass = $entity->getDatum("fk_entity_class");
             $entityNature = $entity->getDatum("is_person") ? ModUtils::ENTITY_NATURE_PER : ModUtils::ENTITY_NATURE_ORG;
 
@@ -91,7 +91,6 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $entityAddress->getItem("is_main")->setValue(true);
             $entity->getChildAddresses()[0] = $entityAddress;
         }
-
         break;
 
     case "POST":
@@ -266,7 +265,6 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         catch (Exception $e) {
             $errmsg = $e->getMessage();
         }
-
         break;
 
     default:
@@ -526,8 +524,6 @@ for ($panel = 1; $panel <= 2; $panel++) {
 
 echo '</div>';  // row
 
-//------------------------------------------------------------------------------
-// main section at the right:
 //------------------------------------------------------------------------------
 echo '<button type="submit" class="btn btn-sm btn-primary" name="submit">Guardar</button>&nbsp;';
 echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/catalogs/view_entity.php?class=' . $entityClass . '" class="btn btn-sm btn-danger" role="button">Cancelar</a>';

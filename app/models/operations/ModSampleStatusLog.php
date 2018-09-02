@@ -143,7 +143,7 @@ class ModSampleStatusLog extends FRegistry
         }
 
         //$id_sample_status_log = $this->id_sample_status_log->getValue();
-        $status_datetime = FUtils::formatDbmsDatetime($this->status_datetime->getValue());
+        $status_datetime = FUtils::formatStdDatetime($this->status_datetime->getValue());
         $status_temperat_n = $this->status_temperat_n->getValue();
         $status_notes = $this->status_notes->getValue();
         $is_system = $this->is_system->getValue();

@@ -111,7 +111,11 @@ class FItem
             case self::DATA_TYPE_DATETIME:
             case self::DATA_TYPE_TIME:
             case self::DATA_TYPE_TIMESTAMP:
-                if (is_int($value)) {
+                if (!isset($value)) {
+                    // null
+                    $this->value = 0;
+                }
+                else if (is_int($value)) {
                     // already a timestamp
                     $this->value = $value;
                 }
@@ -119,19 +123,19 @@ class FItem
                     switch ($this->dataType) {
                         case self::DATA_TYPE_DATE:
                             // parse timestamp from string value in format "yyyy-mm-dd"
-                            $this->value = FUtils::parseDbmsDate($value);
+                            $this->value = FUtils::parseStdDate($value);
                             break;
                         case self::DATA_TYPE_DATETIME:
                             // parse timestamp from string value in format "yyyy-mm-dd hh:mm:ss"
-                            $this->value = FUtils::parseDbmsDatetime($value);
+                            $this->value = FUtils::parseStdDatetime($value);
                             break;
                         case self::DATA_TYPE_TIME:
                             // parse timestamp from string value in format "hh:mm:ss"
-                            $this->value = FUtils::parseDbmsTime($value);
+                            $this->value = FUtils::parseStdTime($value);
                             break;
                         case self::DATA_TYPE_TIMESTAMP:
                             // parse timestamp from string value in format "yyyy-mm-dd hh:mm:ss"
-                            $this->value = FUtils::parseDbmsTimestamp($value);
+                            $this->value = FUtils::parseStdTimestamp($value);
                             break;
                         default:
                     }
@@ -426,7 +430,7 @@ class FItem
                 $html .= '<label class="control-label small" for="' . $key . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
                 $html .= '</div>';
                 $html .= '<div class="col-sm-' . $lengthInput . '">';
-                $html .= '<input type="date" class="form-control input-sm" name="' . $key . '" id="' . $key . '" value="' . (empty($this->value) ? '' : FUtils::formatDbmsDate($this->value)) . '"' . $required . $placeholder .
+                $html .= '<input type="date" class="form-control input-sm" name="' . $key . '" id="' . $key . '" value="' . (empty($this->value) ? '' : FUtils::formatStdDate($this->value)) . '"' . $required . $placeholder .
                     ($this->guiReadOnly ? ' readonly' : '') .
                     (!empty($this->guiEvents) ? ' ' . $this->guiEvents : '') . '>';
                 $html .= '</div>';
@@ -441,7 +445,7 @@ class FItem
                 $html .= '<label class="control-label small" for="' . $key . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
                 $html .= '</div>';
                 $html .= '<div class="col-sm-' . $lengthInput . '">';
-                $html .= '<input type="datetime-local" class="form-control input-sm" name="' . $key . '" id="' . $key . '" value="' . (empty($this->value) ? '' : FUtils::formatDbmsDatetime($this->value)) . '"' . $required . $placeholder .
+                $html .= '<input type="datetime-local" class="form-control input-sm" name="' . $key . '" id="' . $key . '" value="' . (empty($this->value) ? '' : FUtils::formatHtmlDatetime($this->value)) . '"' . $required . $placeholder .
                     ($this->guiReadOnly ? ' readonly' : '') .
                     (!empty($this->guiEvents) ? ' ' . $this->guiEvents : '') . '>';
                 $html .= '</div>';

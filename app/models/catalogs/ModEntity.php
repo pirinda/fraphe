@@ -319,8 +319,6 @@ class ModEntity extends FRegistry
         else {
             throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
         }
-
-        $this->tailorMembers(); // tailor registry members according to current data status and values
     }
 
     public function save(FUserSession $userSession)

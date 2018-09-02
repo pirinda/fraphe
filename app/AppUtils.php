@@ -110,7 +110,6 @@ abstract class AppUtils
                     $sqlCorp = "AND e.nk_entity_parent = " . $params[ModEntity::PARAM_CORP_MEMBERS] . " ";
                 }
 
-
                 $sql = "SELECT e.$tableId AS _val, CONCAT(e.name, IF(e.alias = '', '', CONCAT(', ', e.alias, ',')), ' (', e.code, ')') AS _opt ";
                 $sql .= "FROM $table AS e ";
                 if (!empty($sqlType)) {

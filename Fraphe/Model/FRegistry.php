@@ -66,6 +66,8 @@ abstract class FRegistry
      */
     public function validate(FUserSession $userSession)
     {
+        $this->tailorMembers(); // tailor registry members according to current data status and values
+        
         foreach ($this->items as $item) {
             $item->validate();
         }

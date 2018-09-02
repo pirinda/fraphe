@@ -3,6 +3,7 @@ namespace app\models\operations;
 
 use Fraphe\App\FUserSession;
 use Fraphe\App\FGuiUtils;
+use Fraphe\Lib\FUtils;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
@@ -91,21 +92,21 @@ class ModSample extends FRegistry
         $this->sample_num = new FItem(FItem::DATA_TYPE_STRING, "sample_num", "Folio muestra", "", true);
         $this->sample_name = new FItem(FItem::DATA_TYPE_STRING, "sample_name", "Nombre muestra", "", true);
         $this->sample_lot = new FItem(FItem::DATA_TYPE_STRING, "sample_lot", "Lote muestra", "", false);
-        $this->sample_date_mfg_n = new FItem(FItem::DATA_TYPE_DATE, "sample_date_mfg_n", "Fecha producción", "", false);
+        $this->sample_date_mfg_n = new FItem(FItem::DATA_TYPE_DATE, "sample_date_mfg_n", "Fecha elaboración", "", false);
         $this->sample_date_sell_by_n = new FItem(FItem::DATA_TYPE_DATE, "sample_date_sell_by_n", "Fecha caducidad", "", false);
         $this->sample_quantity = new FItem(FItem::DATA_TYPE_FLOAT, "sample_quantity", "Cantidad muestra", "", true);
         $this->sample_quantity_orig = new FItem(FItem::DATA_TYPE_FLOAT, "sample_quantity_orig", "Cantidad muestra original", "", true);
-        $this->sample_child = new FItem(FItem::DATA_TYPE_INT, "sample_child", "Núm. muestra hijo", "", true);
+        $this->sample_child = new FItem(FItem::DATA_TYPE_INT, "sample_child", "Núm. muestra hijo", "", false);
         $this->sample_released = new FItem(FItem::DATA_TYPE_STRING, "sample_released", "Muestra liberada", "", false);
-        $this->is_sampling_company = new FItem(FItem::DATA_TYPE_INT, "is_sampling_company", "Muestreo propio", "", true);
+        $this->is_sampling_company = new FItem(FItem::DATA_TYPE_BOOL, "is_sampling_company", "Muestreo propio", "", false);
         $this->sampling_datetime_n = new FItem(FItem::DATA_TYPE_DATETIME, "sampling_datetime_n", "Fecha-hora muestreo", "", false);
         $this->sampling_temperat_n = new FItem(FItem::DATA_TYPE_FLOAT, "sampling_temperat_n", "Temp. muestreo °C", "", false);
-        $this->sampling_area = new FItem(FItem::DATA_TYPE_STRING, "sampling_area", "Área muestreo", "", false);
+        $this->sampling_area = new FItem(FItem::DATA_TYPE_STRING, "sampling_area", "Área muestreo", "", true);
         $this->sampling_guide = new FItem(FItem::DATA_TYPE_INT, "sampling_guide", "Núm. guía muestreo", "", false);
         $this->sampling_deviats = new FItem(FItem::DATA_TYPE_STRING, "sampling_deviats", "Desviaciones muestreo", "", false);
         $this->sampling_notes = new FItem(FItem::DATA_TYPE_STRING, "sampling_notes", "Observaciones muestreo", "", false);
-        $this->sampling_imgs = new FItem(FItem::DATA_TYPE_INT, "sampling_imgs", "Imágenes muestreo", "", true);
-        $this->recept_sample = new FItem(FItem::DATA_TYPE_INT, "recept_sample", "Núm. muestra recepción", "", true);
+        $this->sampling_imgs = new FItem(FItem::DATA_TYPE_INT, "sampling_imgs", "Imágenes muestreo", "", false);
+        $this->recept_sample = new FItem(FItem::DATA_TYPE_INT, "recept_sample", "Núm. muestra recepción", "", false);
         $this->recept_datetime_n = new FItem(FItem::DATA_TYPE_DATETIME, "recept_datetime_n", "Fecha-hora recepción", "", false);
         $this->recept_temperat_n = new FItem(FItem::DATA_TYPE_FLOAT, "recept_temperat_n", "Temp. recepción °C", "", false);
         $this->recept_deviats = new FItem(FItem::DATA_TYPE_STRING, "recept_deviats", "Desviaciones recepción", "", false);
@@ -263,7 +264,7 @@ class ModSample extends FRegistry
         }
     }
 
-    protected function generateNumber(): string
+    protected function generateNumber(FUserSession $userSession): string
     {
         $this->validateParentRecept();
 
@@ -271,6 +272,24 @@ class ModSample extends FRegistry
         $nf->setAttribute(\NumberFormatter::MIN_INTEGER_DIGITS, 3); // TODO: paremeterize this formatting argument: 4!
 
         return $this->parentRecept->getDatum("recept_num") . "-" . $nf->format($this->recept_sample->getValue());
+    }
+
+    protected function generateReceptSample(FUserSession $userSession) {
+        $this->validateParentRecept();
+
+        $sql = "SELECT COALESCE(MAX(recept_sample), 0) AS _max_recept_sample FROM o_sample WHERE nk_recept = " . $this->parentRecept->getId() . ";";
+        $statement = $userSession->getPdo()->query($sql);
+        if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $this->recept_sample->setValue(intval($row["_max_recept_sample"]) + 1);
+        }
+    }
+
+    protected function updateSampleClass(FUserSession $userSession) {
+        $sql = "SELECT fk_sample_class FROM oc_sample_type WHERE id_sample_type = " . $this->fk_sample_type->getValue() . ";";
+        $statement = $userSession->getPdo()->query($sql);
+        if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $this->fk_sample_class->setValue(intval($row["fk_sample_class"]) + 1);
+        }
     }
 
     public function setProcessStartDate(int $startDate)
@@ -345,12 +364,64 @@ class ModSample extends FRegistry
         $this->childSamplingImages = array();
     }
 
+    /** Overriden method.
+     */
+    public function forceRegistryNew()
+    {
+        $this->isRegistryNew = true;
+        $this->sample_num->reset();
+        $this->recept_sample->reset();
+    }
+
+    /** Overriden method.
+     */
+    public function tailorMembers()
+    {
+        if (!$this->is_sampling_company->getValue()) {
+            $this->sampling_area->setMandatory(false);
+            $this->sampling_area->setLengthMin(0);
+        }
+        else {
+            $this->sampling_area->setMandatory(true);
+            $this->sampling_area->setLengthMin(1);
+        }
+
+        $items = array($this->customer_name, $this->customer_postcode,
+            $this->customer_city, $this->customer_county, $this->customer_state_region, $this->customer_country);
+
+        if (!$this->is_customer_custom->getValue()) {
+            foreach($items as $item) {
+                $item->setMandatory(false);
+                $item->setLengthMin(0);
+            }
+        }
+        else {
+            foreach($items as $item) {
+                $item->setMandatory(true);
+                $item->setLengthMin(1);
+            }
+        }
+    }
+
+    /** Overriden method.
+     */
     public function validate(FUserSession $userSession)
     {
         // compute data:
 
+        if (empty($this->sample_quantity_orig->getValue())) {
+            $this->sample_quantity_orig->setValue($this->sample_quantity->getValue());
+        }
+        if (empty($this->recept_sample->getValue())) {
+            $this->generateReceptSample($userSession); // will be used by generation of sample number
+        }
+        if (empty($this->recept_datetime_n->getValue())) {
+            $this->recept_datetime_n->setValue($this->parentRecept->getDatum("recept_datetime"));
+        }
+        $this->updateSampleClass($userSession);
+
         if ($this->isRegistryNew) {
-            $this->number->setValue($this->generateNumber());
+            $this->sample_num->setValue($this->generateNumber($userSession)); // recept sample must have been set already
         }
 
         $this->computeProcessDays();
@@ -366,7 +437,7 @@ class ModSample extends FRegistry
             $test->validate($userSession);
         }
 
-        foreach ($this->$childStatusLogs as $statusLog) {
+        foreach ($this->childStatusLogs as $statusLog) {
             $statusLog->getItem("fk_sample")->setValue($this->isRegistryNew ? -1 : $this->id);  // bypass validation
             $statusLog->validate($userSession);
         }
@@ -377,11 +448,13 @@ class ModSample extends FRegistry
         }
     }
 
+    /** Implemented method.
+     */
     public function read(FUserSession $userSession, int $id, int $mode)
     {
         $this->initialize();
 
-        $sql = "SELECT * FROM oc_sample WHERE id_sample = $id;";
+        $sql = "SELECT * FROM o_sample WHERE id_sample = $id;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->id = intval($row["id_sample"]);
@@ -497,6 +570,8 @@ class ModSample extends FRegistry
         }
     }
 
+    /** Implemented method.
+     */
     public function save(FUserSession $userSession)
     {
         $this->validate($userSession);
@@ -716,14 +791,14 @@ class ModSample extends FRegistry
         $sample_num = $this->sample_num->getValue();
         $sample_name = $this->sample_name->getValue();
         $sample_lot = $this->sample_lot->getValue();
-        $sample_date_mfg_n = FUtils::formatDbmsDate($this->sample_date_mfg_n->getValue());
-        $sample_date_sell_by_n = FUtils::formatDbmsDate($this->sample_date_sell_by_n->getValue());
+        $sample_date_mfg_n = empty($this->sample_date_mfg_n->getValue()) ? "" : FUtils::formatStdDate($this->sample_date_mfg_n->getValue());
+        $sample_date_sell_by_n = empty($this->sample_date_sell_by_n->getValue()) ? "" : FUtils::formatStdDate($this->sample_date_sell_by_n->getValue());
         $sample_quantity = $this->sample_quantity->getValue();
         $sample_quantity_orig = $this->sample_quantity_orig->getValue();
         $sample_child = $this->sample_child->getValue();
         $sample_released = $this->sample_released->getValue();
         $is_sampling_company = $this->is_sampling_company->getValue();
-        $sampling_datetime_n = FUtils::formatDbmsDatetime($this->sampling_datetime_n->getValue());
+        $sampling_datetime_n = empty($this->sampling_datetime_n->getValue()) ? "" : FUtils::formatStdDatetime($this->sampling_datetime_n->getValue());
         $sampling_temperat_n = $this->sampling_temperat_n->getValue();
         $sampling_area = $this->sampling_area->getValue();
         $sampling_guide = $this->sampling_guide->getValue();
@@ -731,14 +806,14 @@ class ModSample extends FRegistry
         $sampling_notes = $this->sampling_notes->getValue();
         $sampling_imgs = $this->sampling_imgs->getValue();
         $recept_sample = $this->recept_sample->getValue();
-        $recept_datetime_n = FUtils::formatDbmsDatetime($this->recept_datetime_n->getValue());
+        $recept_datetime_n = empty($this->recept_datetime_n->getValue()) ? "" : FUtils::formatStdDatetime($this->recept_datetime_n->getValue());
         $recept_temperat_n = $this->recept_temperat_n->getValue();
         $recept_deviats = $this->recept_deviats->getValue();
         $recept_notes = $this->recept_notes->getValue();
         $service_type = $this->service_type->getValue();
         $process_days = $this->process_days->getValue();
-        $process_start_date = FUtils::formatDbmsDate($this->process_start_date->getValue());
-        $process_deadline = FUtils::formatDbmsDate($this->process_deadline->getValue());
+        $process_start_date = FUtils::formatStdDate($this->process_start_date->getValue());
+        $process_deadline = FUtils::formatStdDate($this->process_deadline->getValue());
         $is_customer_custom = $this->is_customer_custom->getValue();
         $customer_name = $this->customer_name->getValue();
         $customer_street = $this->customer_street->getValue();
@@ -802,7 +877,7 @@ class ModSample extends FRegistry
         $statement->bindParam(":sample_quantity_orig", $sample_quantity_orig);
         $statement->bindParam(":sample_child", $sample_child, \PDO::PARAM_INT);
         $statement->bindParam(":sample_released", $sample_released);
-        $statement->bindParam(":is_sampling_company", $is_sampling_company, \PDO::PARAM_INT);
+        $statement->bindParam(":is_sampling_company", $is_sampling_company, \PDO::PARAM_BOOL);
         if (empty($sampling_datetime_n)) {
             $statement->bindValue(":sampling_datetime_n", null, \PDO::PARAM_NULL);
         }
