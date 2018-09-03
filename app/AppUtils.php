@@ -44,6 +44,7 @@ abstract class AppUtils
 
             // "name (code)" sorted by name + code + ID:
             case AppConsts::OC_SAMPLING_EQUIPT:
+            case AppConsts::OC_TEST:
                 $sql = "SELECT $tableId AS _val, CONCAT(name, ' (', code, ')') AS _opt FROM $table WHERE NOT is_deleted ORDER BY name, code, $tableId;";
                 break;
 

@@ -105,7 +105,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
 echo '<div class="container" style="margin-top:50px">';
 echo '<div class="page-header">';
-echo '<h2>Ensayo</h2>';
+echo '<h3>Ensayo</h3>';
 echo '</div>';
 
 if (!empty($errmsg)) {

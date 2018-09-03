@@ -7,16 +7,14 @@ use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
 
-class ModJobStatusLog extends FRegistry
+class ModProcessArea extends FRegistry
 {
-    protected $id_job_status_log;
-    protected $status_datetime;
-    protected $status_notes;
+    protected $id_process_area;
+    protected $name;
+    protected $code;
+    protected $sorting;
     protected $is_system;
     protected $is_deleted;
-    protected $fk_job;
-    protected $fk_job_status;
-    protected $fk_user_status;
     protected $fk_user_ins;
     protected $fk_user_upd;
     protected $ts_user_ins;
@@ -24,54 +22,49 @@ class ModJobStatusLog extends FRegistry
 
     function __construct()
     {
-        parent::__construct(AppConsts::O_JOB_STATUS_LOG, AppConsts::$tableIds[AppConsts::O_JOB_STATUS_LOG]);
+        parent::__construct(AppConsts::OC_PROCESS_AREA, AppConsts::$tableIds[AppConsts::OC_PROCESS_AREA]);
 
-        $this->id_job_status_log = new FItem(FItem::DATA_TYPE_INT, "id_job_status_log", "ID cambio estatus muestra", "", false, true);
-        $this->status_datetime = new FItem(FItem::DATA_TYPE_DATETIME, "status_datetime", "Fecha-hr cambio estatus", "aaaa-mm-ddTHH:mm", true);
-        $this->status_notes = new FItem(FItem::DATA_TYPE_STRING, "status_notes", "Observaciones cambio estatus", "", false);
+        $this->id_process_area = new FItem(FItem::DATA_TYPE_INT, "id_process_area", "ID área proceso", "", false, true);
+        $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", "", true);
+        $this->code = new FItem(FItem::DATA_TYPE_STRING, "code", "Código", "", true);
+        $this->sorting = new FItem(FItem::DATA_TYPE_INT, "sorting", "Ordenamiento", "", true);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
-        $this->fk_job = new FItem(FItem::DATA_TYPE_INT, "fk_job", "Muestra", "", true);
-        $this->fk_job_status = new FItem(FItem::DATA_TYPE_INT, "fk_job_status", "Estatus muestra", "", true);
-        $this->fk_user_status = new FItem(FItem::DATA_TYPE_INT, "fk_user_status", "Usuario estatus", "", true);
         $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", "", false);
         $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", "", false);
-        $this->ts_user_ins = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_ins", "Creado", "", false);
-        $this->ts_user_upd = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_upd", "Modificado", "", false);
+        $this->ts_user_ins = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_ins", "Creado", "", true);
+        $this->ts_user_upd = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_upd", "Modificado", "", true);
 
-        $this->items["id_job_status_log"] = $this->id_job_status_log;
-        $this->items["status_datetime"] = $this->status_datetime;
-        $this->items["status_notes"] = $this->status_notes;
+        $this->items["id_process_area"] = $this->id_process_area;
+        $this->items["name"] = $this->name;
+        $this->items["code"] = $this->code;
+        $this->items["sorting"] = $this->sorting;
         $this->items["is_system"] = $this->is_system;
         $this->items["is_deleted"] = $this->is_deleted;
-        $this->items["fk_job"] = $this->fk_job;
-        $this->items["fk_job_status"] = $this->fk_job_status;
-        $this->items["fk_user_status"] = $this->fk_user_status;
         $this->items["fk_user_ins"] = $this->fk_user_ins;
         $this->items["fk_user_upd"] = $this->fk_user_upd;
         $this->items["ts_user_ins"] = $this->ts_user_ins;
         $this->items["ts_user_upd"] = $this->ts_user_upd;
 
-        $this->status_notes->setRangeLength(0, 500);
+        $this->name->setRangeLength(1, 50);
+        $this->code->setRangeLength(1, 5);
     }
 
     public function read(FUserSession $userSession, int $id, int $mode)
     {
         $this->initialize();
 
-        $sql = "SELECT * FROM o_job_status_log WHERE id_job_status_log = $id;";
+        $sql = "SELECT * FROM oc_process_area WHERE id_process_area = $id;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->id = intval($row["id_job_status_log"]);
+            $this->id = intval($row["id_process_area"]);
 
-            $this->id_job_status_log->setValue($row["id_job_status_log"]);
-            $this->status_datetime->setValue($row["status_datetime"]);
-            $this->status_notes->setValue($row["status_notes"]);
+            $this->id_process_area->setValue($row["id_process_area"]);
+            $this->name->setValue($row["name"]);
+            $this->code->setValue($row["code"]);
+            $this->sorting->setValue($row["sorting"]);
             $this->is_system->setValue($row["is_system"]);
             $this->is_deleted->setValue($row["is_deleted"]);
-            $this->fk_job->setValue($row["fk_job"]);
-            $this->fk_job_status->setValue($row["fk_job_status"]);
-            $this->fk_user_status->setValue($row["fk_user_status"]);
             $this->fk_user_ins->setValue($row["fk_user_ins"]);
             $this->fk_user_upd->setValue($row["fk_user_upd"]);
             $this->ts_user_ins->setValue($row["ts_user_ins"]);
@@ -92,57 +85,49 @@ class ModJobStatusLog extends FRegistry
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $userSession->getPdo()->prepare("INSERT INTO o_job_status_log (" .
-                "id_job_status_log, " .
-                "status_datetime, " .
-                "status_notes, " .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO oc_process_area (" .
+                "id_process_area, " .
+                "name, " .
+                "code, " .
+                "sorting, " .
                 "is_system, " .
                 "is_deleted, " .
-                "fk_job, " .
-                "fk_job_status, " .
-                "fk_user_status, " .
                 "fk_user_ins, " .
                 "fk_user_upd, " .
                 "ts_user_ins, " .
                 "ts_user_upd) " .
                 "VALUES (" .
                 "0, " .
-                ":status_datetime, " .
-                ":status_notes, " .
+                ":name, " .
+                ":code, " .
+                ":sorting, " .
                 ":is_system, " .
                 ":is_deleted, " .
-                ":fk_job, " .
-                ":fk_job_status, " .
-                ":fk_user_status, " .
                 ":fk_user, " .
                 "1, " .
                 "NOW(), " .
                 "NOW());");
         }
         else {
-            $statement = $userSession->getPdo()->prepare("UPDATE o_job_status_log SET " .
-                "status_datetime = :status_datetime, " .
-                "status_notes = :status_notes, " .
+            $statement = $userSession->getPdo()->prepare("UPDATE oc_process_area SET " .
+                "name = :name, " .
+                "code = :code, " .
+                "sorting = :sorting, " .
                 "is_system = :is_system, " .
                 "is_deleted = :is_deleted, " .
-                "fk_job = :fk_job, " .
-                "fk_job_status = :fk_job_status, " .
-                "fk_user_status = :fk_user_status, " .
                 //"fk_user_ins = :fk_user_ins, " .
-                "fk_user_upd = :fk_user_upd, " .
-                //"ts_user_ins = NOW(), " .
+                "fk_user_upd = :fk_user, " .
+                //"ts_user_ins = :ts_user_ins, " .
                 "ts_user_upd = NOW() " .
-                "WHERE id_job_status_log = :id;");
+                "WHERE id_test = :id;");
         }
 
-        //$id_job_status_log = $this->id_job_status_log->getValue();
-        $status_datetime = FUtils::formatStdDatetime($this->status_datetime->getValue());
-        $status_notes = $this->status_notes->getValue();
+        //$id_process_area = $this->id_process_area->getValue();
+        $name = $this->name->getValue();
+        $code = $this->code->getValue();
+        $sorting = $this->sorting->getValue();
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();
-        $fk_job = $this->fk_job->getValue();
-        $fk_job_status = $this->fk_job_status->getValue();
-        $fk_user_status = $this->fk_user_status->getValue();
         $fk_user_ins = $this->fk_user_ins->getValue();
         $fk_user_upd = $this->fk_user_upd->getValue();
         //$ts_user_ins = $this->ts_user_ins->getValue();
@@ -150,14 +135,12 @@ class ModJobStatusLog extends FRegistry
 
         $fk_user = $userSession->getCurUser()->getId();
 
-        //$statement->bindParam(":id_job_status_log", $id_job_status_log, \PDO::PARAM_INT);
-        $statement->bindParam(":status_datetime", $status_datetime);
-        $statement->bindParam(":status_notes", $status_notes);
+        //$statement->bindParam(":id_process_area", $id_process_area, \PDO::PARAM_INT);
+        $statement->bindParam(":name", $name);
+        $statement->bindParam(":code", $code);
+        $statement->bindParam(":sorting", $sorting, \PDO::PARAM_INT);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
-        $statement->bindParam(":fk_job", $fk_job, \PDO::PARAM_INT);
-        $statement->bindParam(":fk_job_status", $fk_job_status, \PDO::PARAM_INT);
-        $statement->bindParam(":fk_user_status", $fk_user_status, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_ins", $fk_user_ins, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_upd", $fk_user_upd, \PDO::PARAM_INT);
         //$statement->bindParam(":ts_user_ins", $ts_user_ins);

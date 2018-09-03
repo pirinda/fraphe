@@ -73,7 +73,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         try {
             $recept->setData($data);
             $recept->save($userSession);
-            header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/forms/operations/form_recept_samples.php?id=" . $recept->getId());
+            header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/operations/view_recept_samples.php?id=" . $recept->getId());
         }
         catch (Exception $e) {
             $errmsg = $e->getMessage();
@@ -85,7 +85,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
 echo '<div class="container" style="margin-top:50px">';
 echo '<div class="page-header">';
-echo '<h2>Recepción de muestras</h2>';
+echo '<h3>Recepción de muestras</h3>';
 echo '</div>';
 
 if (!empty($errmsg)) {

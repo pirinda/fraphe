@@ -50,7 +50,7 @@ echo '<th>Nombre</th>';
 echo '<th>Código</th>';
 echo '<th>Clase muestra</th>';
 echo '<th>Método analítico</th>';
-echo '<th>A/A</th>';
+echo '<th><abbr title="Acreditado/Autorizado">A/A</abbr></th>';
 echo '<th class="small">Creador</th>';
 echo '<th class="small">Creación</th>';
 echo '<th class="small">Modificador</th>';

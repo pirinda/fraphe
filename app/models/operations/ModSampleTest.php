@@ -1,5 +1,5 @@
 <?php
-namespace app\models\catalogs;
+namespace app\models\operations;
 
 use Fraphe\App\FUserSession;
 use Fraphe\Lib\FUtils;
@@ -74,16 +74,14 @@ class ModSampleTest extends FRelation
         $this->ids["id_entity"] = 0;
     }
 
-    /* Sets registry's data from model of test process entity.
-     * Pretended to be used by front-end.
-     */
-    public function setModelTestProcessEntity(ModTestProcessEntity $testProcessEntity)
-    {
-        $this->id_test->setValue($testProcessEntity->getDatum("id_test"));
-        $this->id_entity->setValue($testProcessEntity->getDatum("id_entity"));
-        $this->process_days_min->setValue($testProcessEntity->getDatum("process_days_min"));
-        $this->process_days_max->setValue($testProcessEntity->getDatum("process_days_max"));
-        $this->fk_process_area->setValue($testProcessEntity->getDbmsFkProcessArea());
+    protected function generateSampleTest(FUserSession $userSession) {
+        $this->id_sample->validate();
+
+        $sql = "SELECT COALESCE(MAX(sample_test), 0) AS _max_sample_test FROM o_sample_test WHERE id_sample = " . $this->id_sample->getValue() . ";";
+        $statement = $userSession->getPdo()->query($sql);
+        if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $this->sample_test->setValue(intval($row["_max_sample_test"]) + 1);
+        }
     }
 
     /* Computes process days and deadline.
@@ -110,6 +108,16 @@ class ModSampleTest extends FRelation
 
     public function validate(FUserSession $userSession)
     {
+        // compute data:
+
+        $test = new ModTest();
+        $test->read($userSession, $this->id_test->getValue(), FRegistry::MODE_READ);
+        $this->fk_process_area->setValue($test->getDatum("fk_process_area"));
+
+        if (empty($this->sample_test->getValue())) {
+            $this->generateSampleTest($userSession);
+        }
+
         // compute data:
         $this->computeProcessDays();
 
@@ -161,6 +169,7 @@ class ModSampleTest extends FRelation
         $this->validate($userSession);
 
         $statement;
+        $this->isRegistryNew = $this->checkRegistryNew($userSession, "o_sample_test") == 0;
 
         if ($this->isRegistryNew) {
             $statement = $userSession->getPdo()->prepare("INSERT INTO o_sample_test (" .
@@ -237,6 +246,8 @@ class ModSampleTest extends FRelation
         //$ts_user_ins = $this->ts_user_ins->getValue();
         //$ts_user_upd = $this->ts_user_upd->getValue();
 
+        $fk_user = $userSession->getCurUser()->getId();
+
         $statement->bindParam(":id_sample", $id_sample, \PDO::PARAM_INT);
         $statement->bindParam(":id_test", $id_test, \PDO::PARAM_INT);
         $statement->bindParam(":id_entity", $id_entity, \PDO::PARAM_INT);
@@ -255,11 +266,54 @@ class ModSampleTest extends FRelation
         //$statement->bindParam(":ts_user_ins", $ts_user_ins);
         //$statement->bindParam(":ts_user_upd", $ts_user_upd);
 
+        $statement->bindParam(":fk_user", $fk_user, \PDO::PARAM_INT);
+
         $statement->execute();
 
         $this->isRegistryModified = false;
         if ($this->isRegistryNew) {
             $this->isRegistryNew = false;
+        }
+
+        // update test process entity if needed:
+        $create = false;
+        $testProcessEntity = new ModTestProcessEntity();
+        $ids = array("id_test" => $this->id_test->getValue(), "id_entity" => $this->id_entity->getValue());
+
+        try {
+            $testProcessEntity->retrieve($userSession, $ids, FRegistry::MODE_READ);
+        }
+        catch (Exception $e) {
+            $create = true;
+        }
+
+        $data = array();
+        if ($create) {
+            // create new registry
+            $data["id_test"] = $this->id_test->getValue();
+            $data["id_entity"] = $this->id_entity->getValue();
+            $data["process_days_min"] = $this->process_days_min->getValue();
+            $data["process_days_max"] = $this->process_days_max->getValue();
+            $data["cost"] = $this->cost->getValue();
+            $data["is_default"] = false;
+            $testProcessEntity->initialize();
+        }
+        else {
+            // update existing registry:
+            if ($testProcessEntity->getDatum("process_days_min") != $this->process_days_min->getValue()) {
+                $data["process_days_min"] = $this->process_days_min->getValue();
+            }
+            if ($testProcessEntity->getDatum("process_days_max") != $this->process_days_max->getValue()) {
+                $data["process_days_max"] = $this->process_days_max->getValue();
+            }
+            if ($testProcessEntity->getDatum("cost") != $this->cost->getValue()) {
+                $data["cost"] = $this->cost->getValue();
+            }
+        }
+
+        if (count($data) > 0) {
+            $testProcessEntity->setData($data);
+            $testProcessEntity->save($userSession);
         }
     }
 

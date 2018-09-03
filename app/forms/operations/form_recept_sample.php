@@ -72,8 +72,8 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         //$data["sample_num"] = $_POST["sample_num"];
         $data["sample_name"] = $_POST["sample_name"];
         $data["sample_lot"] = $_POST["sample_lot"];
-        $data["sample_date_mfg_n"] = empty($_POST["sample_date_mfg_n"]) ? 0 : FUtils::parseStdDate($_POST["sample_date_mfg_n"]);
-        $data["sample_date_sell_by_n"] = empty($_POST["sample_date_sell_by_n"]) ? 0 : FUtils::parseStdDate($_POST["sample_date_sell_by_n"]);
+        $data["sample_date_mfg_n"] = empty($_POST["sample_date_mfg_n"]) ? null : FUtils::parseStdDate($_POST["sample_date_mfg_n"]);
+        $data["sample_date_sell_by_n"] = empty($_POST["sample_date_sell_by_n"]) ? null : FUtils::parseStdDate($_POST["sample_date_sell_by_n"]);
         $data["sample_quantity"] = floatval($_POST["sample_quantity"]);
         //$data["sample_quantity_orig"] = $_POST["sample_quantity_orig"];
         //$data["sample_child"] = $_POST["sample_child"];
@@ -81,23 +81,33 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         $isSamplingCompany =  empty($_POST["is_sampling_company"]) ? false : boolval($_POST["is_sampling_company"]);
         if (!$isSamplingCompany) {
             $data["is_sampling_company"] = false;
-            $data["sampling_datetime_n"] = 0;
-            $data["sampling_temperat_n"] = 0;
+            $data["sampling_datetime_n"] = null;
+            $data["sampling_temperat_n"] = null;
             $data["sampling_area"] = "";
             $data["sampling_guide"] = 0;
             $data["sampling_deviats"] = "";
             $data["sampling_notes"] = "";
             //$data["sampling_imgs"] = $_POST["sampling_imgs"];
+            $data["fk_sampling_method"] = ModConsts::OC_SAMPLING_METHOD_CUSTOMER;
+            $data["nk_sampling_equipt_1"] = 0;
+            $data["nk_sampling_equipt_2"] = 0;
+            $data["nk_sampling_equipt_3"] = 0;
+            $data["fk_user_sampler"] = ModConsts::CC_USER_NA;
         }
         else {
             $data["is_sampling_company"] = true;
-            $data["sampling_datetime_n"] = FUtils::parseHtmlDatetime($_POST["sampling_datetime_n"]);
+            $data["sampling_datetime_n"] = empty($_POST["sampling_datetime_n"]) ? null : FUtils::parseHtmlDatetime($_POST["sampling_datetime_n"]);
             $data["sampling_temperat_n"] = floatval($_POST["sampling_temperat_n"]);
             $data["sampling_area"] = $_POST["sampling_area"];
             $data["sampling_guide"] = intval($_POST["sampling_guide"]);
             $data["sampling_deviats"] = $_POST["sampling_deviats"];
             $data["sampling_notes"] = $_POST["sampling_notes"];
             //$data["sampling_imgs"] = $_POST["sampling_imgs"];
+            $data["fk_sampling_method"] = intval($_POST["fk_sampling_method"]);
+            $data["nk_sampling_equipt_1"] = intval($_POST["nk_sampling_equipt_1"]);
+            $data["nk_sampling_equipt_2"] = intval($_POST["nk_sampling_equipt_2"]);
+            $data["nk_sampling_equipt_3"] = intval($_POST["nk_sampling_equipt_3"]);
+            $data["fk_user_sampler"] = intval($_POST["fk_user_sampler"]);
         }
         //$data["recept_sample"] = $_POST["recept_sample"];
         //$data["recept_datetime_n"] = $_POST["recept_datetime_n"];
@@ -121,11 +131,6 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $data["customer_state_region"] = "";
             $data["customer_country"] = "";
             $data["customer_contact"] = "";
-            $data["fk_sampling_method"] = ModConsts::OC_SAMPLING_METHOD_CUSTOMER;
-            $data["nk_sampling_equipt_1"] = 0;
-            $data["nk_sampling_equipt_2"] = 0;
-            $data["nk_sampling_equipt_3"] = 0;
-            $data["fk_user_sampler"] = ModConsts::CC_USER_NA;
         }
         else {
             $data["is_customer_custom"] = true;
@@ -139,11 +144,6 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $data["customer_state_region"] = $_POST["customer_state_region"];
             $data["customer_country"] = $_POST["customer_country"];
             $data["customer_contact"] = $_POST["customer_contact"];
-            $data["fk_sampling_method"] = intval($_POST["fk_sampling_method"]);
-            $data["nk_sampling_equipt_1"] = intval($_POST["nk_sampling_equipt_1"]);
-            $data["nk_sampling_equipt_2"] = intval($_POST["nk_sampling_equipt_2"]);
-            $data["nk_sampling_equipt_3"] = intval($_POST["nk_sampling_equipt_3"]);
-            $data["fk_user_sampler"] = intval($_POST["fk_user_sampler"]);
         }
         $data["is_def_sampling_img"] = empty($_POST["is_def_sampling_img"]) ? false : boolval($_POST["is_def_sampling_img"]);
         $data["ref_chain_custody"] = $_POST["ref_chain_custody"];
@@ -170,7 +170,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $sample->setParentRecept($recept);
             $sample->setData($data);
             $sample->save($userSession);
-            header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/forms/operations/form_recept_samples.php?id=" . $recept->getId());
+            header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/operations/view_recept_sample_tests.php?id=" . $sample->getId());
         }
         catch (Exception $e) {
             $errmsg = $e->getMessage();
@@ -182,7 +182,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
 echo '<div class="container" style="margin-top:50px">';
 echo '<div class="page-header">';
-echo '<h2>Recepción de muestras</h2>';
+echo '<h3>Muestra</h3>';
 echo '</div>';
 
 if (!empty($errmsg)) {
@@ -199,7 +199,7 @@ if (!empty($errmsg)) {
 echo '<form class="form-horizontal" method="post" action="' . FUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '" onsubmit="return validateForm()" enctype="multipart/form-data">';
 
 // preserve registry ID in post:
-echo '<input type="hidden" name="' . FRegistry::ID . '" id="' . FRegistry::ID . '" value="' . $sample->getId() . '">';
+echo '<input type="hidden" name="' . FRegistry::ID . '" value="' . $sample->getId() . '">';
 echo '<input type="hidden" name="recept" value="' . $recept->getId() . '">';
 echo '<input type="hidden" name="customer" id="customer" value="' . $recept->getDatum("fk_customer") . '">'; // make customer ID available to JavaScript through DOM
 if ($copy) {
@@ -433,7 +433,7 @@ echo '</div>';  // row
 
 //------------------------------------------------------------------------------
 echo '<button type="submit" class="btn btn-sm btn-primary">Guardar</button>&nbsp;';
-echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_samples.php?id=' . $recept->getId() . '" class="btn btn-sm btn-danger" role="button">Cancelar</a>';
+echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept_samples.php?id=' . $recept->getId() . '" class="btn btn-sm btn-danger" role="button">Cancelar</a>';
 
 echo '</form>';
 echo '</div>';  // echo '<div class="container" style="margin-top:50px">';
@@ -452,11 +452,11 @@ function loadCustomer() {
     request.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             var json = this.responseText;
-            console.log("json: " + json);
-            customer = JSON.parse(json); // load in memory customers's data
+            //console.log("json: " + json);
+            customer = JSON.parse(json); // load in memory customer's data
         }
     };
-    var url = "form_recept_load_customer.php?id=" + document.getElementById("customer").value; // hidden html input!
+    var url = "ajax_recept_sample_customer.php?id=" + document.getElementById("customer").value; // hidden html input!
     request.open("GET", url);
     request.send();
 }

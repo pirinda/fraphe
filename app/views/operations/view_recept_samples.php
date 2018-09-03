@@ -33,8 +33,9 @@ $customer->read($userSession, $recept->getDatum("fk_customer"), FRegistry::MODE_
 echo '<div class="container" style="margin-top:50px">';
 echo '<h3>Recepción de muestras</h3>';
 
+//------------------------------------------------------------------------------
 echo '<div class="panel panel-default">';
-echo '<div class="panel-heading">Recepción</div>';
+echo '<div class="panel-heading">Datos de la recepción</div>';
 echo '<div class="panel-body small">';
 
 echo '<div class="row">';
@@ -65,6 +66,9 @@ echo '</div>';
 
 echo '</div>';
 echo '</div>';
+//------------------------------------------------------------------------------
+
+echo '<h4>Muestras</h4>';
 
 echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?recept=' . $recept->getId() . '" class="btn btn-primary btn-sm" role="button">Crear</a>&nbsp;';
 echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept.php" class="btn btn-danger btn-sm" role="button">Volver</a>';
@@ -79,7 +83,8 @@ ss.code AS _ss_code,
 cu.code AS _cu_code,
 us.initials AS _us_initials,
 ur.initials AS _ur_initials,
-ui.name AS _ui_name, uu.name AS _uu_name
+ui.name AS _ui_name, uu.name AS _uu_name,
+(SELECT COUNT(*) FROM o_sample_test AS qst WHERE qst.id_sample = s.id_sample) AS _tests
 FROM o_sample AS s
 INNER JOIN cc_company_branch AS cb ON s.fk_company_branch = cb.id_company_branch
 INNER JOIN oc_sample_class AS sc ON s.fk_sample_class = sc.id_sample_class
@@ -103,15 +108,16 @@ echo '<th>Nombre</th>';
 echo '<th>Cantidad</th>';
 echo '<th>Unidad</th>';
 echo '<th>Lote</th>';
-echo '<th>Tipo</th>';
 echo '<th>Estatus</th>';
-echo '<th>Mue.</th>';
-echo '<th>Rec.</th>';
-echo '<th>Suc.</th>';
+echo '<th><abbr title="Ensayos">Ens.</abbr></th>';
+echo '<th><abbr title="Muestreador">Mtr.</abbr></th>';
+echo '<th><abbr title="Receptor">Rec.</abbr></th>';
+echo '<th><abbr title="Sucursal">Suc.</abbr></th>';
 echo '<th class="small">Creador</th>';
 echo '<th class="small">Creación</th>';
 echo '<th class="small">Modificador</th>';
 echo '<th class="small">Modificación</th>';
+echo '<th></th>';
 echo '<th></th>';
 echo '<th></th>';
 //echo '<th></th>';
@@ -127,8 +133,8 @@ foreach ($pdo->query($sql) as $row) {
     echo '<td>' . $row['sample_quantity'] . '</td>';
     echo '<td>' . $row['_cu_code'] . '</td>';
     echo '<td>' . $row['sample_lot'] . '</td>';
-    echo '<td>' . $row['_st_name'] . '</td>';
     echo '<td>' . $row['_ss_code'] . '</td>';
+    echo '<td>' . $row['_tests'] . '</td>';
     echo '<td>' . $row['_us_initials'] . '</td>';
     echo '<td>' . $row['_ur_initials'] . '</td>';
     echo '<td>' . $row['_cb_code'] . '</td>';
@@ -137,7 +143,8 @@ foreach ($pdo->query($sql) as $row) {
     echo '<td class="small">' . $row['_uu_name'] . '</td>';
     echo '<td class="small">' . $row['_ts_user_upd'] . '</td>';
     echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?id=' . $row['_id'] . '" class="btn btn-success btn-xs" role="button"><span class="glyphicon glyphicon-edit"></span></a></td>';
-    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?id=' . $row['_id'] . '&copy=1" class="btn btn-success btn-xs" role="button"><span class="glyphicon glyphicon-duplicate"></span></a></td>';
+    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept_sample_tests.php?id=' . $row['_id'] . '" class="btn btn-warning btn-xs" role="button"><span class="glyphicon glyphicon-th-list"></span></a></td>';
+    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?id=' . $row['_id'] . '&copy=1" class="btn btn-primary btn-xs" role="button"><span class="glyphicon glyphicon-duplicate"></span></a></td>';
 //    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?id=' . $row['_id'] . '&copy=1" class="btn btn-danger btn-xs" role="button"><span class="glyphicon glyphicon-ban-circle"></span></a></td>';
     echo '</tr>';
 }

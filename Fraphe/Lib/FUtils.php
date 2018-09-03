@@ -19,14 +19,14 @@ abstract class FUtils
         return !isset($timestamp) ? "" : date("Y-m-d", $timestamp);
     }
 
-    /** Format used: "Y-m-d  H:i:s".
+    /** Format used: "Y-m-d H:i:s".
       */
     public static function formatStdDatetime(int $timestamp): string
     {
         return !isset($timestamp) ? "" : date("Y-m-d H:i:s", $timestamp);
     }
 
-    /** Format used: " H:i:s".
+    /** Format used: "H:i:s".
       */
     public static function formatStdTime(int $timestamp): string
     {
@@ -40,13 +40,13 @@ abstract class FUtils
         return self::formatStdDatetime($timestamp);
     }
 
-    /** Format used: "Y-m-d  H:i:s".
+    /** Format used: "Y-m-d\TH:i".
       */
     public static function formatHtmlDatetime(int $timestamp): string
     {
-        return !isset($timestamp) ? "" : date("Y-m-d\TH:i:s", $timestamp);
+        return !isset($timestamp) ? "" : date("Y-m-d\TH:i", $timestamp);
     }
-    /** Format used: "Y-m-d".
+    /** Format used: "!Y-m-d".
       */
     public static function parseStdDate(string $time): int
     {
@@ -54,11 +54,14 @@ abstract class FUtils
             return 0;
         }
 
-        $dt = \DateTime::createFromFormat("!Y-m-d", $time, new \DateTimeZone(date_default_timezone_get())); // '!'
+        $dt = \DateTime::createFromFormat("!Y-m-d", $time, new \DateTimeZone(date_default_timezone_get()));
+        if ($dt === false) {
+            return 0;
+        }
         return $dt->getTimestamp();
     }
 
-    /** Format used: "Y-m-d H:i:s".
+    /** Format used: "!Y-m-d H:i:s".
       */
     public static function parseStdDatetime(string $time): int
     {
@@ -67,10 +70,13 @@ abstract class FUtils
         }
 
         $dt = \DateTime::createFromFormat("!Y-m-d H:i:s", $time, new \DateTimeZone(date_default_timezone_get()));
+        if ($dt === false) {
+            return 0;
+        }
         return $dt->getTimestamp();
     }
 
-    /** Format used: "H:i:s".
+    /** Format used: "!H:i:s".
       */
     public static function parseStdTime(string $time): int
     {
@@ -79,17 +85,20 @@ abstract class FUtils
         }
 
         $dt = \DateTime::createFromFormat("!H:i:s", $time, new \DateTimeZone(date_default_timezone_get()));
+        if ($dt === false) {
+            return 0;
+        }
         return $dt->getTimestamp();
     }
 
-    /** Format used: "Y-m-d H:i:s". Same as parseStdDatetime().
+    /** Format used: "!Y-m-d H:i:s". Same as parseStdDatetime().
       */
     public static function parseStdTimestamp(string $time): int
     {
         return self::parseStdDatetime($time);
     }
 
-    /** Format used: "Y-m-dTH:i".
+    /** Format used: "!Y-m-d\TH:i".
       */
     public static function parseHtmlDatetime(string $time): int
     {
@@ -97,7 +106,10 @@ abstract class FUtils
             return 0;
         }
 
-        $dt = \DateTime::createFromFormat("!Y-m-dTH:i", $time, new \DateTimeZone(date_default_timezone_get()));
+        $dt = \DateTime::createFromFormat("!Y-m-d\TH:i", $time, new \DateTimeZone(date_default_timezone_get()));
+        if ($dt === false) {
+            return 0;
+        }
         return $dt->getTimestamp();
     }
 
@@ -110,6 +122,9 @@ abstract class FUtils
         }
 
         $dt = new \DateTime(self::formatStdDate($timestamp));
+        if ($dt === false) {
+            return 0;
+        }
         return $dt->getTimestamp();
     }
 

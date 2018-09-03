@@ -9,6 +9,8 @@ use app\AppConsts;
 
 class ModTest extends FRegistry
 {
+    public const PREFIX = "test_";
+
     protected $id_test;
     protected $name;
     protected $code;

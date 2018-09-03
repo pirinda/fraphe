@@ -18,25 +18,24 @@ use app\models\catalogs\ModEntity;
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
     $json = "";
     if (!empty($_GET["id"])) {
-        // read customer:
         $userSession = FGuiUtils::createUserSession();
+
         $entity = new ModEntity();
         $entity->read($userSession, intval($_GET["id"]), FRegistry::MODE_READ);
 
         // get customer data:
-        $registry = $entity;
-        $json .= '"customer_name":"' . $registry->getDatum("name") . '", ';
+        $json .= '"customer_name":"' . $entity->getDatum("name") . '", ';
 
         // get customer's address data:
-        $registry = $entity->getChildAddresses()[0];
-        $json .= '"customer_street":"' . $registry->getDatum("street") . '", ';
-        $json .= '"customer_district":"' . $registry->getDatum("district") . '", ';
-        $json .= '"customer_postcode":"' . $registry->getDatum("postcode") . '", ';
-        $json .= '"customer_reference":"' . $registry->getDatum("reference") . '", ';
-        $json .= '"customer_city":"' . $registry->getDatum("city") . '", ';
-        $json .= '"customer_county":"' . $registry->getDatum("county") . '", ';
-        $json .= '"customer_state_region":"' . $registry->getDatum("state_region") . '", ';
-        $json .= '"customer_country":"' . $registry->getDatum("country") . '", ';
+        $address = $entity->getChildAddresses()[0];
+        $json .= '"customer_street":"' . $address->getDatum("street") . '", ';
+        $json .= '"customer_district":"' . $address->getDatum("district") . '", ';
+        $json .= '"customer_postcode":"' . $address->getDatum("postcode") . '", ';
+        $json .= '"customer_reference":"' . $address->getDatum("reference") . '", ';
+        $json .= '"customer_city":"' . $address->getDatum("city") . '", ';
+        $json .= '"customer_county":"' . $address->getDatum("county") . '", ';
+        $json .= '"customer_state_region":"' . $address->getDatum("state_region") . '", ';
+        $json .= '"customer_country":"' . $address->getDatum("country") . '", ';
         $json .= '"customer_contact":""';
     }
     echo '{' . $json . '}';

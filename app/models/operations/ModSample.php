@@ -83,6 +83,7 @@ class ModSample extends FRegistry
     protected $childSamplingImages;
 
     protected $parentRecept;
+    protected $dbmsContainerUnitCode;
 
     function __construct()
     {
@@ -99,7 +100,7 @@ class ModSample extends FRegistry
         $this->sample_child = new FItem(FItem::DATA_TYPE_INT, "sample_child", "Núm. muestra hijo", "", false);
         $this->sample_released = new FItem(FItem::DATA_TYPE_STRING, "sample_released", "Muestra liberada", "", false);
         $this->is_sampling_company = new FItem(FItem::DATA_TYPE_BOOL, "is_sampling_company", "Muestreo propio", "", false);
-        $this->sampling_datetime_n = new FItem(FItem::DATA_TYPE_DATETIME, "sampling_datetime_n", "Fecha-hora muestreo", "", false);
+        $this->sampling_datetime_n = new FItem(FItem::DATA_TYPE_DATETIME, "sampling_datetime_n", "Fecha-hr muestreo", "aaaa-mm-ddTHH:mm", false);
         $this->sampling_temperat_n = new FItem(FItem::DATA_TYPE_FLOAT, "sampling_temperat_n", "Temp. muestreo °C", "", false);
         $this->sampling_area = new FItem(FItem::DATA_TYPE_STRING, "sampling_area", "Área muestreo", "", true);
         $this->sampling_guide = new FItem(FItem::DATA_TYPE_INT, "sampling_guide", "Núm. guía muestreo", "", false);
@@ -107,7 +108,7 @@ class ModSample extends FRegistry
         $this->sampling_notes = new FItem(FItem::DATA_TYPE_STRING, "sampling_notes", "Observaciones muestreo", "", false);
         $this->sampling_imgs = new FItem(FItem::DATA_TYPE_INT, "sampling_imgs", "Imágenes muestreo", "", false);
         $this->recept_sample = new FItem(FItem::DATA_TYPE_INT, "recept_sample", "Núm. muestra recepción", "", false);
-        $this->recept_datetime_n = new FItem(FItem::DATA_TYPE_DATETIME, "recept_datetime_n", "Fecha-hora recepción", "", false);
+        $this->recept_datetime_n = new FItem(FItem::DATA_TYPE_DATETIME, "recept_datetime_n", "Fecha-hr recepción", "aaaa-mm-ddTHH:mm", false);
         $this->recept_temperat_n = new FItem(FItem::DATA_TYPE_FLOAT, "recept_temperat_n", "Temp. recepción °C", "", false);
         $this->recept_deviats = new FItem(FItem::DATA_TYPE_STRING, "recept_deviats", "Desviaciones recepción", "", false);
         $this->recept_notes = new FItem(FItem::DATA_TYPE_STRING, "recept_notes", "Observaciones recepción", "", false);
@@ -364,6 +365,11 @@ class ModSample extends FRegistry
         $this->childSamplingImages = array();
     }
 
+    public function getDbmsContainerUnitCode(): string
+    {
+        return $this->dbmsContainerUnitCode;
+    }
+
     /** Overriden method.
      */
     public function forceRegistryNew()
@@ -378,12 +384,20 @@ class ModSample extends FRegistry
     public function tailorMembers()
     {
         if (!$this->is_sampling_company->getValue()) {
+            // sampling by customer:
+            $this->sampling_datetime_n->setMandatory(false);
             $this->sampling_area->setMandatory(false);
             $this->sampling_area->setLengthMin(0);
+            $this->sampling_guide->setMandatory(false);
+            $this->fk_user_sampler->setMandatory(false);
         }
         else {
+            // sampling by company:
+            $this->sampling_datetime_n->setMandatory(true);
             $this->sampling_area->setMandatory(true);
             $this->sampling_area->setLengthMin(1);
+            $this->sampling_guide->setMandatory(true);
+            $this->fk_user_sampler->setMandatory(true);
         }
 
         $items = array($this->customer_name, $this->customer_postcode,
@@ -567,6 +581,16 @@ class ModSample extends FRegistry
         }
         else {
             throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
+        }
+
+        // read DBMS complementary data:
+        $sql = "SELECT code FROM oc_container_unit WHERE id_container_unit = " . $this->fk_container_unit->getValue() . ";";
+        $statement = $userSession->getPdo()->query($sql);
+        if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $this->dbmsContainerUnitCode = $row["code"];
+        }
+        else {
+            throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_DEP_NOT_FOUND);
         }
     }
 
