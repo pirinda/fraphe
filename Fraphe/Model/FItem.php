@@ -104,7 +104,7 @@ class FItem
                 break;
 
             case self::DATA_TYPE_STRING:
-                $this->value = strval($value);
+                $this->value = trim(strval($value));
                 break;
 
             case self::DATA_TYPE_DATE:

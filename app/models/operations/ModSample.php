@@ -78,9 +78,9 @@ class ModSample extends FRegistry
     protected $ts_user_ins;
     protected $ts_user_upd;
 
-    protected $childTests;
-    protected $childStatusLogs;
-    protected $childSamplingImages;
+    protected $childSampleTests;        // array of ModSampleTest
+    protected $childSampleStatusLogs;   // array of ModSampleStatusLog
+    protected $childSamplingImages;     // array of ModSamplingImage
 
     protected $parentRecept;
     protected $dbmsContainerUnitCode;
@@ -150,7 +150,7 @@ class ModSample extends FRegistry
         $this->nk_sampling_equipt_2 = new FItem(FItem::DATA_TYPE_INT, "nk_sampling_equipt_2", "Equipo muestreo 2", "", false);
         $this->nk_sampling_equipt_3 = new FItem(FItem::DATA_TYPE_INT, "nk_sampling_equipt_3", "Equipo muestreo 3", "", false);
         $this->nk_recept = new FItem(FItem::DATA_TYPE_INT, "nk_recept", "Recepción", "", false);
-        $this->fk_user_sampler = new FItem(FItem::DATA_TYPE_INT, "fk_user_sampler", "Muestreador", "", true);
+        $this->fk_user_sampler = new FItem(FItem::DATA_TYPE_INT, "fk_user_sampler", "Realizador muestreo", "", true);
         $this->fk_user_receiver = new FItem(FItem::DATA_TYPE_INT, "fk_user_receiver", "Receptor", "", true);
         $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", "", false);
         $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", "", false);
@@ -249,9 +249,12 @@ class ModSample extends FRegistry
         $this->ref_request->setRangeLength(0, 25);
         $this->ref_agreet->setRangeLength(0, 25);
 
-        $this->clearChildTests();
-        $this->clearChildStatusLogs();
+        $this->clearChildSampleTests();
+        $this->clearChildSampleStatusLogs();
         $this->clearChildSamplingImages();
+
+        $this->parentRecept = null;
+        $this->dbmsContainerUnitCode = null;
     }
 
     public function setParentRecept(ModRecept $recept)
@@ -275,7 +278,8 @@ class ModSample extends FRegistry
         return $this->parentRecept->getDatum("recept_num") . "-" . $nf->format($this->recept_sample->getValue());
     }
 
-    protected function generateReceptSample(FUserSession $userSession) {
+    protected function generateReceptSample(FUserSession $userSession)
+    {
         $this->validateParentRecept();
 
         $sql = "SELECT COALESCE(MAX(recept_sample), 0) AS _max_recept_sample FROM o_sample WHERE nk_recept = " . $this->parentRecept->getId() . ";";
@@ -285,11 +289,12 @@ class ModSample extends FRegistry
         }
     }
 
-    protected function updateSampleClass(FUserSession $userSession) {
+    protected function updateSampleClass(FUserSession $userSession)
+    {
         $sql = "SELECT fk_sample_class FROM oc_sample_type WHERE id_sample_type = " . $this->fk_sample_type->getValue() . ";";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->fk_sample_class->setValue(intval($row["fk_sample_class"]) + 1);
+            $this->fk_sample_class->setValue(intval($row["fk_sample_class"]));
         }
     }
 
@@ -298,7 +303,7 @@ class ModSample extends FRegistry
         $this->process_start_date->setValue($startDate);
 
         // propagate process start date:
-        foreach ($this->childTests as $test) {
+        foreach ($this->childSampleTests as $test) {
             $test->getItem("process_start_date")->setValue($startDate);
         }
     }
@@ -309,7 +314,7 @@ class ModSample extends FRegistry
         $minStartDate = $this->process_start_date->getValue();  // must be already set
         $maxDeadline = $this->process_start_date->getValue();   // must be already set
 
-        foreach ($this->childTests as $test) {
+        foreach ($this->childSampleTests as $test) {
             $test->computeProcessDays();
 
             if ($test->getDatum("process_days") > $maxDays) {
@@ -335,14 +340,19 @@ class ModSample extends FRegistry
         $this->process_deadline->setValue($maxDeadline);
     }
 
-    public function &getChildTests(): array
+    public function getDbmsContainerUnitCode(): string
     {
-        return $this->childTests;
+        return $this->dbmsContainerUnitCode;
     }
 
-    public function &getChildStatusLogs(): array
+    public function &getChildSampleTests(): array
     {
-        return $this->childStatusLogs;
+        return $this->childSampleTests;
+    }
+
+    public function &getChildSampleStatusLogs(): array
+    {
+        return $this->childSampleStatusLogs;
     }
 
     public function &getChildSamplingImages(): array
@@ -350,14 +360,14 @@ class ModSample extends FRegistry
         return $this->childSamplingImages;
     }
 
-    public function clearChildTests()
+    public function clearChildSampleTests()
     {
-        $this->childTests = array();
+        $this->childSampleTests = array();
     }
 
-    public function clearChildStatusLogs()
+    public function clearChildSampleStatusLogs()
     {
-        $this->childStatusLogs = array();
+        $this->childSampleStatusLogs = array();
     }
 
     public function clearChildSamplingImages()
@@ -365,18 +375,26 @@ class ModSample extends FRegistry
         $this->childSamplingImages = array();
     }
 
-    public function getDbmsContainerUnitCode(): string
-    {
-        return $this->dbmsContainerUnitCode;
-    }
-
     /** Overriden method.
      */
     public function forceRegistryNew()
     {
-        $this->isRegistryNew = true;
+        parent::forceRegistryNew();
+
         $this->sample_num->reset();
         $this->recept_sample->reset();
+
+        foreach ($this->childSampleTests as $child) {
+            $child->forceRegistryNew();
+        }
+
+        foreach ($this->childSampleStatusLogs as $child) {
+            $child->forceRegistryNew();
+        }
+
+        foreach ($this->childSamplingImages as $child) {
+            $child->forceRegistryNew();
+        }
     }
 
     /** Overriden method.
@@ -423,15 +441,20 @@ class ModSample extends FRegistry
     {
         // compute data:
 
+        $this->validateParentRecept();
+
         if (empty($this->sample_quantity_orig->getValue())) {
             $this->sample_quantity_orig->setValue($this->sample_quantity->getValue());
         }
+
         if (empty($this->recept_sample->getValue())) {
             $this->generateReceptSample($userSession); // will be used by generation of sample number
         }
+
         if (empty($this->recept_datetime_n->getValue())) {
             $this->recept_datetime_n->setValue($this->parentRecept->getDatum("recept_datetime"));
         }
+
         $this->updateSampleClass($userSession);
 
         if ($this->isRegistryNew) {
@@ -444,21 +467,25 @@ class ModSample extends FRegistry
 
         parent::validate($userSession);
 
-        foreach ($this->childTests as $test) {
-            $ids = array();
-            $ids["id_sample"] = $this->isRegistryNew ? -1 : $this->id;  // bypass validation
-            $test->setIds($ids);
-            $test->validate($userSession);
+        foreach ($this->childSampleTests as $child) {
+            $data = array();
+            $data["fk_sample"] = $this->isRegistryNew ? -1 : $this->id;  // bypass validation
+            $child->setData($data);
+            $child->validate($userSession);
         }
 
-        foreach ($this->childStatusLogs as $statusLog) {
-            $statusLog->getItem("fk_sample")->setValue($this->isRegistryNew ? -1 : $this->id);  // bypass validation
-            $statusLog->validate($userSession);
+        foreach ($this->childSampleStatusLogs as $child) {
+            $data = array();
+            $data["fk_sample"] = $this->isRegistryNew ? -1 : $this->id;  // bypass validation
+            $child->setData($data);
+            $child->validate($userSession);
         }
 
-        foreach ($this->childSamplingImages as $samplingImage) {
-            $samplingImage->getItem("fk_sample")->setValue($this->isRegistryNew ? -1 : $this->id);  // bypass validation
-            $samplingImage->validate($userSession);
+        foreach ($this->childSamplingImages as $child) {
+            $data = array();
+            $data["fk_sample"] = $this->isRegistryNew ? -1 : $this->id;  // bypass validation
+            $child->setData($data);
+            $child->validate($userSession);
         }
     }
 
@@ -548,35 +575,30 @@ class ModSample extends FRegistry
             $pdo = FGuiUtils::createPdo();
 
             // read child sample tests:
-            $sql = "SELECT id_sample, id_test, id_entity FROM o_sample_test WHERE id_sample = $this->id ORDER BY id_sample, id_test, id_entity;";
+            $sql = "SELECT id_sample_test FROM o_sample_test WHERE fk_sample = $this->id ORDER BY id_sample_test;";
             $statement = $pdo->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $ids = array();
-                $ids["id_sample"] = intval($row["id_sample"]);
-                $ids["id_test"] = intval($row["id_test"]);
-                $ids["id_entity"] = intval($row["id_entity"]);
-
-                $sampleTest = new ModSampleTest();
-                $sampleTest->retrieve($userSession, $ids, $mode);
-                $this->childTests[] = $sampleTest;
+                $child = new ModSampleTest();
+                $child->read($userSession, intval($row["id_sample_test"]), $mode);
+                $this->childSampleTests[] = $child;
             }
 
             // read child sample status log entries:
             $sql = "SELECT id_sample_status_log FROM o_sample_status_log WHERE fk_sample = $this->id ORDER BY id_sample_status_log;";
             $statement = $pdo->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $sampleStatusLog = new ModSampleStatusLog();
-                $sampleStatusLog->read($userSession, intval($row["id_sample_status_log"]), $mode);
-                $this->childStatusLogs[] = $sampleStatusLog;
+                $child = new ModSampleStatusLog();
+                $child->read($userSession, intval($row["id_sample_status_log"]), $mode);
+                $this->childSampleStatusLogs[] = $child;
             }
 
             // read child sample images:
             $sql = "SELECT id_sampling_img FROM o_sampling_img WHERE fk_sample = $this->id ORDER BY id_sampling_img;";
             $statement = $pdo->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $samplingImage = new ModSamplingImage();
-                $samplingImage->read($userSession, intval($row["id_sampling_img"]), $mode);
-                $this->childSamplingImages[] = $samplingImage;
+                $child = new ModSamplingImage();
+                $child->read($userSession, intval($row["id_sampling_img"]), $mode);
+                $this->childSamplingImages[] = $child;
             }
         }
         else {
@@ -1025,46 +1047,43 @@ class ModSample extends FRegistry
         $this->isRegistryModified = false;
         if ($this->isRegistryNew) {
             $this->id = intval($userSession->getPdo()->lastInsertId());
+            $this->id_sample->setValue($this->id);
             $this->isRegistryNew = false;
         }
 
         // save child sample tests:
-        $num = 0;
-        foreach ($this->childTests as $test) {
-            // assure link to parent:
+        $test = 0;
+        foreach ($this->childSampleTests as $child) {
+            // ensure link to parent and set other data:
             $ids = array();
-            $ids["id_sample"] = $this->id;
-            $test->setIds($ids);
-
-            // set system data:
-            $data = array();
-            $data["sample_test"] = ++$num;
-            $test->setData($data);
+            $data["fk_sample"] = $this->id;
+            $data["sample_test"] = ++$test;
 
             // save child:
-            $test->save($userSession);
+            $child->setData($data);
+            $child->save($userSession);
         }
 
         // save child sample status log entries:
-        foreach ($this->childStatusLogs as $statusLog) {
-            // assure link to parent:
+        foreach ($this->childSampleStatusLogs as $child) {
+            // ensure link to parent:
             $data = array();
             $data["fk_sample"] = $this->id;
-            $statusLog->setData($data);
 
             // save child:
-            $statusLog->save($userSession);
+            $child->setData($data);
+            $child->save($userSession);
         }
 
         // save child sample images:
-        foreach ($this->childSamplingImages as $samplingImage) {
-            // assure link to parent:
+        foreach ($this->childSamplingImages as $child) {
+            // ensure link to parent:
             $data = array();
             $data["fk_sample"] = $this->id;
-            $samplingImage->setData($data);
 
             // save child:
-            $samplingImage->save($userSession);
+            $child->setData($data);
+            $child->save($userSession);
         }
     }
 

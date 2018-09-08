@@ -9,7 +9,7 @@ use app\AppConsts;
 
 class ModEntityEntityType extends FRelation
 {
-    public const PREFIX = "entity_type_";
+    public const PREFIX = "entity_entity_type_";
 
     protected $id_entity;
     protected $id_entity_type;
@@ -32,11 +32,10 @@ class ModEntityEntityType extends FRelation
     public function retrieve(FUserSession $userSession, array $ids, int $mode)
     {
         $this->initialize();
-        $this->setIds($ids);
 
         // copy relation IDs to simplify query:
-        $id_entity = $this->ids["id_entity"];
-        $id_entity_type = $this->ids["id_entity_type"];
+        $id_entity = $ids["id_entity"];
+        $id_entity_type = $ids["id_entity_type"];
 
         $sql = "SELECT * FROM cc_entity_entity_type WHERE id_entity = $id_entity AND id_entity_type = $id_entity_type;";
         $statement = $userSession->getPdo()->query($sql);
@@ -70,8 +69,8 @@ class ModEntityEntityType extends FRelation
             throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NON_UPDATABLE);
         }
 
-        $id_entity = $this->ids["id_entity"];
-        $id_entity_type = $this->ids["id_entity_type"];
+        $id_entity = $this->id_entity->getValue();
+        $id_entity_type = $this->id_entity_type->getValue();
 
         $statement->bindParam(":id_entity", $id_entity, \PDO::PARAM_INT);
         $statement->bindParam(":id_entity_type", $id_entity_type, \PDO::PARAM_INT);

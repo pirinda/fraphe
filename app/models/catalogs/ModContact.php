@@ -273,6 +273,7 @@ class ModContact extends FRegistry
         $this->isRegistryModified = false;
         if ($this->isRegistryNew) {
             $this->id = intval($userSession->getPdo()->lastInsertId());
+            $this->id_contact->setValue($this->id);
             $this->isRegistryNew = false;
         }
     }

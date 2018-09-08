@@ -48,17 +48,6 @@ abstract class FRelation extends FRegistry
         }
     }
 
-    protected function copyIdsToItems()
-    {
-        $data = array();
-
-        foreach ($this->ids as $key => $id) {
-            $data[$key] = intval($id);
-        }
-
-        $this->setData($data);
-    }
-
     protected function copyIdsFromItems()
     {
         foreach ($this->ids as $key => $id) {
@@ -76,30 +65,6 @@ abstract class FRelation extends FRegistry
         parent::setData($data);
 
         $this->copyIdsFromItems();
-    }
-
-    /* Sets relation IDs.
-     * Param $ids: associative array of relation IDs in the key=id format.
-     * Returns: nothing.
-     * Throws: Exception if something fails.
-     */
-    public function setIds(array $ids)
-    {
-        // validate keys:
-        foreach ($ids as $key => $id) {
-            $this->validateItemKey($key);
-            if (!is_int($id)) {
-                throw new \Exception(__METHOD__ . ": El ID '$key' debe ser número entero: $id es '" . gettype($id) . "'.");
-            }
-        }
-
-        // set relation IDs:
-        foreach ($ids as $key => $id) {
-            $this->ids[$key] = $id;
-            $this->isRegistryModified = true;
-        }
-
-        $this->copyIdsToItems();
     }
 
     /* Gets relation IDs.

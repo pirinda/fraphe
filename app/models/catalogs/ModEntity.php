@@ -12,8 +12,9 @@ use app\models\ModUtils;
 
 class ModEntity extends FRegistry
 {
-    public const ID_DIGITS = 6;
+    public const PREFIX = "entity_";
     public const PARAM_CORP_MEMBERS = "corp_members";
+    public const ID_DIGITS = 6;
 
     protected $id_entity;
     protected $name;
@@ -43,9 +44,9 @@ class ModEntity extends FRegistry
     protected $ts_user_ins;
     protected $ts_user_upd;
 
-    protected $childEntityTypes;
-    protected $childSamplingImages;
-    protected $childAddresses;
+    protected $childEntityEntityTypes;      // array of ModEntityEntityType
+    protected $childEntitySamplingImages;   // array of ModEntitySamplingImage
+    protected $childEntityAddressess;       // array of ModEntityAddress
 
     function __construct()
     {
@@ -119,46 +120,46 @@ class ModEntity extends FRegistry
         $this->web_page->setRangeLength(0, 100);
         $this->notes->setRangeLength(0, 500);
 
-        $this->clearChildEntityTypes();
-        $this->clearChildSamplingImages();
-        $this->clearChildAddresses();
+        $this->clearChildEntityEntityTypes();
+        $this->clearChildEntitySamplingImages();
+        $this->clearChildEntityAddresses();
     }
 
-    public function &getChildEntityTypes(): array
+    public function &getChildEntityEntityTypes(): array
     {
-        return $this->childEntityTypes;
+        return $this->childEntityEntityTypes;
     }
 
-    public function &getChildSamplingImages(): array
+    public function &getChildEntitySamplingImages(): array
     {
-        return $this->childSamplingImages;
+        return $this->childEntitySamplingImages;
     }
 
-    public function &getChildAddresses(): array
+    public function &getChildEntityAddresses(): array
     {
-        return $this->childAddresses;
+        return $this->childEntityAddressess;
     }
 
-    public function clearChildEntityTypes()
+    public function clearChildEntityEntityTypes()
     {
-        $this->childEntityTypes = array();
+        $this->childEntityEntityTypes = array();
     }
 
-    public function clearChildSamplingImages()
+    public function clearChildEntitySamplingImages()
     {
-        $this->childSamplingImages = array();
+        $this->childEntitySamplingImages = array();
     }
 
-    public function clearChildAddresses()
+    public function clearChildEntityAddresses()
     {
-        $this->childAddresses = array();
+        $this->childEntityAddressess = array();
     }
 
-    public function isChildEntityType(int $entityType): bool
+    public function hasChildEntityEntityType(int $entityType): bool
     {
         $exists = false;
 
-        foreach ($this->childEntityTypes as $child) {
+        foreach ($this->childEntityEntityTypes as $child) {
             if ($child->getDatum("id_entity_type") == $entityType) {
                 $exists = true;
                 break;
@@ -168,9 +169,9 @@ class ModEntity extends FRegistry
         return $exists;
     }
 
-    public function addChildEntityType(int $entityType): bool
+    public function addChildEntityEntityType(int $entityType): bool
     {
-        $exists = $this->isChildEntityType($entityType);
+        $exists = $this->hasChildEntityEntityType($entityType);
 
         if (!$exists) {
             $data = array();
@@ -178,14 +179,14 @@ class ModEntity extends FRegistry
             $data["id_entity_type"] = $entityType;
             $child = new ModEntityEntityType();
             $child->setData($data);
-            $this->childEntityTypes[] = $child;
+            $this->childEntityEntityTypes[] = $child;
         }
 
         return !$exists;
     }
 
     public function composeTargetFileDefSamplingImage(int $num) {
-        return FFiles::createFileNameForId(ModEntitySamplingImage::PREFIX, self::ID_DIGITS, $this->id, $num, "jpg");
+        return FFiles::createFileNameForId(self::PREFIX, self::ID_DIGITS, $this->id, $num, "jpg");
     }
 
     public function tailorMembers()
@@ -220,25 +221,29 @@ class ModEntity extends FRegistry
 
         parent::validate($userSession);
 
-        foreach ($this->childEntityTypes as $entityType) {
-            $ids = array();
-            $ids["id_entity"] = $this->isRegistryNew ? -1 : $this->id;  // bypass validation
-            $entityType->setIds($ids);
-            $entityType->validate($userSession);
+        foreach ($this->childEntityEntityTypes as $child) {
+            $data = array();
+            $data["id_entity"] = $this->isRegistryNew ? -1 : $this->id;  // bypass validation
+            $child->setData($data);
+            $child->validate($userSession);
         }
 
-        foreach ($this->childSamplingImages as $samplingImage) {
-            $samplingImage->getItem("fk_entity")->setValue($this->isRegistryNew ? -1 : $this->id);      // bypass validation
-            $samplingImage->validate($userSession);
+        foreach ($this->childEntitySamplingImages as $child) {
+            $data = array();
+            $data["fk_entity"] = $this->isRegistryNew ? -1 : $this->id; // bypass validation
+            $child->setData($data);
+            $child->validate($userSession);
         }
 
-        if (count($this->childAddresses) == 0) {
+        if (count($this->childEntityAddressess) == 0) {
             throw new \Exception(__METHOD__ . ": No se han definido domicilios.");
         }
 
-        foreach ($this->childAddresses as $address) {
-            $address->getItem("fk_entity")->setValue($this->isRegistryNew ? -1 : $this->id);    // bypass validation
-            $address->validate($userSession);
+        foreach ($this->childEntityAddressess as $child) {
+            $data = array();
+            $data["fk_entity"] = $this->isRegistryNew ? -1 : $this->id; // bypass validation
+            $child->setData($data);
+            $child->validate($userSession);
         }
     }
 
@@ -293,27 +298,27 @@ class ModEntity extends FRegistry
                 $ids["id_entity"] = intval($row["id_entity"]);
                 $ids["id_entity_type"] = intval($row["id_entity_type"]);
 
-                $entityType = new ModEntityEntityType();
-                $entityType->retrieve($userSession, $ids, $mode);
-                $this->childEntityTypes[] = $entityType;
+                $child = new ModEntityEntityType();
+                $child->retrieve($userSession, $ids, $mode);
+                $this->childEntityEntityTypes[] = $child;
             }
 
             // read child entity sampling images:
             $sql = "SELECT id_entity_sampling_img FROM cc_entity_sampling_img WHERE fk_entity = $this->id ORDER BY id_entity_sampling_img;";
             $statement = $pdo->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $samplingImage = new ModEntitySamplingImage();
-                $samplingImage->read($userSession, intval($row["id_entity_sampling_img"]), $mode);
-                $this->childSamplingImages[] = $samplingImage;
+                $child = new ModEntitySamplingImage();
+                $child->read($userSession, intval($row["id_entity_sampling_img"]), $mode);
+                $this->childEntitySamplingImages[] = $child;
             }
 
             // read child entity addresses:
             $sql = "SELECT id_entity_address FROM cc_entity_address WHERE fk_entity = $this->id ORDER BY id_entity_address;";
             $statement = $pdo->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $address = new ModEntityAddress();
-                $address->read($userSession, intval($row["id_entity_address"]), $mode);
-                $this->childAddresses[] = $address;
+                $child = new ModEntityAddress();
+                $child->read($userSession, intval($row["id_entity_address"]), $mode);
+                $this->childEntityAddressess[] = $child;
             }
         }
         else {
@@ -510,44 +515,45 @@ class ModEntity extends FRegistry
         $this->isRegistryModified = false;
         if ($this->isRegistryNew) {
             $this->id = intval($userSession->getPdo()->lastInsertId());
+            $this->id_entity->setValue($this->id);
             $this->isRegistryNew = false;
         }
 
         // save child entity entity types:
-        $userSession->getPdo()->exec("DELETE FROM cc_entity_entity_type WHERE id_entity = $this->id;");  // pure relations
-        foreach ($this->childEntityTypes as $entityType) {
-            // assure link to parent:
-            $ids = array();
-            $ids["id_entity"] = $this->id;
-            $entityType->setIds($ids);
+        $userSession->getPdo()->exec("DELETE FROM cc_entity_entity_type WHERE id_entity = $this->id;");  // raw relations
+        foreach ($this->childEntityEntityTypes as $child) {
+            // ensure link to parent:
+            $data = array();
+            $data["id_entity"] = $this->id;
 
             // save child:
-            $entityType->forceRegistryNew();    // it is a pure relation
-            $entityType->save($userSession);
+            $child->setData($data);
+            $child->forceRegistryNew(); // it is a raw relation
+            $child->save($userSession);
         }
 
         // save child entity sampling images:
-        $index = 0;
-        foreach ($this->childSamplingImages as $samplingImage) {
-            // assure link to parent and set other data:
+        $img = 0;
+        foreach ($this->childEntitySamplingImages as $child) {
+            // ensure link to parent and set other data:
             $data = array();
             $data["fk_entity"] = $this->id;
-            $data["sampling_img"] = $this->composeTargetFileDefSamplingImage(++$index);
-            $samplingImage->setData($data);
+            $data["sampling_img"] = $this->composeTargetFileDefSamplingImage(++$img);
 
             // save child:
-            $samplingImage->save($userSession);
+            $child->setData($data);
+            $child->save($userSession);
         }
 
         // save child entity addresses:
-        foreach ($this->childAddresses as $address) {
-            // assure link to parent:
+        foreach ($this->childEntityAddressess as $child) {
+            // ensure link to parent:
             $data = array();
             $data["fk_entity"] = $this->id;
-            $address->setData($data);
 
             // save child:
-            $address->save($userSession);
+            $child->setData($data);
+            $child->save($userSession);
         }
     }
 

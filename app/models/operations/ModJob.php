@@ -10,7 +10,7 @@ use app\AppConsts;
 class ModJob extends FRegistry
 {
     protected $id_job;
-    protected $number;
+    protected $job_num;
     protected $job_date;
     protected $process_days;
     protected $process_start_date;
@@ -27,17 +27,17 @@ class ModJob extends FRegistry
     protected $ts_user_ins;
     protected $ts_user_upd;
 
-    protected $childTests;
-    protected $childStatusLogs;
+    protected $childJobTests;
+    protected $childJobStatusLogs;
 
     function __construct()
     {
         parent::__construct(AppConsts::O_JOB, AppConsts::$tableIds[AppConsts::O_JOB]);
 
         $this->id_job = new FItem(FItem::DATA_TYPE_INT, "id_job", "ID orden trabajo", "", false, true);
-        $this->number = new FItem(FItem::DATA_TYPE_STRING, "number", "Folio orden trabajo", "", true);
+        $this->job_num = new FItem(FItem::DATA_TYPE_STRING, "job_num", "Folio orden trabajo", "", true);
         $this->job_date = new FItem(FItem::DATA_TYPE_DATE, "job_date", "Fecha orden trabajo", "", true);
-        $this->process_days = new FItem(FItem::DATA_TYPE_INT, "process_days", "Días proceso", "", true);
+        $this->process_days = new FItem(FItem::DATA_TYPE_INT, "process_days", "Días proceso", "", false);
         $this->process_start_date = new FItem(FItem::DATA_TYPE_DATE, "process_start_date", "Fecha inicio proceso", "", true);
         $this->process_deadline = new FItem(FItem::DATA_TYPE_DATE, "process_deadline", "Fecha límite proceso", "", true);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
@@ -53,7 +53,7 @@ class ModJob extends FRegistry
         $this->ts_user_upd = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_upd", "Modificado", "", false);
 
         $this->items["id_job"] = $this->id_job;
-        $this->items["number"] = $this->number;
+        $this->items["job_num"] = $this->job_num;
         $this->items["job_date"] = $this->job_date;
         $this->items["process_days"] = $this->process_days;
         $this->items["process_start_date"] = $this->process_start_date;
@@ -70,30 +70,30 @@ class ModJob extends FRegistry
         $this->items["ts_user_ins"] = $this->ts_user_ins;
         $this->items["ts_user_upd"] = $this->ts_user_upd;
 
-        $this->number->setRangeLength(1, 25);
+        $this->job_num->setRangeLength(1, 25);
 
-        $this->clearChildTests();
-        $this->clearChildStatusLogs();
+        $this->clearChildJobTests();
+        $this->clearChildJobStatusLogs();
     }
 
-    public function &getChildTests(): array
+    public function &getChildJobTests(): array
     {
-        return $this->childTests;
+        return $this->childJobTests;
     }
 
-    public function &getChildStatusLogs(): array
+    public function &getChildJobStatusLogs(): array
     {
-        return $this->childStatusLogs;
+        return $this->childJobStatusLogs;
     }
 
-    public function clearChildTests()
+    public function clearChildJobTests()
     {
-        $this->childTests = array();
+        $this->childJobTests = array();
     }
 
-    public function clearChildStatusLogs()
+    public function clearChildJobStatusLogs()
     {
-        $this->childStatusLogs = array();
+        $this->childJobStatusLogs = array();
     }
 
     public function validate(FUserSession $userSession)
@@ -102,16 +102,18 @@ class ModJob extends FRegistry
 
         parent::validate($userSession);
 
-        foreach ($this->childTests as $test) {
-            $ids = array();
-            $ids["id_job"] = $this->isRegistryNew ? -1 : $this->id; // bypass validation
-            $test->setIds($ids);
-            $test->validate($userSession);
+        foreach ($this->childJobTests as $child) {
+            $data = array();
+            $data["fk_job"] = $this->isRegistryNew ? -1 : $this->id; // bypass validation
+            $child->setData($data);
+            $child->validate($userSession);
         }
 
-        foreach ($this->$childStatusLogs as $statusLog) {
-            $statusLog->getItem("fk_job")->setValue($this->isRegistryNew ? -1 : $this->id);  // bypass validation
-            $statusLog->validate($userSession);
+        foreach ($this->$childJobStatusLogs as $child) {
+            $data = array();
+            $data["fk_job"] = $this->isRegistryNew ? -1 : $this->id; // bypass validation
+            $child->setData($data);
+            $child->validate($userSession);
         }
     }
 
@@ -125,7 +127,7 @@ class ModJob extends FRegistry
             $this->id = intval($row["id_job"]);
 
             $this->id_job->setValue($row["id_job"]);
-            $this->number->setValue($row["number"]);
+            $this->job_num->setValue($row["job_num"]);
             $this->job_date->setValue($row["job_date"]);
             $this->process_days->setValue($row["process_days"]);
             $this->process_start_date->setValue($row["process_start_date"]);
@@ -149,26 +151,21 @@ class ModJob extends FRegistry
             $pdo = FGuiUtils::createPdo();
 
             // read child job tests:
-            $sql = "SELECT id_job, id_test, id_entity FROM o_job_test WHERE id_job = $this->id ORDER BY id_job, id_test, id_entity;";
+            $sql = "SELECT id_job_test FROM o_job_test WHERE fk_job = $this->id ORDER BY id_job_test;";
             $statement = $pdo->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $ids = array();
-                $ids["id_job"] = intval($row["id_job"]);
-                $ids["id_test"] = intval($row["id_test"]);
-                $ids["id_entity"] = intval($row["id_entity"]);
-
-                $test = new ModJobTest();
-                $test->retrieve($userSession, $ids, $mode);
-                $this->childTests[] = $test;
+                $child = new ModJobTest();
+                $child->read($userSession, intval($row["id_job_test"]), $mode);
+                $this->childJobTests[] = $child;
             }
 
             // read child job status log entries:
             $sql = "SELECT id_job_status_log FROM o_job_status_log WHERE fk_job = $this->id ORDER BY id_job_status_log;";
             $statement = $pdo->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $statusLog = new ModJobStatusLog();
-                $statusLog->read($userSession, intval($row["id_job_status_log"]), $mode);
-                $this->childStatusLogs[] = $statusLog;
+                $child = new ModJobStatusLog();
+                $child->read($userSession, intval($row["id_job_status_log"]), $mode);
+                $this->childJobStatusLogs[] = $child;
             }
         }
         else {
@@ -185,7 +182,7 @@ class ModJob extends FRegistry
         if ($this->isRegistryNew) {
             $statement = $userSession->getPdo()->prepare("INSERT INTO o_job (" .
                 "id_job, " .
-                "number, " .
+                "job_num, " .
                 "job_date, " .
                 "process_days, " .
                 "process_start_date, " .
@@ -203,7 +200,7 @@ class ModJob extends FRegistry
                 "ts_user_upd) " .
                 "VALUES (" .
                 "0, " .
-                ":number, " .
+                ":job_num, " .
                 ":job_date, " .
                 ":process_days, " .
                 ":process_start_date, " .
@@ -222,7 +219,7 @@ class ModJob extends FRegistry
         }
         else {
             $statement = $userSession->getPdo()->prepare("UPDATE o_job SET " .
-                "number = :number, " .
+                "job_num = :job_num, " .
                 "job_date = :job_date, " .
                 "process_days = :process_days, " .
                 "process_start_date = :process_start_date, " .
@@ -242,7 +239,7 @@ class ModJob extends FRegistry
         }
 
         //$id_job = $this->id_job->getValue();
-        $number = $this->number->getValue();
+        $job_num = $this->job_num->getValue();
         $job_date = FUtils::formatStdDate($this->job_date->getValue());
         $process_days = $this->process_days->getValue();
         $process_start_date = FUtils::formatStdDate($this->process_start_date->getValue());
@@ -262,7 +259,7 @@ class ModJob extends FRegistry
         $fk_user = $userSession->getCurUser()->getId();
 
         //$statement->bindParam(":id_job", $id_job, \PDO::PARAM_INT);
-        $statement->bindParam(":number", $number);
+        $statement->bindParam(":job_num", $job_num);
         $statement->bindParam(":job_date", $job_date);
         $statement->bindParam(":process_days", $process_days, \PDO::PARAM_INT);
         $statement->bindParam(":process_start_date", $process_start_date);
@@ -290,30 +287,30 @@ class ModJob extends FRegistry
         $this->isRegistryModified = false;
         if ($this->isRegistryNew) {
             $this->id = intval($userSession->getPdo()->lastInsertId());
+            $this->id_job->setValue($this->id);
             $this->isRegistryNew = false;
         }
 
         // save child job tests:
-        $userSession->getPdo()->exec("DELETE FROM o_job_test WHERE id_job = $this->id;"); // pure relations
-        foreach ($this->childTests as $test) {
-            // assure link to parent:
-            $ids = array();
-            $ids["id_job"] = $this->id;
-            $test->setIds($ids);
+        foreach ($this->childJobTests as $test) {
+            // ensure link to parent:
+            $data = array();
+            $data["fk_job"] = $this->id;
 
             // save child:
-            $test->save($userSession);
+            $child->setData($data);
+            $child->save($userSession);
         }
 
         // save child job status log entries:
-        foreach ($this->childStatusLogs as $statusLog) {
-            // assure link to parent:
+        foreach ($this->childJobStatusLogs as $child) {
+            // ensure link to parent:
             $data = array();
             $data["fk_job"] = $this->id;
-            $statusLog->setData($data);
 
             // save child:
-            $statusLog->save($userSession);
+            $child->setData($data);
+            $child->save($userSession);
         }
     }
 

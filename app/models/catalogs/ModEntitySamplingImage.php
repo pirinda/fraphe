@@ -10,7 +10,7 @@ use app\models\ModConsts;
 
 class ModEntitySamplingImage extends FRegistry
 {
-    public const PREFIX = "image_";
+    public const PREFIX = "entity_sampling_img_";
 
     protected $id_entity_sampling_img;
     protected $sampling_img;
@@ -150,6 +150,7 @@ class ModEntitySamplingImage extends FRegistry
         $this->isRegistryModified = false;
         if ($this->isRegistryNew) {
             $this->id = intval($userSession->getPdo()->lastInsertId());
+            $this->id_entity_sampling_img->setValue($this->id);
             $this->isRegistryNew = false;
         }
     }

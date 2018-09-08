@@ -27,7 +27,7 @@ class ModTest extends FRegistry
     protected $ts_user_ins;
     protected $ts_user_upd;
 
-    protected $childProcessEntitys;
+    protected $childTestEntitys; // array of ModTestEntity
 
     function __construct()
     {
@@ -70,56 +70,59 @@ class ModTest extends FRegistry
         $this->sample_quantity->setRangeLength(1, 100);
         $this->sample_directs->setRangeLength(1, 500);
 
-        $this->childProcessEntitys = array();
+        $this->childTestEntitys = array();
     }
 
-    public function &getChildProcessEntitys(): array
+    public function &getChildTestEntitys(): array
     {
-        return $this->childProcessEntitys;
+        return $this->childTestEntitys;
     }
 
-    public function clearChildProcessEntitys(): array
+    public function clearChildTestEntitys()
     {
-        $this->childProcessEntitys = array();
+        $this->childTestEntitys = array();
     }
 
-    public function setDefaultChildProcessEntity(ModTestProcessEntity $defaultProcessEntity)
+    public function setDefaultChildTestEntity(ModTestEntity $defaultTestEntity)
     {
         // clear "is default" flag in children:
-        foreach ($this->childProcessEntitys as $processEntity) {
-            $processEntity->getItem("is_default")->setValue(false);
+        foreach ($this->childTestEntitys as $child) {
+            $child->getItem("is_default")->setValue(false);
+            if ($child->getId() == $defaultTestEntity->getId()) {
+                $found = true;
+            }
         }
 
-        // assure "is default" flag is set in supplied entity:
-        $defaultProcessEntity->getItem("is_default")->setValue(true);
+        // ensure "is default" flag is set in supplied entity:
+        $defaultTestEntity->getItem("is_default")->setValue(true);
 
         // replace or append default child:
         $found = false;
-        $len = count($this->childProcessEntitys);
+        $len = count($this->childTestEntitys);
         for ($i = 0; $i < $len; $i++) {
-            if ($this->childProcessEntitys[$i]->compareIds($defaultProcessEntity->getIds())) {
-                $this->childProcessEntitys[$i] = $defaultProcessEntity; // replace
+            if ($this->childTestEntitys[$i]->getId() == $defaultTestEntity->getId()) {
+                $this->childTestEntitys[$i] = $defaultTestEntity; // replace
                 $found = true;
                 break;
             }
         }
         if (!$found) {
-            $this->childProcessEntitys[] = $defaultProcessEntity; // append
+            $this->childTestEntitys[] = $defaultTestEntity; // append
         }
     }
 
-    public function getDefaultChildProcessEntity()
+    public function getDefaultChildTestEntity()
     {
-        $defaultProcessEntity = null;
+        $defaultTestEntity = null;
 
-        foreach ($this->childProcessEntitys as $processEntity) {
-            if ($processEntity->getDatum("is_default")) {
-                $defaultProcessEntity = $processEntity;
+        foreach ($this->childTestEntitys as $child) {
+            if ($child->getDatum("is_default")) {
+                $defaultTestEntity = $child;
                 break;
             }
         }
 
-        return $defaultProcessEntity;
+        return $defaultTestEntity;
     }
 
     public function validate(FUserSession $userSession)
@@ -128,11 +131,11 @@ class ModTest extends FRegistry
 
         parent::validate($userSession);
 
-        foreach ($this->childProcessEntitys as $processEntity) {
-            $ids = array();
-            $ids["id_test"] = $this->isRegistryNew ? -1 : $this->id;    // bypass validation
-            $processEntity->setIds($ids);
-            $processEntity->validate($userSession);
+        foreach ($this->childTestEntitys as $child) {
+            $data = array();
+            $data["fk_test"] = $this->isRegistryNew ? -1 : $this->id; // bypass validation
+            $child->setData($data);
+            $child->validate($userSession);
         }
     }
 
@@ -167,17 +170,13 @@ class ModTest extends FRegistry
             // create PDO connection for reading children:
             $pdo = FGuiUtils::createPdo();
 
-            // read child process options:
-            $sql = "SELECT id_test, id_entity FROM oc_test_process_entity WHERE id_test = $this->id ORDER BY id_test, id_entity;";
+            // read child test entities:
+            $sql = "SELECT id_test_entity FROM oc_test_entity WHERE fk_test = $this->id ORDER BY id_test_entity;";
             $statement = $pdo->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $ids = array();
-                $ids["id_test"] = intval($row["id_test"]);
-                $ids["id_entity"] = intval($row["id_entity"]);
-
-                $processEntity = new ModTestProcessEntity();
-                $processEntity->retrieve($userSession, $ids, $mode);
-                $this->childProcessEntitys[] = $processEntity;
+                $child = new ModTestEntity();
+                $child->read($userSession, intval($row["id_test_entity"]), $mode);
+                $this->childTestEntitys[] = $child;
             }
         }
         else {
@@ -289,18 +288,19 @@ class ModTest extends FRegistry
         $this->isRegistryModified = false;
         if ($this->isRegistryNew) {
             $this->id = intval($userSession->getPdo()->lastInsertId());
+            $this->id_test->setValue($this->id);
             $this->isRegistryNew = false;
         }
 
         // save child process options:
-        foreach ($this->childProcessEntitys as $processEntity) {
-            // assure link to parent:
-            $ids = array();
-            $ids["id_test"] = $this->id;
-            $processEntity->setIds($ids);
+        foreach ($this->childTestEntitys as $child) {
+            // ensure link to parent:
+            $data = array();
+            $data["fk_test"] = $this->id;
 
             // save child:
-            $processEntity->save($userSession);
+            $child->setData($data);
+            $child->save($userSession);
         }
     }
 
@@ -312,5 +312,18 @@ class ModTest extends FRegistry
     public function undelete(FUserSession $userSession)
     {
 
+    }
+
+    public static function readFkProcessArea(FUserSession $userSession, int $idTest)
+    {
+        $fkProcessArea = null;
+
+        $sql = "SELECT fk_process_area FROM oc_test WHERE id_test = $idTest;";
+        $statement = $userSession->getPdo()->query($sql);
+        if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $fkProcessArea = intval($row["fk_process_area"]);
+        }
+
+        return $fkProcessArea;
     }
 }

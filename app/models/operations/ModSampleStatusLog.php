@@ -160,7 +160,7 @@ class ModSampleStatusLog extends FRegistry
 
         //$statement->bindParam(":id_sample_status_log", $id_sample_status_log, \PDO::PARAM_INT);
         $statement->bindParam(":status_datetime", $status_datetime);
-        if (empty()) {
+        if (empty($status_temperat_n)) {
             $statement->bindValue(":status_temperat_n", null, \PDO::PARAM_NULL);
         }
         else {
@@ -188,6 +188,7 @@ class ModSampleStatusLog extends FRegistry
         $this->isRegistryModified = false;
         if ($this->isRegistryNew) {
             $this->id = intval($userSession->getPdo()->lastInsertId());
+            $this->id_sample_status_log->setValue($this->id);
             $this->isRegistryNew = false;
         }
     }

@@ -55,36 +55,37 @@ echo '</div>';
 echo '</div>';
 //------------------------------------------------------------------------------
 
-echo '<h4>Ensayos</h4>';
+echo '<h4>Ensayos de la muestra</h4>';
 
 echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample_test.php?sample=' . $sample->getId() . '" class="btn btn-primary btn-sm" role="button">Crear</a>&nbsp;';
 echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept_samples.php?id=' . $sample->getDatum("nk_recept") . '" class="btn btn-danger btn-sm" role="button">Volver</a>';
 
 $sql = <<<SQL
-SELECT st.sample_test, st.process_days, st.process_start_date, st.process_deadline,
-st.id_sample, st.id_test, st.id_entity,
+SELECT st.sample_test, st.id_sample_test, st.process_days, st.process_start_date, st.process_deadline,
 st.ts_user_ins AS _ts_user_ins, st.ts_user_upd AS _ts_user_upd,
 t.name AS _t_name,
-e.name AS _e_name,
+IF(e.alias <> '', e.alias, e.name) AS _entity,
+pa.code AS _pa_code,
 ui.name AS _ui_name, uu.name AS _uu_name
 FROM o_sample_test AS st
-INNER JOIN oc_test AS t ON st.id_test = t.id_test
-INNER JOIN cc_entity AS e ON st.id_entity = e.id_entity
+INNER JOIN oc_test AS t ON st.fk_test = t.id_test
+INNER JOIN cc_entity AS e ON st.fk_entity = e.id_entity
 INNER JOIN oc_process_area AS pa ON st.fk_process_area = pa.id_process_area
 INNER JOIN cc_user AS ui ON st.fk_user_ins = ui.id_user
 INNER JOIN cc_user AS uu ON st.fk_user_upd = uu.id_user
 SQL;
 $sql .= " ";
-$sql .= "WHERE NOT st.is_deleted AND st.id_sample = " . $_GET[FRegistry::ID] . " ";
-$sql .= "ORDER BY st.sample_test, st.id_sample, st.id_test, st.id_entity;";
+$sql .= "WHERE NOT st.is_deleted AND st.fk_sample = " . $_GET[FRegistry::ID] . " ";
+$sql .= "ORDER BY st.sample_test, st.id_sample_test;";
 
 echo '<table class="table table-striped">';
 echo '<thead>';
 echo '<tr>';
-echo '<th><abbr title="Número">No.</abbr></th>';
+echo '<th><abbr title="Número">Núm.</abbr></th>';
+echo '<th><abbr title="Área proceso">AP</abbr></th>';
 echo '<th>Ensayo</th>';
 echo '<th>Entidad</th>';
-echo '<th><abbr title="Días proceso">D. proc.</abbr></th>';
+echo '<th><abbr title="Días proceso">DP</abbr></th>';
 echo '<th>Inicio proceso</th>';
 echo '<th>Límite proceso</th>';
 echo '<th class="small">Creador</th>';
@@ -101,8 +102,9 @@ $pdo = FGuiUtils::createPdo();
 foreach ($pdo->query($sql) as $row) {
     echo '<tr>';
     echo '<td>' . $row['sample_test'] . '</td>';
+    echo '<td>' . $row['_pa_code'] . '</td>';
     echo '<td>' . $row['_t_name'] . '</td>';
-    echo '<td>' . $row['_e_name'] . '</td>';
+    echo '<td>' . $row['_entity'] . '</td>';
     echo '<td>' . $row['process_days'] . '</td>';
     echo '<td>' . $row['process_start_date'] . '</td>';
     echo '<td>' . $row['process_deadline'] . '</td>';
@@ -110,8 +112,8 @@ foreach ($pdo->query($sql) as $row) {
     echo '<td class="small">' . $row['_ts_user_ins'] . '</td>';
     echo '<td class="small">' . $row['_uu_name'] . '</td>';
     echo '<td class="small">' . $row['_ts_user_upd'] . '</td>';
-    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample_test.php?sample=' . $row['id_sample'] . '&test=' . $row['id_test'] . '&entity=' . $row['id_entity'] . '" class="btn btn-success btn-xs" role="button"><span class="glyphicon glyphicon-edit"></span></a></td>';
-//    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?id=' . $row['_id'] . '&copy=1" class="btn btn-danger btn-xs" role="button"><span class="glyphicon glyphicon-ban-circle"></span></a></td>';
+    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample_test.php?id=' . $row['id_sample_test'] . '" class="btn btn-success btn-xs" role="button"><span class="glyphicon glyphicon-edit"></span></a></td>';
+//    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?id=' . $row['_id'] . '" class="btn btn-danger btn-xs" role="button"><span class="glyphicon glyphicon-ban-circle"></span></a></td>';
     echo '</tr>';
 }
 

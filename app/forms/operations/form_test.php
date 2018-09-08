@@ -15,12 +15,13 @@ use Fraphe\App\FGuiUtils;
 use Fraphe\Lib\FDevUtils;
 use Fraphe\Lib\FUtils;
 use Fraphe\Model\FItem;
+use Fraphe\Model\FModel;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
 use app\AppUtils;
 use app\models\ModConsts;
 use app\models\operations\ModTest;
-use app\models\operations\ModTestProcessEntity;
+use app\models\operations\ModTestEntity;
 
 echo '<!DOCTYPE html>';
 echo '<html>';
@@ -30,7 +31,7 @@ echo FAppNavbar::compose("catalogs");
 
 $userSession = FGuiUtils::createUserSession();
 $test = new ModTest();
-$testProcessEntity; // the default one
+$testEntity; // the default one
 $errmsg = "";
 
 switch ($_SERVER["REQUEST_METHOD"]) {
@@ -39,12 +40,12 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
         if (!empty($_GET[FRegistry::ID])) {
             $test->read($userSession, intval($_GET[FRegistry::ID]), FRegistry::MODE_READ);
-            $testProcessEntity = $test->getDefaultChildProcessEntity();
+            $testEntity = $test->getDefaultChildTestEntity();
         }
 
-        if (!isset($testProcessEntity)) {
-            $testProcessEntity = new ModTestProcessEntity();
-            $test->setDefaultChildProcessEntity($testProcessEntity);
+        if (!isset($testEntity)) {
+            $testEntity = new ModTestEntity();
+            $test->setDefaultChildTestEntity($testEntity);
         }
         break;
 
@@ -71,28 +72,33 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         $data["fk_test_acredit_attrib"] = intval($_POST["fk_test_acredit_attrib"]);
 
         // default test process entity:
-        $dataProcessEntity = array();
-        $dataProcessEntity["id_test"] = $test->getId();
-        switch ($_POST[ModTestProcessEntity::PREFIX]) {
+        $dataEntity = array();
+        $dataEntity["process_days_min"] = intval($_POST[ModTestEntity::PREFIX . "process_days_min"]);
+        $dataEntity["process_days_max"] = intval($_POST[ModTestEntity::PREFIX . "process_days_max"]);
+        $dataEntity["cost"] = floatval($_POST[ModTestEntity::PREFIX . "cost"]);
+        $dataEntity["is_default"] = true;
+        $dataEntity["fk_test"] = $test->getId();
+        switch ($_POST[ModTestEntity::PREFIX]) {
             case "company":
-                $dataProcessEntity["id_entity"] = 1;    // this company itself
+                $dataEntity["fk_entity"] = 1;    // this company itself
                 break;
             case "provider":
-                $dataProcessEntity["id_entity"] = intval($_POST[ModTestProcessEntity::PREFIX . "id_entity"]);
+                $dataEntity["fk_entity"] = intval($_POST[ModTestEntity::PREFIX . "fk_entity"]);
                 break;
             default:
         }
-        $dataProcessEntity["process_days_min"] = intval($_POST[ModTestProcessEntity::PREFIX . "process_days_min"]);
-        $dataProcessEntity["process_days_max"] = intval($_POST[ModTestProcessEntity::PREFIX . "process_days_max"]);
-        $dataProcessEntity["cost"] = floatval($_POST[ModTestProcessEntity::PREFIX . "cost"]);
-        $dataProcessEntity["is_default"] = true;
 
         try {
-            $testProcessEntity = new ModTestProcessEntity();
-            $testProcessEntity->setData($dataProcessEntity);
-            $test->setDefaultChildProcessEntity($testProcessEntity);
+            $testEntity = ModTestEntity::readTestEntity($userSession, $dataEntity["fk_test"], $dataEntity["fk_entity"]);
+            if (!isset($testEntity)) {
+                $testEntity = new ModTestEntity();
+            }
+            $testEntity->setData($dataEntity);
+            $test->setDefaultChildTestEntity($testEntity);
             $test->setData($data);
-            $test->save($userSession);
+
+            FModel::save($userSession, $test);
+
             header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/operations/view_test.php");
         }
         catch (Exception $e) {
@@ -144,23 +150,23 @@ echo $test->getItem("sample_directs")->composeHtmlTextArea(4, 8, 1);
 
 echo '<div class="form-group">';
 echo '<div class="col-sm-4">';
-echo '<label class="control-label small" for="' . ModTestProcessEntity::PREFIX . '">' . $testProcessEntity->getItem("id_entity")->getName() . ': *</label>';
+echo '<label class="control-label small" for="' . ModTestEntity::PREFIX . '">' . $testEntity->getItem("fk_entity")->getName() . ': *</label>';
 echo '</div>';
 echo '<div class="col-sm-8">';
-echo '<label class="radio-inline small"><input type="radio" name="' . ModTestProcessEntity::PREFIX . '" value="company"' . ($testProcessEntity->isRegistryNew() || $testProcessEntity->getDatum("id_entity") == 1 ? ' checked' : '') . ' onchange="changedEntity();">Empresa</label>';
-echo '<label class="radio-inline small"><input type="radio" name="' . ModTestProcessEntity::PREFIX . '" value="provider"' . (!$testProcessEntity->isRegistryNew() && $testProcessEntity->getDatum("id_entity") != 1 ? ' checked' : '') . ' onchange="changedEntity();">Proveedor</label>';
+echo '<label class="radio-inline small"><input type="radio" name="' . ModTestEntity::PREFIX . '" value="company"' . ($testEntity->isRegistryNew() || $testEntity->getDatum("fk_entity") == 1 ? ' checked' : '') . ' onchange="changedEntity();">Empresa</label>';
+echo '<label class="radio-inline small"><input type="radio" name="' . ModTestEntity::PREFIX . '" value="provider"' . (!$testEntity->isRegistryNew() && $testEntity->getDatum("fk_entity") != 1 ? ' checked' : '') . ' onchange="changedEntity();">Proveedor</label>';
 echo '</div>';
 echo '</div>';
 
 $params = array();
 $params["fk_entity_class"] = ModConsts::CC_ENTITY_CLASS_PROV;
 $params["entity_type"] = ModConsts::CC_ENTITY_TYPE_PROV_LAB;
-$options = AppUtils::getSelectOptions($userSession, AppConsts::CC_ENTITY, $testProcessEntity->getDatum("id_entity"), $params);
-echo $testProcessEntity->getItem("id_entity")->composeHtmlSelect($options, 4, 8, ModTestProcessEntity::PREFIX);
+$options = AppUtils::getSelectOptions($userSession, AppConsts::CC_ENTITY, $testEntity->getDatum("fk_entity"), $params);
+echo $testEntity->getItem("fk_entity")->composeHtmlSelect($options, 4, 8, ModTestEntity::PREFIX);
 
-echo $testProcessEntity->getItem("process_days_min")->composeHtmlInput(FItem::INPUT_NUMBER, 4, 4, ModTestProcessEntity::PREFIX);
-echo $testProcessEntity->getItem("process_days_max")->composeHtmlInput(FItem::INPUT_NUMBER, 4, 4, ModTestProcessEntity::PREFIX);
-echo $testProcessEntity->getItem("cost")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4, ModTestProcessEntity::PREFIX);
+echo $testEntity->getItem("process_days_min")->composeHtmlInput(FItem::INPUT_NUMBER, 4, 4, ModTestEntity::PREFIX);
+echo $testEntity->getItem("process_days_max")->composeHtmlInput(FItem::INPUT_NUMBER, 4, 4, ModTestEntity::PREFIX);
+echo $testEntity->getItem("cost")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4, ModTestEntity::PREFIX);
 
 echo '<br><button type="submit" class="btn btn-sm btn-primary">Guardar</button>';
 echo '&nbsp;<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_test.php" class="btn btn-sm btn-danger" role="button">Cancelar</a>';
@@ -174,18 +180,20 @@ echo <<<SCRIPT
 (function() {
     changedEntity();
 })();
+
 function changedEntity() {
-    switch (document.forms[0].elements["process_entity_"].value) {
+    switch (document.forms[0].elements["test_entity_"].value) {
         case "company":
-            document.getElementById("process_entity_id_entity").setAttribute("disabled", "");
-            document.getElementById("process_entity_id_entity").value = 0;
+            document.getElementById("test_entity_fk_entity").setAttribute("disabled", "");
+            document.getElementById("test_entity_fk_entity").value = 0;
             break;
         case "provider":
-            document.getElementById("process_entity_id_entity").removeAttribute("disabled");
+            document.getElementById("test_entity_fk_entity").removeAttribute("disabled");
             break;
         default:
     }
 }
+
 function validateForm() {
     return checkBeforeSubmit(); // prevent multiple form submitions
 }

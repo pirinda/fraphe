@@ -174,6 +174,7 @@ class ModJobStatusLog extends FRegistry
         $this->isRegistryModified = false;
         if ($this->isRegistryNew) {
             $this->id = intval($userSession->getPdo()->lastInsertId());
+            $this->id_job_status_log->setValue($this->id);
             $this->isRegistryNew = false;
         }
     }

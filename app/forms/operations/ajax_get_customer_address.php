@@ -10,9 +10,6 @@ require $_SESSION["rootDir"] . "Fraphe" . DIRECTORY_SEPARATOR . "fraphe.php";
 
 use Fraphe\App\FGuiUtils;
 use Fraphe\Model\FRegistry;
-use app\AppConsts;
-use app\AppUtils;
-use app\models\ModConsts;
 use app\models\catalogs\ModEntity;
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
@@ -27,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         $json .= '"customer_name":"' . $entity->getDatum("name") . '", ';
 
         // get customer's address data:
-        $address = $entity->getChildAddresses()[0];
+        $address = $entity->getChildEntityAddresses()[0];
         $json .= '"customer_street":"' . $address->getDatum("street") . '", ';
         $json .= '"customer_district":"' . $address->getDatum("district") . '", ';
         $json .= '"customer_postcode":"' . $address->getDatum("postcode") . '", ';

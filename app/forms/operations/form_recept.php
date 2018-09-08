@@ -14,6 +14,7 @@ use Fraphe\App\FAppNavbar;
 use Fraphe\App\FGuiUtils;
 use Fraphe\Lib\FUtils;
 use Fraphe\Model\FItem;
+use Fraphe\Model\FModel;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
 use app\AppUtils;
@@ -72,7 +73,9 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
         try {
             $recept->setData($data);
-            $recept->save($userSession);
+
+            FModel::save($userSession, $recept);
+
             header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/operations/view_recept_samples.php?id=" . $recept->getId());
         }
         catch (Exception $e) {

@@ -9,6 +9,8 @@ use app\AppConsts;
 
 class ModProcessArea extends FRegistry
 {
+    public const PREFIX = "process_area_";
+
     protected $id_process_area;
     protected $name;
     protected $code;
@@ -157,6 +159,7 @@ class ModProcessArea extends FRegistry
         $this->isRegistryModified = false;
         if ($this->isRegistryNew) {
             $this->id = intval($userSession->getPdo()->lastInsertId());
+            $this->id_process_area->setValue($this->id);
             $this->isRegistryNew = false;
         }
     }

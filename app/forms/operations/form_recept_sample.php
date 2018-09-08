@@ -14,6 +14,7 @@ use Fraphe\App\FAppNavbar;
 use Fraphe\App\FGuiUtils;
 use Fraphe\Lib\FUtils;
 use Fraphe\Model\FItem;
+use Fraphe\Model\FModel;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
 use app\AppUtils;
@@ -169,7 +170,9 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         try {
             $sample->setParentRecept($recept);
             $sample->setData($data);
-            $sample->save($userSession);
+
+            FModel::save($userSession, $sample);
+
             header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/operations/view_recept_sample_tests.php?id=" . $sample->getId());
         }
         catch (Exception $e) {
@@ -392,7 +395,7 @@ echo '<div class="panel-body">';
 
 $options = array();
 $options[] = AppUtils::composeSelectOption();
-foreach ($customer->getChildAddresses()[0]->getChildContacts() as $contact) {
+foreach ($customer->getChildEntityAddresses()[0]->getChildContacts() as $contact) {
     if ($contact->getDatum("is_report")) {
         $options[] = '<option value="' . $contact->getId() . '"' . ($sample->getDatum("fk_report_contact") == $contact->getId() ? 'selected' : '') . '>' . $contact->getDatum("name") . '</option>';
     }
@@ -446,20 +449,24 @@ echo <<<SCRIPT
     changedCustomerCustom(document.getElementById("is_customer_custom"));
     changedSamplingCompany(document.getElementById("is_sampling_company"))
 })();
-var customer;
+
+var customer; // holds customer name and address
+
 function loadCustomer() {
     var request = new XMLHttpRequest();
     request.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             var json = this.responseText;
             //console.log("json: " + json);
+            
             customer = JSON.parse(json); // load in memory customer's data
         }
     };
-    var url = "ajax_recept_sample_customer.php?id=" + document.getElementById("customer").value; // hidden html input!
+    var url = "ajax_get_customer_address.php?id=" + document.getElementById("customer").value; // hidden html input!
     request.open("GET", url);
     request.send();
 }
+
 function changedCustomerCustom(element) {
     var inputs = ["customer_name", "customer_street", "customer_district", "customer_postcode", "customer_reference", "customer_city", "customer_county", "customer_state_region", "customer_country", "customer_contact" ];
     if (element.checked) {
@@ -475,6 +482,7 @@ function changedCustomerCustom(element) {
         }
     }
 }
+
 function changedSamplingCompany(element) {
     var inputs = ["sampling_datetime_n", "sampling_area", "sampling_temperat_n", "sampling_guide", "sampling_notes", "sampling_deviats"];
     var selects = ["fk_sampling_method", "nk_sampling_equipt_1", "nk_sampling_equipt_2", "nk_sampling_equipt_3", "fk_user_sampler"];
@@ -497,6 +505,7 @@ function changedSamplingCompany(element) {
         }
     }
 }
+
 function validateForm() {
     return checkBeforeSubmit(); // prevent multiple form submitions
 }

@@ -10,7 +10,7 @@ use app\models\ModConsts;
 
 class ModEntityAddress extends FRegistry
 {
-    public const PREFIX = "address_";
+    public const PREFIX = "entity_address_";
 
     protected $id_entity_address;
     protected $name;
@@ -36,7 +36,7 @@ class ModEntityAddress extends FRegistry
     protected $ts_user_ins;
     protected $ts_user_upd;
 
-    protected $childContacts;
+    protected $childContacts; // array of ModContact
 
     function __construct()
     {
@@ -116,7 +116,7 @@ class ModEntityAddress extends FRegistry
         $this->childContacts = array();
     }
 
-    public function isChildContact(int $contactType): bool
+    public function hasChildContact(int $contactType): bool
     {
         $exists = false;
 
@@ -200,12 +200,16 @@ class ModEntityAddress extends FRegistry
 
     public function validate(FUserSession $userSession)
     {
+        // validate registry:
+
         parent::validate($userSession);
 
-        foreach ($this->childContacts as $contact) {
-            $contact->getItem("fk_entity")->setValue($this->fk_entity->getValue());
-            $contact->getItem("fk_entity_address")->setValue($this->isRegistryNew ? -1 : $this->id);    // bypass validation
-            $contact->validate($userSession);
+        foreach ($this->childContacts as $child) {
+            $data = array();
+            $data["fk_entity"] = $this->fk_entity->getValue();
+            $data["fk_entity_address"] = $this->isRegistryNew ? -1 : $this->id; // bypass validation
+            $child->setData($data);
+            $child->validate($userSession);
         }
     }
 
@@ -252,9 +256,9 @@ class ModEntityAddress extends FRegistry
             $sql = "SELECT id_contact FROM cc_contact WHERE fk_entity_address = $this->id ORDER BY id_contact;";
             $statement = $pdo->query($sql);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $contact = new ModContact();
-                $contact->read($userSession, intval($row["id_contact"]), $mode);
-                $this->childContacts[] = $contact;
+                $child = new ModContact();
+                $child->read($userSession, intval($row["id_contact"]), $mode);
+                $this->childContacts[] = $child;
             }
         }
         else {
@@ -406,19 +410,20 @@ class ModEntityAddress extends FRegistry
         $this->isRegistryModified = false;
         if ($this->isRegistryNew) {
             $this->id = intval($userSession->getPdo()->lastInsertId());
+            $this->id_entity_address->setValue($this->id);
             $this->isRegistryNew = false;
         }
 
         // save child contacts:
-        foreach ($this->childContacts as $contact) {
-            // assure link to parent:
+        foreach ($this->childContacts as $child) {
+            // ensure link to parent:
             $data = array();
             $data["fk_entity"] = $fk_entity;
             $data["fk_entity_address"] = $this->id;
-            $contact->setData($data);
 
             // save child:
-            $contact->save($userSession);
+            $child->setData($data);
+            $child->save($userSession);
         }
     }
 

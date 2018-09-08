@@ -45,7 +45,7 @@ SQL;
 echo '<table class="table table-striped">';
 echo '<thead>';
 echo '<tr>';
-echo '<th>Área proceso</th>';
+echo '<th><abbr title="Área proceso">AP</abbr></th>';
 echo '<th>Nombre</th>';
 echo '<th>Código</th>';
 echo '<th>Clase muestra</th>';

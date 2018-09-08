@@ -15,6 +15,7 @@ use Fraphe\App\FGuiUtils;
 use Fraphe\Lib\FFiles;
 use Fraphe\Lib\FUtils;
 use Fraphe\Model\FItem;
+use Fraphe\Model\FModel;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
 use app\AppUtils;
@@ -66,11 +67,11 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             if (!isset($entityTypes)) {
                 $entityTypes = ModEntity::createEntityTypes($entityClass);
             }
-            if (count($entity->getChildSamplingImages()) > 0) {
-                $entitySamplingImage = $entity->getChildSamplingImages()[0];
+            if (count($entity->getChildEntitySamplingImages()) > 0) {
+                $entitySamplingImage = $entity->getChildEntitySamplingImages()[0];
             }
-            if (count($entity->getChildAddresses()) > 0) {
-                $entityAddress = $entity->getChildAddresses()[0];
+            if (count($entity->getChildEntityAddresses()) > 0) {
+                $entityAddress = $entity->getChildEntityAddresses()[0];
             }
 
             $targetFile = "../../img/entity/" . $entity->composeTargetFileDefSamplingImage(1);
@@ -89,7 +90,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $entityAddress->getItem("name")->setValue("Matriz");
             $entityAddress->getItem("country")->setValue("MEX"); // TODO: parameterize this configurable value!
             $entityAddress->getItem("is_main")->setValue(true);
-            $entity->getChildAddresses()[0] = $entityAddress;
+            $entity->getChildEntityAddresses()[0] = $entityAddress;
         }
         break;
 
@@ -114,11 +115,11 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             if (!isset($entityTypes)) {
                 $entityTypes = ModEntity::createEntityTypes($entityClass);
             }
-            if (count($entity->getChildSamplingImages()) > 0) {
-                $entitySamplingImage = $entity->getChildSamplingImages()[0];
+            if (count($entity->getChildEntitySamplingImages()) > 0) {
+                $entitySamplingImage = $entity->getChildEntitySamplingImages()[0];
             }
-            if (count($entity->getChildAddresses()) > 0) {
-                $entityAddress = $entity->getChildAddresses()[0];
+            if (count($entity->getChildEntityAddresses()) > 0) {
+                $entityAddress = $entity->getChildEntityAddresses()[0];
             }
         }
 
@@ -127,7 +128,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $entityAddress->getItem("name")->setValue("Matriz");
             $entityAddress->getItem("country")->setValue("MEX"); // TODO: parameterize this configurable value!
             $entityAddress->getItem("is_main")->setValue(true);
-            $entity->getChildAddresses()[0] = $entityAddress;
+            $entity->getChildEntityAddresses()[0] = $entityAddress;
         }
 
         // recover registry data:
@@ -169,10 +170,10 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         }
 
         // entity types:
-        $entity->clearChildEntityTypes();
+        $entity->clearChildEntityEntityTypes();
         foreach ($entityTypes as $entityType) {
             if (!empty($_POST[ModEntityEntityType::PREFIX . $entityType]) && boolval($_POST[ModEntityEntityType::PREFIX . $entityType])) {
-                $entity->addChildEntityType($entityType);
+                $entity->addChildEntityEntityType($entityType);
             }
         }
 
@@ -180,13 +181,13 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         if (!empty($_POST["load_def_sampling_img"]) && boolval($_POST["load_def_sampling_img"])) {
             if (!isset($entitySamplingImage)) {
                 $entitySamplingImage = new ModEntitySamplingImage();
-                $entity->getChildSamplingImages()[0] = $entitySamplingImage;
+                $entity->getChildEntitySamplingImages()[0] = $entitySamplingImage;
             }
 
             $dataImage = array();
             $dataImage["id_entity_sampling_img"] = intval($_POST[ModEntitySamplingImage::PREFIX . "id_entity_sampling_img"]);
-            //$dataImage["sampling_img"] = $_POST[ModEntitySamplingImage::PREFIX . "def_sampling_img_file"]; XXX!!!
-            $dataImage["sampling_img"] = $_FILES[ModEntitySamplingImage::PREFIX . "def_sampling_img_file"]["name"];
+            //$dataImage["sampling_img"] = $_POST[ModEntitySamplingImage::PREFIX . "def_file"]; XXX!!!
+            $dataImage["sampling_img"] = $_FILES[ModEntitySamplingImage::PREFIX . "def_file"]["name"];
             //$data["is_system"] = $_POST["is_system"];
             //$data["is_deleted"] = $_POST["is_deleted"];
             //$data["fk_entity"] = $_POST["fk_entity"];
@@ -253,11 +254,12 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             }
 
             $entity->setData($data);
-            $entity->save($userSession);
+
+            FModel::save($userSession, $entity);
 
             if (!empty($_POST["load_def_sampling_img"]) && boolval($_POST["load_def_sampling_img"])) {
                 $targetFile = "../../img/entity/" . $entity->composeTargetFileDefSamplingImage(1);
-                FFiles::uploadFile($_FILES[ModEntitySamplingImage::PREFIX . "def_sampling_img_file"], $targetFile);
+                FFiles::uploadFile($_FILES[ModEntitySamplingImage::PREFIX . "def_file"], $targetFile);
             }
 
             header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/catalogs/view_entity.php?class=$entityClass");
@@ -383,10 +385,10 @@ if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
 
     echo '<div class="form-group">';
     echo '<div class="col-sm-4">';
-    echo '<label class="control-label small" for="' . ModEntitySamplingImage::PREFIX . 'def_sampling_img_file">Imagen muestreo x def.:</label>';
+    echo '<label class="control-label small" for="' . ModEntitySamplingImage::PREFIX . 'def_file">Imagen muestreo x def.:</label>';
     echo '</div>';
     echo '<div class="col-sm-8">';
-    echo '<input type="file" class="form-control input-sm" name="' . ModEntitySamplingImage::PREFIX . 'def_sampling_img_file" id="' . ModEntitySamplingImage::PREFIX . 'def_sampling_img_file" disabled>';
+    echo '<input type="file" class="form-control input-sm" name="' . ModEntitySamplingImage::PREFIX . 'def_file" id="' . ModEntitySamplingImage::PREFIX . 'def_file" disabled>';
     echo '</div>';
     echo '</div>';
 }
@@ -397,7 +399,7 @@ for ($row = 0; $row < 3; $row++) {
     echo '<div class="row">';
     for ($col = 0; $col < 3; $col++) {
         echo '<div class="col-sm-4">';
-        echo '<label class="checkbox-inline small"><input type="checkbox" name="entity_type_' . $entityTypes[$index] . '" value="1"' . ($entity->isChildEntityType($entityTypes[$index]) ? ' checked' : '') . '>' .
+        echo '<label class="checkbox-inline small"><input type="checkbox" name="' . ModEntityEntityType::PREFIX . $entityTypes[$index] . '" value="1"' . ($entity->hasChildEntityEntityType($entityTypes[$index]) ? ' checked' : '') . '>' .
         AppUtils::getName($userSession, AppConsts::CC_ENTITY_TYPE, $entityTypes[$index]) . '</label>';
         echo '</div>';
         $index++;
@@ -534,14 +536,22 @@ echo '</div>';  // echo '<div class="container" style="margin-top:50px">';
 echo FApp::composeFooter();
 echo <<<SCRIPT
 <script>
+(function () {
+    for (i = 1; i <= 10; i++) {
+        document.forms[0].elements["contact_" + i + "_surname"].removeAttribute("required");
+        document.forms[0].elements["contact_" + i + "_forename"].removeAttribute("required");
+    }
+})();
+
 function switchInputFile() {
     if (document.getElementById("load_def_sampling_img").checked) {
-        document.getElementById("image_def_sampling_img_file").removeAttribute("disabled");
+        document.getElementById("entity_sampling_img_def_file").removeAttribute("disabled");
     }
     else {
-        document.getElementById("image_def_sampling_img_file").setAttribute("disabled", "");
+        document.getElementById("entity_sampling_img_def_file").setAttribute("disabled", "");
     }
 }
+
 function showContactIcons(id_prefix) {
     var enableIconOk = document.forms[0].elements[id_prefix + "apply"].checked;
     var enableIconFile = document.forms[0].elements[id_prefix + "is_report"].checked;
@@ -549,12 +559,7 @@ function showContactIcons(id_prefix) {
     document.getElementById(id_prefix + "icon_ok").className = enableIconOk ? "glyphicon glyphicon-ok-sign small" : "";
     document.getElementById(id_prefix + "icon_file").className = enableIconOk && enableIconFile ? "glyphicon glyphicon-file small" : "";
 }
-(function () {
-    for (i = 1; i <= 10; i++) {
-        document.forms[0].elements["contact_" + i + "_surname"].removeAttribute("required");
-        document.forms[0].elements["contact_" + i + "_forename"].removeAttribute("required");
-    }
-})();
+
 function validateForm() {
     for (i = 1; i <= 10; i++) {
         if (document.forms[0].elements["contact_" + i + "_apply"].checked) {

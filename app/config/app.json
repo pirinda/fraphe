@@ -1,6 +1,6 @@
 {
-  "appName":"SYS 1.0",
-  "appVendor":"Empresa",
+  "appName":"AALIMS 1.0",
+  "appVendor":"CEDIMI",
   "appMode":"DEV",
   "appCatalogs":["catalogs"],
   "dbHost":"localhost",

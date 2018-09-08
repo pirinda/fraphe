@@ -35,7 +35,7 @@ abstract class AppConsts
     public const OC_CONTAINER_UNIT = 201142;
     public const OC_TEST_ACREDIT_ATTRIB = 201201;
     public const OC_TEST = 201211;
-    public const OC_TEST_PROCESS_ENTITY = 201216;
+    public const OC_TEST_ENTITY = 201216;
     public const OC_TEST_PROFILE = 201221;
     public const OC_TEST_PROFILE_TEST = 201226;
     public const OC_TEST_PACKAGE = 201231;
@@ -97,7 +97,7 @@ abstract class AppConsts
         self::OC_CONTAINER_UNIT => "oc_container_unit",
         self::OC_TEST_ACREDIT_ATTRIB => "oc_test_acredit_attrib",
         self::OC_TEST => "oc_test",
-        self::OC_TEST_PROCESS_ENTITY => "oc_test_process_entity",
+        self::OC_TEST_ENTITY => "oc_test_entity",
         self::OC_TEST_PROFILE => "oc_test_profile",
         self::OC_TEST_PROFILE_TEST => "oc_test_profile_test",
         self::OC_TEST_PACKAGE => "oc_test_package",
@@ -160,7 +160,7 @@ abstract class AppConsts
         self::OC_CONTAINER_UNIT => "id_container_unit",
         self::OC_TEST_ACREDIT_ATTRIB => "id_test_acredit_attrib",
         self::OC_TEST => "id_test",
-        //
+        self::OC_TEST_ENTITY => "id_test_entity",
         self::OC_TEST_PROFILE => "id_test_profile",
         //
         self::OC_TEST_PACKAGE => "id_test_package",
@@ -178,15 +178,15 @@ abstract class AppConsts
         self::OC_RESULT_PERMISS_LIMIT => "id_result_permiss_limit",
 
         self::O_SAMPLE => "id_sample",
-        //
+        self::O_SAMPLE_TEST => "id_sample_test",
         self::O_SAMPLE_STATUS_LOG => "id_sample_status_log",
         self::O_SAMPLING_IMG => "id_sampling_img",
         self::O_RECEPT => "id_recept",
         self::O_JOB => "id_job",
-        //
+        self::O_JOB_TEST => "id_job_test",
         self::O_JOB_STATUS_LOG => "id_job_status_log",
         self::O_REPORT => "id_report",
-        //
+        self::O_REPORT_TEST => "id_report_test",
         self::O_REPORT_STATUS_LOG => "id_report_status_log",
     );
 }

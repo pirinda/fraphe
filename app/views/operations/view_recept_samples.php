@@ -52,7 +52,7 @@ echo '</div>';
 
 echo '<br>';
 
-$address = $customer->getChildAddresses()[0];
+$address = $customer->getChildEntityAddresses()[0];
 echo '<div class="row">';
 echo '<div class="col-sm-2"><b>Domicilio:</b></div>';
 echo '<div class="col-sm-10">' . (empty($address) ? '' : $address->composeAddress()) . '</div>';
@@ -77,18 +77,14 @@ $sql = <<<SQL
 SELECT s.sample_num, s.id_sample AS _id, s.sample_name, s.sample_quantity, s.sample_lot,
 s.ts_user_ins AS _ts_user_ins, s.ts_user_upd AS _ts_user_upd,
 cb.code AS _cb_code,
-sc.name AS _sc_name,
-st.name AS _st_name,
 ss.code AS _ss_code,
 cu.code AS _cu_code,
 us.initials AS _us_initials,
 ur.initials AS _ur_initials,
 ui.name AS _ui_name, uu.name AS _uu_name,
-(SELECT COUNT(*) FROM o_sample_test AS qst WHERE qst.id_sample = s.id_sample) AS _tests
+(SELECT COUNT(*) FROM o_sample_test AS qst WHERE qst.fk_sample = s.id_sample) AS _tests
 FROM o_sample AS s
 INNER JOIN cc_company_branch AS cb ON s.fk_company_branch = cb.id_company_branch
-INNER JOIN oc_sample_class AS sc ON s.fk_sample_class = sc.id_sample_class
-INNER JOIN oc_sample_type AS st ON s.fk_sample_type = st.id_sample_type
 INNER JOIN oc_sample_status AS ss ON s.fk_sample_status = ss.id_sample_status
 INNER JOIN oc_container_unit AS cu ON s.fk_container_unit = cu.id_container_unit
 INNER JOIN cc_user AS us ON s.fk_user_sampler = us.id_user
@@ -109,8 +105,8 @@ echo '<th>Cantidad</th>';
 echo '<th>Unidad</th>';
 echo '<th>Lote</th>';
 echo '<th>Estatus</th>';
-echo '<th><abbr title="Ensayos">Ens.</abbr></th>';
-echo '<th><abbr title="Muestreador">Mtr.</abbr></th>';
+echo '<th><abbr title="Cantidad ensayos">C/E</abbr></th>';
+echo '<th><abbr title="Realizador muestreo">Mtr.</abbr></th>';
 echo '<th><abbr title="Receptor">Rec.</abbr></th>';
 echo '<th><abbr title="Sucursal">Suc.</abbr></th>';
 echo '<th class="small">Creador</th>';
@@ -128,13 +124,13 @@ echo '<tbody>';
 $pdo = FGuiUtils::createPdo();
 foreach ($pdo->query($sql) as $row) {
     echo '<tr>';
-    echo '<td>' . $row['sample_num'] . '</td>';
+    echo '<td><b>' . $row['sample_num'] . '</b></td>';
     echo '<td>' . $row['sample_name'] . '</td>';
     echo '<td>' . $row['sample_quantity'] . '</td>';
     echo '<td>' . $row['_cu_code'] . '</td>';
     echo '<td>' . $row['sample_lot'] . '</td>';
     echo '<td>' . $row['_ss_code'] . '</td>';
-    echo '<td>' . $row['_tests'] . '</td>';
+    echo '<td><span class="badge">' . $row['_tests'] . '</span></td>';
     echo '<td>' . $row['_us_initials'] . '</td>';
     echo '<td>' . $row['_ur_initials'] . '</td>';
     echo '<td>' . $row['_cb_code'] . '</td>';
@@ -145,7 +141,7 @@ foreach ($pdo->query($sql) as $row) {
     echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?id=' . $row['_id'] . '" class="btn btn-success btn-xs" role="button"><span class="glyphicon glyphicon-edit"></span></a></td>';
     echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept_sample_tests.php?id=' . $row['_id'] . '" class="btn btn-warning btn-xs" role="button"><span class="glyphicon glyphicon-th-list"></span></a></td>';
     echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?id=' . $row['_id'] . '&copy=1" class="btn btn-primary btn-xs" role="button"><span class="glyphicon glyphicon-duplicate"></span></a></td>';
-//    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?id=' . $row['_id'] . '&copy=1" class="btn btn-danger btn-xs" role="button"><span class="glyphicon glyphicon-ban-circle"></span></a></td>';
+//    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?id=' . $row['_id'] . '" class="btn btn-danger btn-xs" role="button"><span class="glyphicon glyphicon-ban-circle"></span></a></td>';
     echo '</tr>';
 }
 

@@ -11,6 +11,7 @@ use app\models\catalogs\ModEntity;
 
 class ModRecept extends FRegistry
 {
+    public const PREFIX = "recept_";
     public const SERVICE_ORDINARY = "O";
     public const SERVICE_URGENT = "U";
 
@@ -38,7 +39,7 @@ class ModRecept extends FRegistry
     protected $ts_user_ins;
     protected $ts_user_upd;
 
-    protected $childSamples;
+    protected $childSamples; // array of ModSample
 
     protected $orig_recept_datetime;
     protected $orig_fk_user_receiver;
@@ -236,7 +237,7 @@ class ModRecept extends FRegistry
 
         $customer = new ModEntity();
         $customer->read($userSession, $this->fk_customer->getValue(), FRegistry::MODE_READ);
-        $contact = $customer->getChildAddresses()[0]->getChildContactReport();
+        $contact = $customer->getChildEntityAddresses()[0]->getChildContactReport();
 
         $data["is_def_sampling_img"] = $customer->getDatum("is_def_sampling_img");
         $data["fk_customer"] = $customer->getId();
@@ -480,7 +481,7 @@ class ModRecept extends FRegistry
         // save child samples:
         $num = 0;
         foreach ($this->childSamples as $sample) {
-            // assure link to parent and set system data:
+            // ensure link to parent and set system data:
             $data = array();
             $data["nk_recept"] = $this->id;
             $data["recept_sample"] = ++$num;
