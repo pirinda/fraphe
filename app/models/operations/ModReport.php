@@ -44,6 +44,8 @@ class ModReport extends FRegistry
     protected $childReportTests;
     protected $childReportStatusLogs;
 
+    protected $orig_fk_report_status;
+
     function __construct()
     {
         parent::__construct(AppConsts::O_REPORT, AppConsts::$tables[AppConsts::O_REPORT], AppConsts::$tableIds[AppConsts::O_REPORT]);
@@ -116,6 +118,8 @@ class ModReport extends FRegistry
 
         $this->clearChildReportTests();
         $this->clearChildReportStatusLogs();
+
+        $this->orig_fk_report_status = null;
     }
 
     public function &getChildReportTests(): array
@@ -205,6 +209,8 @@ class ModReport extends FRegistry
 
             $this->isRegistryNew = false;
             $this->mode = $mode;
+
+            $this->orig_fk_report_status = $this->fk_report_status->getValue();
 
             // create PDO connection for reading children:
             $pdo = FGuiUtils::createPdo();
@@ -435,13 +441,34 @@ class ModReport extends FRegistry
 
         // save child report status log entries:
         foreach ($this->childReportStatusLogs as $child) {
-            // ensure link to parent:
-            $data = array();
-            $data["fk_report"] = $this->id;
+            if ($child->isRegistryNew()) {
+                // ensure link to parent:
+                $data = array();
+                $data["fk_report"] = $this->id;
 
-            // save child:
-            $child->setData($data);
-            $child->save($userSession);
+                // save child:
+                $child->setData($data);
+                $child->save($userSession);
+            }
+        }
+
+        // create status-log entry, if needed:
+        if ($this->orig_fk_report_status != $this->fk_report_status->getValue()) {
+            $data = array();
+            $data["status_datetime"] = time();
+            $data["status_notes"] = "";
+            $data["reissue"] = 0;
+            $data["is_system"] = true;
+            //$data["is_deleted"] = ?;
+            $data["fk_report"] = $this->id;
+            $data["fk_report_status"] = $this->fk_report_status->getValue();
+            $data["nk_report_reissue_cause"] = null;
+            $data["fk_user_status"] = $fk_user;
+
+            $entry = new ModReportStatusLog();
+            $this->childReportStatusLogs[] = $entry; // append entry
+            $entry->setData($data);
+            $entry->save($userSession);
         }
     }
 

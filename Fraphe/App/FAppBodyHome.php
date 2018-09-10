@@ -74,9 +74,12 @@ abstract class FAppBodyHome
                 $html .= '      <p>Procesamiento de órdenes de trabajo.</p>';
                 $html .= '    </div>';
 
+                $module = FGuiUtils::getModule("result");
                 $html .= '    <div class="col-sm-4">';
+                $html .= '      <a href="' . $module->getHref() . '">';
                 $html .= '      <h1><span class="glyphicon glyphicon-file"></span></h1>';
                 $html .= '      <h4>RESULTADOS</h4>';
+                $html .= '      </a>';
                 $html .= '      <p>Verificación, validación y liberación de informes de resultados.</p>';
                 $html .= '    </div>';
 

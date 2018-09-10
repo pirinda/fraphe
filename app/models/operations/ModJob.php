@@ -31,6 +31,8 @@ class ModJob extends FRegistry
     protected $childJobTests;
     protected $childJobStatusLogs;
 
+    protected $orig_fk_job_status;
+
     function __construct()
     {
         parent::__construct(AppConsts::O_JOB, AppConsts::$tables[AppConsts::O_JOB], AppConsts::$tableIds[AppConsts::O_JOB]);
@@ -75,6 +77,8 @@ class ModJob extends FRegistry
 
         $this->clearChildJobTests();
         $this->clearChildJobStatusLogs();
+
+        $this->orig_fk_job_status = null;
     }
 
     public function &getChildJobTests(): array
@@ -185,6 +189,8 @@ class ModJob extends FRegistry
             $this->isRegistryNew = false;
             $this->mode = $mode;
 
+            $this->orig_fk_job_status = $this->fk_job_status->getValue();
+
             // create PDO connection for reading children:
             $pdo = FGuiUtils::createPdo();
 
@@ -273,7 +279,7 @@ class ModJob extends FRegistry
                 "fk_user_upd = :fk_user, " .
                 //"ts_user_ins = :ts_user_ins, " .
                 "ts_user_upd = NOW() " .
-                "WHERE id_sample = :id;");
+                "WHERE id_job = :id;");
         }
 
         //$id_job = $this->id_job->getValue();
@@ -344,13 +350,32 @@ class ModJob extends FRegistry
 
         // save child job status log entries:
         foreach ($this->childJobStatusLogs as $child) {
-            // ensure link to parent:
-            $data = array();
-            $data["fk_job"] = $this->id;
+            if ($child->isRegistryNew()) {
+                // ensure link to parent:
+                $data = array();
+                $data["fk_job"] = $this->id;
 
-            // save child:
-            $child->setData($data);
-            $child->save($userSession);
+                // save child:
+                $child->setData($data);
+                $child->save($userSession);
+            }
+        }
+
+        // create status-log entry, if needed:
+        if ($this->orig_fk_job_status != $this->fk_job_status->getValue()) {
+            $data = array();
+            $data["status_datetime"] = time();
+            $data["status_notes"] = "";
+            $data["is_system"] = true;
+            //$data["is_deleted"] = ?;
+            $data["fk_job"] = $this->id;
+            $data["fk_job_status"] = $this->fk_job_status->getValue();
+            $data["fk_user_status"] = $fk_user;
+
+            $entry = new ModJobStatusLog();
+            $this->childJobStatusLogs[] = $entry; // append entry
+            $entry->setData($data);
+            $entry->save($userSession);
         }
     }
 

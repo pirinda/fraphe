@@ -3,6 +3,7 @@ namespace app\models\operations;
 
 use Fraphe\App\FUserSession;
 use Fraphe\App\FGuiUtils;
+use Fraphe\Lib\FLibUtils;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
@@ -120,19 +121,7 @@ class ModJobStatusLog extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $userSession->getPdo()->prepare("UPDATE $this->tableName SET " .
-                "status_datetime = :status_datetime, " .
-                "status_notes = :status_notes, " .
-                "is_system = :is_system, " .
-                "is_deleted = :is_deleted, " .
-                "fk_job = :fk_job, " .
-                "fk_job_status = :fk_job_status, " .
-                "fk_user_status = :fk_user_status, " .
-                //"fk_user_ins = :fk_user_ins, " .
-                "fk_user_upd = :fk_user_upd, " .
-                //"ts_user_ins = NOW(), " .
-                "ts_user_upd = NOW() " .
-                "WHERE id_job_status_log = :id;");
+            throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NON_UPDATABLE);
         }
 
         //$id_job_status_log = $this->id_job_status_log->getValue();

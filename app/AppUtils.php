@@ -135,15 +135,15 @@ abstract class AppUtils
         return $options;
     }
 
-    public static function getName(FUserSession $userSession, int $catalog, int $id): string
+    public static function readField(FUserSession $userSession, string $field, int $catalog, int $id): string
     {
         $name = "";
         $table = AppConsts::$tables[$catalog];
         $tableId = AppConsts::$tableIds[$catalog];
-        $sql = "SELECT name FROM $table WHERE $tableId = $id;";
+        $sql = "SELECT $field FROM $table WHERE $tableId = $id;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $name = $row["name"];
+            $name = $row[$field];
         }
         else {
             throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);

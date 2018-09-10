@@ -3,6 +3,7 @@ namespace app\models\operations;
 
 use Fraphe\App\FUserSession;
 use Fraphe\App\FGuiUtils;
+use Fraphe\Lib\FLibUtils;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
@@ -31,7 +32,7 @@ class ModReportStatusLog extends FRegistry
         $this->id_report_status_log = new FItem(FItem::DATA_TYPE_INT, "id_report_status_log", "ID cambio estatus reporte", "", false, true);
         $this->status_datetime = new FItem(FItem::DATA_TYPE_DATETIME, "status_datetime", "Fecha-hr cambio estatus", "", true);
         $this->status_notes = new FItem(FItem::DATA_TYPE_STRING, "status_notes", "Observaciones cambio estatus", "", false);
-        $this->reissue = new FItem(FItem::DATA_TYPE_INT, "reissue", "Reimpresión núm.", "", true);
+        $this->reissue = new FItem(FItem::DATA_TYPE_INT, "reissue", "Reimpresión núm.", "", false);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
         $this->fk_report = new FItem(FItem::DATA_TYPE_INT, "fk_report", "Reporte", "", true);
@@ -132,21 +133,7 @@ class ModReportStatusLog extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $userSession->getPdo()->prepare("UPDATE $this->tableName SET " .
-                "status_datetime = :status_datetime, " .
-                "status_notes = :status_notes, " .
-                "reissue = :reissue, " .
-                "is_system = :is_system, " .
-                "is_deleted = :is_deleted, " .
-                "fk_report = :fk_report, " .
-                "fk_report_status = :fk_report_status, " .
-                "nk_report_reissue_cause = :nk_report_reissue_cause, " .
-                "fk_user_status = :fk_user_status, " .
-                //"fk_user_ins = :fk_user_ins, " .
-                "fk_user_upd = :fk_user_upd, " .
-                //"ts_user_ins = NOW(), " .
-                "ts_user_upd = NOW() " .
-                "WHERE id_report_status_log = :id;");
+            throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NON_UPDATABLE);
         }
 
         //$id_report_status_log = $this->id_report_status_log->getValue();
@@ -181,8 +168,8 @@ class ModReportStatusLog extends FRegistry
             $statement->bindParam(":nk_report_reissue_cause", $nk_report_reissue_cause, \PDO::PARAM_INT);
         }
         $statement->bindParam(":fk_user_status", $fk_user_status, \PDO::PARAM_INT);
-        $statement->bindParam(":fk_user_ins", $fk_user_ins, \PDO::PARAM_INT);
-        $statement->bindParam(":fk_user_upd", $fk_user_upd, \PDO::PARAM_INT);
+        //$statement->bindParam(":fk_user_ins", $fk_user_ins, \PDO::PARAM_INT);
+        //$statement->bindParam(":fk_user_upd", $fk_user_upd, \PDO::PARAM_INT);
         //$statement->bindParam(":ts_user_ins", $ts_user_ins);
         //$statement->bindParam(":ts_user_upd", $ts_user_upd);
 

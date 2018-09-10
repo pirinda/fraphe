@@ -6,6 +6,7 @@ use Fraphe\Lib\FLibUtils;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
+use app\AppUtils;
 
 class ModSampleTest extends FRegistry
 {
@@ -118,7 +119,7 @@ class ModSampleTest extends FRegistry
     {
         // compute data:
 
-        $this->fk_process_area->setValue(ModTest::readFkProcessArea($userSession, $this->fk_test->getValue()));
+        $this->fk_process_area->setValue(intval(AppUtils::readField($userSession, "fk_process_area", AppConsts::OC_TEST, $this->fk_test->getValue())));
 
         if (empty($this->sample_test->getValue())) {
             $this->generateSampleTest($userSession);

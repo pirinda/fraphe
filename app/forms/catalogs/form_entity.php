@@ -400,7 +400,7 @@ for ($row = 0; $row < 3; $row++) {
     for ($col = 0; $col < 3; $col++) {
         echo '<div class="col-sm-4">';
         echo '<label class="checkbox-inline small"><input type="checkbox" name="' . ModEntityEntityType::PREFIX . $entityTypes[$index] . '" value="1"' . ($entity->hasChildEntityEntityType($entityTypes[$index]) ? ' checked' : '') . '>' .
-        AppUtils::getName($userSession, AppConsts::CC_ENTITY_TYPE, $entityTypes[$index]) . '</label>';
+        AppUtils::readField($userSession, 'name', AppConsts::CC_ENTITY_TYPE, $entityTypes[$index]) . '</label>';
         echo '</div>';
         $index++;
     }
@@ -483,7 +483,7 @@ for ($panel = 1; $panel <= 2; $panel++) {
         echo '<div class="panel-heading">';
         echo '<div class="panel-title">';
         echo '<a id="' . $prefix . 'panel" class="small" data-toggle="collapse" data-parent="#accordion' . $panel . '" href="#collapse' . $contactType . '">';
-        echo 'Contacto ' . strtolower(AppUtils::getName($userSession, AppConsts::CC_CONTACT_TYPE, $contactType)) . '</a>';
+        echo 'Contacto ' . strtolower(AppUtils::readField($userSession, 'name', AppConsts::CC_CONTACT_TYPE, $contactType)) . '</a>';
         echo '&nbsp;<span id="' . $prefix . 'icon_ok" class="' . (!empty($contact) ? "glyphicon glyphicon-ok-sign small" : "") . '"></span>';
         echo '&nbsp;<span id="' . $prefix . 'icon_file" class="' . (!empty($contact) && $contact->getItem("is_report")->getValue() ? "glyphicon glyphicon-file small" : "") . '"></span>';
         echo '</div>';

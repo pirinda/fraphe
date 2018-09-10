@@ -96,12 +96,12 @@ foreach ($pdo->query($sql) as $row) {
     echo '<td><nobr>';
     // button back:
     echo '<button type="button" class="btn btn-default btn-xs" ' .
-        'onclick="procRecept(\'' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/proc_recept.php?id=' . $row['id_recept'] . '&move=back\');"' .
+        'onclick="procRecept(\'' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/proc_recept.php?id=' . $row['id_recept'] . '&move=back\', \'back\');"' .
         ($recept_st <= ModConsts::OC_RECEPT_STATUS_NEW || $recept_st == 0 ? " disabled" : "") . '>' .
         '<span class="glyphicon glyphicon-circle-arrow-left"></span></button>&nbsp;';
     // button next:
     echo '<button type="button" class="btn btn-default btn-xs" ' .
-        'onclick="procRecept(\'' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/proc_recept.php?id=' . $row['id_recept'] . '&move=next\');"' .
+        'onclick="procRecept(\'' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/proc_recept.php?id=' . $row['id_recept'] . '&move=next\', \'next\');"' .
         ($recept_st >= ModConsts::OC_RECEPT_STATUS_PROCESSING || $recept_st == 0 ? " disabled" : "") . '>' .
         '<span class="glyphicon glyphicon-circle-arrow-right"></span></button>';
     echo '</nobr></td>';
@@ -132,8 +132,8 @@ echo '</div>';
 echo FApp::composeFooter();
 echo <<<SCRIPT
 <script>
-function procRecept(url) {
-    if (confirm("¿Enviar al siguiente estado?")) {
+function procRecept(url, move) {
+    if (confirm("¿Enviar al estatus " + (move == "next" ? "siguiente" : "previo") + "?")) {
         window.location.assign(url);
     }
 }

@@ -7,6 +7,7 @@ use Fraphe\Lib\FLibUtils;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
+use app\AppUtils;
 
 class ModSample extends FRegistry
 {
@@ -85,9 +86,10 @@ class ModSample extends FRegistry
     protected $childSamplingImages;     // array of ModSamplingImage
 
     protected $parentRecept;
-    protected $dbmsContainerUnitCode;
     protected $auxChildJobs;
     protected $auxChildReport;
+
+    protected $orig_fk_sample_status;
 
     function __construct()
     {
@@ -258,9 +260,10 @@ class ModSample extends FRegistry
         $this->clearChildSamplingImages();
 
         $this->parentRecept = null;
-        $this->dbmsContainerUnitCode = null;
         $this->auxChildJobs = array();
         $this->auxChildReport = null;
+
+        $this->orig_fk_sample_status = null;
     }
 
     public function setParentRecept(ModRecept $recept)
@@ -344,11 +347,6 @@ class ModSample extends FRegistry
         $this->process_days->setValue($maxDays);
         $this->process_start_date->setValue($minStartDate);
         $this->process_deadline->setValue($maxDeadline);
-    }
-
-    public function getDbmsContainerUnitCode(): string
-    {
-        return $this->dbmsContainerUnitCode;
     }
 
     public function &getChildSampleTests(): array
@@ -584,6 +582,8 @@ class ModSample extends FRegistry
             $this->isRegistryNew = false;
             $this->mode = $mode;
 
+            $this->orig_fk_sample_status = $this->fk_sample_status->getValue();
+
             // create PDO connection for reading children:
             $pdo = FGuiUtils::createPdo();
 
@@ -616,16 +616,6 @@ class ModSample extends FRegistry
         }
         else {
             throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
-        }
-
-        // read DBMS complementary data:
-        $sql = "SELECT code FROM oc_container_unit WHERE id_container_unit = " . $this->fk_container_unit->getValue() . ";";
-        $statement = $userSession->getPdo()->query($sql);
-        if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->dbmsContainerUnitCode = $row["code"];
-        }
-        else {
-            throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_DEP_NOT_FOUND);
         }
     }
 
@@ -1079,13 +1069,15 @@ class ModSample extends FRegistry
 
         // save child sample status log entries:
         foreach ($this->childSampleStatusLogs as $child) {
-            // ensure link to parent:
-            $data = array();
-            $data["fk_sample"] = $this->id;
+            if ($child->isRegistryNew()) {
+                // ensure link to parent:
+                $data = array();
+                $data["fk_sample"] = $this->id;
 
-            // save child:
-            $child->setData($data);
-            $child->save($userSession);
+                // save child:
+                $child->setData($data);
+                $child->save($userSession);
+            }
         }
 
         // save child sample images:
@@ -1111,6 +1103,7 @@ class ModSample extends FRegistry
             $auxChild->save($userSession);
         }
 
+        // save aswell auxiliar child report:
         if (isset($this->auxChildReport)) {
             // ensure link to parent:
             $data = array();
@@ -1119,6 +1112,24 @@ class ModSample extends FRegistry
             // save child:
             $this->auxChildReport->setData($data);
             $this->auxChildReport->save($userSession);
+        }
+
+        // create status-log entry, if needed:
+        if ($this->orig_fk_sample_status != $this->fk_sample_status->getValue()) {
+            $data = array();
+            $data["status_datetime"] = time();
+            $data["status_temperat_n"] = $this->status_temperat_n->getValue();
+            $data["status_notes"] = "";
+            $data["is_system"] = true;
+            //$data["is_deleted"] = ?;
+            $data["fk_sample"] = $this->id;
+            $data["fk_sample_status"] = $this->fk_sample_status->getValue();
+            $data["fk_user_status"] = $fk_user;
+
+            $entry = new ModJobStatusLog();
+            $this->childSampleStatusLogs[] = $entry; // append entry
+            $entry->setData($data);
+            $entry->save($userSession);
         }
     }
 

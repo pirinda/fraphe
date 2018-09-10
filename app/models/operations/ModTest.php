@@ -326,17 +326,4 @@ class ModTest extends FRegistry
             $this->childTestEntitys[0]->resetAutoIncrement($userSession);
         }
     }
-
-    public static function readFkProcessArea(FUserSession $userSession, int $idTest)
-    {
-        $fkProcessArea = null;
-
-        $sql = "SELECT fk_process_area FROM oc_test WHERE id_test = $idTest;";
-        $statement = $userSession->getPdo()->query($sql);
-        if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $fkProcessArea = intval($row["fk_process_area"]);
-        }
-
-        return $fkProcessArea;
-    }
 }

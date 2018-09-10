@@ -14,6 +14,8 @@ use Fraphe\App\FAppNavbar;
 use Fraphe\App\FGuiUtils;
 use Fraphe\Lib\FLibUtils;
 use Fraphe\Model\FRegistry;
+use app\AppConsts;
+use app\AppUtils;
 use app\models\operations\ModSample;
 
 echo '<!DOCTYPE html>';
@@ -46,7 +48,7 @@ echo '<div class="row">';
 echo '<div class="col-sm-2"><b>' . $sample->getItem("sample_name")->getName() . ':</b></div>';
 echo '<div class="col-sm-3">' . $sample->getDatum("sample_name") . '</div>';
 echo '<div class="col-sm-2"><b>' . $sample->getItem("sample_quantity")->getName() . ':</b></div>';
-echo '<div class="col-sm-2">' . $sample->getDatum("sample_quantity") . ' ' . $sample->getDbmsContainerUnitCode() . '</div>';
+echo '<div class="col-sm-2">' . $sample->getDatum("sample_quantity") . ' ' . AppUtils::readField($userSession, "code", AppConsts::OC_CONTAINER_UNIT, $sample->getDatum("fk_container_unit")) . '</div>';
 echo '<div class="col-sm-2"><b>' . $sample->getItem("sample_lot")->getName() . ':</b></div>';
 echo '<div class="col-sm-1">' . $sample->getDatum("sample_lot") . '</div>';
 echo '</div>';

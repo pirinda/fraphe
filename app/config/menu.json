@@ -135,7 +135,51 @@
                     },
                     "jobAll":{
                         "submenu":"Órdenes de trabajo (todas)",
-                        "href":"app/views/operations/view_job.php?job_st=0"
+                        "href":"app/views/operations/view_job.php?job_st=all"
+                    }
+                }
+            }
+        }
+    },
+    "result":{
+        "module":"<span class='glyphicon glyphicon-file'></span> Resultados",
+        "href":"app/modules.php?module=result",
+        "menus":{
+            "job":{
+                "menu":"Resultados",
+                "href":"menu=result",
+                "submenus":{
+                    "resultPend":{
+                        "submenu":"Informes de resultados pendientes",
+                        "href":"app/views/operations/view_result.php?job_st=1"
+                    },
+                    "resultProc":{
+                        "submenu":"Informes de resultados en proceso",
+                        "href":"app/views/operations/view_result.php?job_st=2"
+                    },
+                    "resultFin":{
+                        "submenu":"Informes de resultados terminados",
+                        "href":"app/views/operations/view_result.php?job_st=3"
+                    },
+                    "resultVer":{
+                        "submenu":"Informes de resultados verificados",
+                        "href":"app/views/operations/view_result.php?job_st=3"
+                    },
+                    "resultVal":{
+                        "submenu":"Informes de resultados validados",
+                        "href":"app/views/operations/view_result.php?job_st=3"
+                    },
+                    "resultRel":{
+                        "submenu":"Informes de resultados liberados",
+                        "href":"app/views/operations/view_result.php?job_st=3"
+                    },
+                    "resultDel":{
+                        "submenu":"Informes de resultados entregados",
+                        "href":"app/views/operations/view_result.php?job_st=3"
+                    },
+                    "jobAll":{
+                        "submenu":"Informes de resultados (todos)",
+                        "href":"app/views/operations/view_result.php?job_st=all"
                     }
                 }
             }

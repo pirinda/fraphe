@@ -5,6 +5,7 @@ use Fraphe\App\FUserSession;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
+use app\AppUtils;
 
 class ModTestEntity extends FRegistry
 {
@@ -97,7 +98,7 @@ class ModTestEntity extends FRegistry
         }
 
         // read DBMS complementary data:
-        $this->dbmsFkProcessArea = ModTest::readFkProcessArea($userSession, $this->fk_test->getValue());
+        $this->dbmsFkProcessArea = intval(AppUtils::readField($userSession, "fk_process_area", AppConsts::OC_TEST, $this->fk_test->getValue()));
     }
 
     public function save(FUserSession $userSession)
