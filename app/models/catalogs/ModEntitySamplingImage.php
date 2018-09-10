@@ -11,6 +11,7 @@ use app\models\ModConsts;
 class ModEntitySamplingImage extends FRegistry
 {
     public const PREFIX = "entity_sampling_img_";
+    public const PATH_IMG = "../../img/entity/";
 
     protected $id_entity_sampling_img;
     protected $sampling_img;
@@ -24,7 +25,7 @@ class ModEntitySamplingImage extends FRegistry
 
     function __construct()
     {
-        parent::__construct(AppConsts::CC_ENTITY_SAMPLING_IMG, AppConsts::$tableIds[AppConsts::CC_ENTITY_SAMPLING_IMG]);
+        parent::__construct(AppConsts::CC_ENTITY_SAMPLING_IMG, AppConsts::$tables[AppConsts::CC_ENTITY_SAMPLING_IMG], AppConsts::$tableIds[AppConsts::CC_ENTITY_SAMPLING_IMG]);
 
         $this->id_entity_sampling_img = new FItem(FItem::DATA_TYPE_INT, "id_entity_sampling_img", "ID imagen entidad", "", false, true);
         $this->sampling_img = new FItem(FItem::DATA_TYPE_STRING, "sampling_img", "Imagen muestreo", "", true);
@@ -49,11 +50,16 @@ class ModEntitySamplingImage extends FRegistry
         $this->sampling_img->setRangeLength(1, 250);
     }
 
+    public function getTargetFile(): string
+    {
+        return self::PATH_IMG . $this->sampling_img->getValue();
+    }
+
     public function read(FUserSession $userSession, int $id, int $mode)
     {
         $this->initialize();
 
-        $sql = "SELECT * FROM cc_entity_sampling_img WHERE id_entity_sampling_img = $id;";
+        $sql = "SELECT * FROM $this->tableName WHERE id_entity_sampling_img = $id;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->id = intval($row["id_entity_sampling_img"]);
@@ -83,7 +89,7 @@ class ModEntitySamplingImage extends FRegistry
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $userSession->getPdo()->prepare("INSERT INTO cc_entity_sampling_img (" .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO $this->tableName (" .
                 "id_entity_sampling_img, " .
                 "sampling_img, " .
                 "is_system, " .
@@ -105,7 +111,7 @@ class ModEntitySamplingImage extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $userSession->getPdo()->prepare("UPDATE cc_entity_sampling_img SET " .
+            $statement = $userSession->getPdo()->prepare("UPDATE $this->tableName SET " .
                 "sampling_img = :sampling_img, " .
                 "is_system = :is_system, " .
                 "is_deleted = :is_deleted, " .

@@ -32,7 +32,7 @@ class ModContact extends FRegistry
 
     function __construct()
     {
-        parent::__construct(AppConsts::CC_CONTACT, AppConsts::$tableIds[AppConsts::CC_CONTACT]);
+        parent::__construct(AppConsts::CC_CONTACT, AppConsts::$tables[AppConsts::CC_CONTACT], AppConsts::$tableIds[AppConsts::CC_CONTACT]);
 
         $this->id_contact = new FItem(FItem::DATA_TYPE_INT, "id_contact", "ID contacto", "", false, true);
         $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", "", true);
@@ -101,6 +101,8 @@ class ModContact extends FRegistry
         return $contact;
     }
 
+    /** Overriden method.
+     */
     public function validate(FUserSession $userSession)
     {
         // compute data:
@@ -116,7 +118,7 @@ class ModContact extends FRegistry
     {
         $this->initialize();
 
-        $sql = "SELECT * FROM cc_contact WHERE id_contact = $id;";
+        $sql = "SELECT * FROM $this->tableName WHERE id_contact = $id;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->id = intval($row["id_contact"]);
@@ -156,7 +158,7 @@ class ModContact extends FRegistry
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $userSession->getPdo()->prepare("INSERT INTO cc_contact (" .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO $this->tableName (" .
                 "id_contact, " .
                 "name, " .
                 "prefix, " .
@@ -198,7 +200,7 @@ class ModContact extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $userSession->getPdo()->prepare("UPDATE cc_contact SET " .
+            $statement = $userSession->getPdo()->prepare("UPDATE $this->tableName SET " .
                 "name = :name, " .
                 "prefix = :prefix, " .
                 "surname = :surname, " .

@@ -6,7 +6,7 @@ if (!isset($_SESSION)) {
 // bootstrap Fraphe:
 require $_SESSION["rootDir"] . "Fraphe" . DIRECTORY_SEPARATOR . "fraphe.php";
 
-use Fraphe\Lib\FUtils;
+use Fraphe\Lib\FLibUtils;
 
 //$nf = new \NumberFormatter(Locale::getDefault(), \NumberFormatter::PATTERN_DECIMAL);
 /*
@@ -31,7 +31,7 @@ echo "<br>";
 echo "Current local datetime from date(): " . date("Y-m-d H:i:s");
 echo "<br>";
 
-echo "Current local datetime from FUtils::getLocalDatetime(): (" . FUtils::getLocalDatetime() . ") " . date("Y-m-d H:i:s", FUtils::getLocalDatetime());
+echo "Current local datetime from FLibUtils::getLocalDatetime(): (" . FLibUtils::getLocalDatetime() . ") " . date("Y-m-d H:i:s", FLibUtils::getLocalDatetime());
 echo "<br>";
 
 echo "date_default_timezone_get(): " . date_default_timezone_get();
@@ -41,13 +41,13 @@ echo "date_default_timezone_get(): " . date_default_timezone_get();
 echo "<br>";
 echo "time(): " . time();
 echo "<br>";
-echo "FUtils::getLocalDatetime(): " . FUtils::getLocalDatetime();
+echo "FLibUtils::getLocalDatetime(): " . FLibUtils::getLocalDatetime();
 echo "<br>";
 echo "date('Y-m-d H:i:s'): " . date('Y-m-d H:i:s');
 echo "<br>";
 echo "date('Y-m-d H:i:s Z'): " . date('Y-m-d H:i:s Z');
 echo "<br>";
-echo "date('Y-m-d H:i:s', FUtils::getLocalDatetime()): " . date('Y-m-d H:i:s', FUtils::getLocalDatetime());
+echo "date('Y-m-d H:i:s', FLibUtils::getLocalDatetime()): " . date('Y-m-d H:i:s', FLibUtils::getLocalDatetime());
 echo "<br>";
 
 echo "<hr>";
@@ -57,11 +57,11 @@ echo "date_default_timezone_get(): " . date_default_timezone_get();
 echo "<br>";
 echo "time(): " . time();
 echo "<br>";
-echo "FUtils::getLocalDatetime(): " . FUtils::getLocalDatetime();
+echo "FLibUtils::getLocalDatetime(): " . FLibUtils::getLocalDatetime();
 echo "<br>";
 echo "date('Y-m-d H:i:s'): " . date('Y-m-d H:i:s');
 echo "<br>";
 echo "date('Y-m-d H:i:s Z'): " . date('Y-m-d H:i:s Z');
 echo "<br>";
-echo "date('Y-m-d H:i:s', FUtils::getLocalDatetime()): " . date('Y-m-d H:i:s', FUtils::getLocalDatetime());
+echo "date('Y-m-d H:i:s', FLibUtils::getLocalDatetime()): " . date('Y-m-d H:i:s', FLibUtils::getLocalDatetime());
 echo "<br>";

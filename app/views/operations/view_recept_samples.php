@@ -12,7 +12,7 @@ use Fraphe\App\FApp;
 use Fraphe\App\FAppConsts;
 use Fraphe\App\FAppNavbar;
 use Fraphe\App\FGuiUtils;
-use Fraphe\Lib\FUtils;
+use Fraphe\Lib\FLibUtils;
 use Fraphe\Model\FRegistry;
 use app\models\catalogs\ModEntity;
 use app\models\operations\ModRecept;
@@ -31,7 +31,7 @@ $customer->read($userSession, $recept->getDatum("fk_customer"), FRegistry::MODE_
 
 //------------------------------------------------------------------------------
 echo '<div class="container" style="margin-top:50px">';
-echo '<h3>Recepción de muestras</h3>';
+echo '<h3><span class="glyphicon glyphicon-list-alt"></span> Recepción de muestras</h3>';
 
 //------------------------------------------------------------------------------
 echo '<div class="panel panel-default">';
@@ -42,7 +42,7 @@ echo '<div class="row">';
 echo '<div class="col-sm-2"><b>' . $recept->getItem("recept_num")->getName() . ':</b></div>';
 echo '<div class="col-sm-3"><span class="bg-info lead">' . $recept->getDatum("recept_num") . '</span></div>';
 echo '<div class="col-sm-2"><b>' . $recept->getItem("recept_datetime")->getName() . ':</b></div>';
-echo '<div class="col-sm-3"><span class="bg-info">' . FUtils::formatStdDatetime($recept->getDatum("recept_datetime")) . '</span></div>';
+echo '<div class="col-sm-3"><span class="bg-info">' . FLibUtils::formatStdDatetime($recept->getDatum("recept_datetime")) . '</span></div>';
 echo '</div>';
 
 echo '<div class="row">';
@@ -71,10 +71,10 @@ echo '</div>';
 echo '<h4>Muestras</h4>';
 
 echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?recept=' . $recept->getId() . '" class="btn btn-primary btn-sm" role="button">Crear</a>&nbsp;';
-echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept.php" class="btn btn-danger btn-sm" role="button">Volver</a>';
+echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept.php?" class="btn btn-danger btn-sm" role="button">Volver</a>';
 
 $sql = <<<SQL
-SELECT s.sample_num, s.id_sample AS _id, s.sample_name, s.sample_quantity, s.sample_lot,
+SELECT s.sample_num, s.id_sample AS _id, s.sample_name, round(s.sample_quantity, 3) AS _sample_quantity, s.sample_lot,
 s.ts_user_ins AS _ts_user_ins, s.ts_user_upd AS _ts_user_upd,
 cb.code AS _cb_code,
 ss.code AS _ss_code,
@@ -82,7 +82,8 @@ cu.code AS _cu_code,
 us.initials AS _us_initials,
 ur.initials AS _ur_initials,
 ui.name AS _ui_name, uu.name AS _uu_name,
-(SELECT COUNT(*) FROM o_sample_test AS qst WHERE qst.fk_sample = s.id_sample) AS _tests
+(SELECT COUNT(*) FROM o_sample_test AS qst WHERE qst.fk_sample = s.id_sample) AS _tests,
+(SELECT COUNT(*) FROM o_sampling_img AS qsi WHERE qsi.fk_sample = s.id_sample) AS _imgs
 FROM o_sample AS s
 INNER JOIN cc_company_branch AS cb ON s.fk_company_branch = cb.id_company_branch
 INNER JOIN oc_sample_status AS ss ON s.fk_sample_status = ss.id_sample_status
@@ -105,18 +106,16 @@ echo '<th>Cantidad</th>';
 echo '<th>Unidad</th>';
 echo '<th>Lote</th>';
 echo '<th>Estatus</th>';
-echo '<th><abbr title="Cantidad ensayos">C/E</abbr></th>';
 echo '<th><abbr title="Realizador muestreo">Mtr.</abbr></th>';
 echo '<th><abbr title="Receptor">Rec.</abbr></th>';
 echo '<th><abbr title="Sucursal">Suc.</abbr></th>';
+echo '<th><abbr title="Cantidad ensayos">C/E</abbr></th>';
+echo '<th><abbr title="Cantidad imágenes muestreo">C/I</abbr></th>';
 echo '<th class="small">Creador</th>';
 echo '<th class="small">Creación</th>';
 echo '<th class="small">Modificador</th>';
 echo '<th class="small">Modificación</th>';
 echo '<th></th>';
-echo '<th></th>';
-echo '<th></th>';
-//echo '<th></th>';
 echo '</tr>';
 echo '</thead>';
 echo '<tbody>';
@@ -124,24 +123,28 @@ echo '<tbody>';
 $pdo = FGuiUtils::createPdo();
 foreach ($pdo->query($sql) as $row) {
     echo '<tr>';
-    echo '<td><b>' . $row['sample_num'] . '</b></td>';
+    echo '<td><nobr><b>' . $row['sample_num'] . '</b></nobr></td>';
     echo '<td>' . $row['sample_name'] . '</td>';
-    echo '<td>' . $row['sample_quantity'] . '</td>';
+    echo '<td>' . $row['_sample_quantity'] . '</td>';
     echo '<td>' . $row['_cu_code'] . '</td>';
     echo '<td>' . $row['sample_lot'] . '</td>';
     echo '<td>' . $row['_ss_code'] . '</td>';
-    echo '<td><span class="badge">' . $row['_tests'] . '</span></td>';
     echo '<td>' . $row['_us_initials'] . '</td>';
     echo '<td>' . $row['_ur_initials'] . '</td>';
     echo '<td>' . $row['_cb_code'] . '</td>';
+    echo '<td><span class="badge">' . $row['_tests'] . '</span></td>';
+    echo '<td><span class="badge">' . $row['_imgs'] . '</span></td>';
     echo '<td class="small">' . $row['_ui_name'] . '</td>';
     echo '<td class="small">' . $row['_ts_user_ins'] . '</td>';
     echo '<td class="small">' . $row['_uu_name'] . '</td>';
     echo '<td class="small">' . $row['_ts_user_upd'] . '</td>';
-    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?id=' . $row['_id'] . '" class="btn btn-success btn-xs" role="button"><span class="glyphicon glyphicon-edit"></span></a></td>';
-    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept_sample_tests.php?id=' . $row['_id'] . '" class="btn btn-warning btn-xs" role="button"><span class="glyphicon glyphicon-th-list"></span></a></td>';
-    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?id=' . $row['_id'] . '&copy=1" class="btn btn-primary btn-xs" role="button"><span class="glyphicon glyphicon-duplicate"></span></a></td>';
-//    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?id=' . $row['_id'] . '" class="btn btn-danger btn-xs" role="button"><span class="glyphicon glyphicon-ban-circle"></span></a></td>';
+    echo '<td><nobr>';
+    echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?id=' . $row['_id'] . '" class="btn btn-success btn-xs" role="button"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;';
+    echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept_sample_tests.php?id=' . $row['_id'] . '" class="btn btn-warning btn-xs" role="button"><span class="glyphicon glyphicon-th-list"></span></a>&nbsp;';
+    echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept_sample_imgs.php?id=' . $row['_id'] . '" class="btn btn-warning btn-xs" role="button"><span class="glyphicon glyphicon-picture"></span></a>&nbsp;';
+    echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?id=' . $row['_id'] . '&copy=1" class="btn btn-primary btn-xs" role="button"><span class="glyphicon glyphicon-duplicate"></span></a>&nbsp;';
+    echo '<a href="#" class="btn btn-danger btn-xs" role="button"><span class="glyphicon glyphicon-ban-circle"></span></a>';
+    echo '</nobr></td>';
     echo '</tr>';
 }
 

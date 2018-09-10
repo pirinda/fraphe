@@ -12,9 +12,9 @@ use Fraphe\App\FApp;
 use Fraphe\App\FAppConsts;
 use Fraphe\App\FAppNavbar;
 use Fraphe\App\FGuiUtils;
-use Fraphe\Lib\FUtils;
+use Fraphe\Lib\FLibUtils;
 use Fraphe\Model\FItem;
-use Fraphe\Model\FModel;
+use Fraphe\Model\FModelUtils;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
 use app\AppUtils;
@@ -47,7 +47,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $sample = $recept->createSample($userSession);
         }
 
-        if (!empty(!empty($_GET["copy"])) && $_GET["copy"] == "1") {
+        if (!empty($_GET["copy"]) && boolval($_GET["copy"])) {
             $copy = true;
             $sample->forceRegistryNew();
         }
@@ -63,7 +63,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $sample = $recept->createSample($userSession);
         }
 
-        if (!empty(!empty($_POST["copy"])) && $_POST["copy"] == "1") {
+        if (!empty($_POST["copy"]) && boolval($_POST["copy"])) {
             $copy = true;
             $sample->forceRegistryNew();
         }
@@ -73,8 +73,8 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         //$data["sample_num"] = $_POST["sample_num"];
         $data["sample_name"] = $_POST["sample_name"];
         $data["sample_lot"] = $_POST["sample_lot"];
-        $data["sample_date_mfg_n"] = empty($_POST["sample_date_mfg_n"]) ? null : FUtils::parseStdDate($_POST["sample_date_mfg_n"]);
-        $data["sample_date_sell_by_n"] = empty($_POST["sample_date_sell_by_n"]) ? null : FUtils::parseStdDate($_POST["sample_date_sell_by_n"]);
+        $data["sample_date_mfg_n"] = empty($_POST["sample_date_mfg_n"]) ? null : FLibUtils::parseStdDate($_POST["sample_date_mfg_n"]);
+        $data["sample_date_sell_by_n"] = empty($_POST["sample_date_sell_by_n"]) ? null : FLibUtils::parseStdDate($_POST["sample_date_sell_by_n"]);
         $data["sample_quantity"] = floatval($_POST["sample_quantity"]);
         //$data["sample_quantity_orig"] = $_POST["sample_quantity_orig"];
         //$data["sample_child"] = $_POST["sample_child"];
@@ -97,7 +97,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         }
         else {
             $data["is_sampling_company"] = true;
-            $data["sampling_datetime_n"] = empty($_POST["sampling_datetime_n"]) ? null : FUtils::parseHtmlDatetime($_POST["sampling_datetime_n"]);
+            $data["sampling_datetime_n"] = empty($_POST["sampling_datetime_n"]) ? null : FLibUtils::parseHtmlDatetime($_POST["sampling_datetime_n"]);
             $data["sampling_temperat_n"] = floatval($_POST["sampling_temperat_n"]);
             $data["sampling_area"] = $_POST["sampling_area"];
             $data["sampling_guide"] = intval($_POST["sampling_guide"]);
@@ -171,7 +171,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $sample->setParentRecept($recept);
             $sample->setData($data);
 
-            FModel::save($userSession, $sample);
+            FModelUtils::save($userSession, $sample);
 
             header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/operations/view_recept_sample_tests.php?id=" . $sample->getId());
         }
@@ -199,7 +199,7 @@ if (!empty($errmsg)) {
 // Input Form for Samples
 ////////////////////////////////////////////////////////////////////////////////
 
-echo '<form class="form-horizontal" method="post" action="' . FUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '" onsubmit="return validateForm()" enctype="multipart/form-data">';
+echo '<form class="form-horizontal" method="post" action="' . FLibUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '" onsubmit="return validateForm();" enctype="multipart/form-data">';
 
 // preserve registry ID in post:
 echo '<input type="hidden" name="' . FRegistry::ID . '" value="' . $sample->getId() . '">';
@@ -221,7 +221,7 @@ echo '<div class="row">';
 echo '<div class="col-sm-2"><b>' . $recept->getItem("recept_num")->getName() . ':</b></div>';
 echo '<div class="col-sm-3"><span class="bg-info lead">' . $recept->getDatum("recept_num") . '</span></div>';
 echo '<div class="col-sm-2"><b>' . $recept->getItem("recept_datetime")->getName() . ':</b></div>';
-echo '<div class="col-sm-3"><span class="bg-info">' . FUtils::formatStdDatetime($recept->getDatum("recept_datetime")) . '</span></div>';
+echo '<div class="col-sm-3"><span class="bg-info">' . FLibUtils::formatStdDatetime($recept->getDatum("recept_datetime")) . '</span></div>';
 echo '</div>';
 
 echo '<div class="row">';
@@ -458,7 +458,7 @@ function loadCustomer() {
         if (this.readyState == 4 && this.status == 200) {
             var json = this.responseText;
             //console.log("json: " + json);
-            
+
             customer = JSON.parse(json); // load in memory customer's data
         }
     };

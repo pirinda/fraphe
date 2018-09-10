@@ -31,7 +31,7 @@ class ModTest extends FRegistry
 
     function __construct()
     {
-        parent::__construct(AppConsts::OC_TEST, AppConsts::$tableIds[AppConsts::OC_TEST]);
+        parent::__construct(AppConsts::OC_TEST, AppConsts::$tables[AppConsts::OC_TEST], AppConsts::$tableIds[AppConsts::OC_TEST]);
 
         $this->id_test = new FItem(FItem::DATA_TYPE_INT, "id_test", "ID ensayo", "", false, true);
         $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", "", true);
@@ -125,6 +125,8 @@ class ModTest extends FRegistry
         return $defaultTestEntity;
     }
 
+    /** Overriden method.
+     */
     public function validate(FUserSession $userSession)
     {
         // validate registry:
@@ -143,7 +145,7 @@ class ModTest extends FRegistry
     {
         $this->initialize();
 
-        $sql = "SELECT * FROM oc_test WHERE id_test = $id;";
+        $sql = "SELECT * FROM $this->tableName WHERE id_test = $id;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->id = intval($row["id_test"]);
@@ -191,7 +193,7 @@ class ModTest extends FRegistry
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $userSession->getPdo()->prepare("INSERT INTO oc_test (" .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO $this->tableName (" .
                 "id_test, " .
                 "name, " .
                 "code, " .
@@ -225,7 +227,7 @@ class ModTest extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $userSession->getPdo()->prepare("UPDATE oc_test SET " .
+            $statement = $userSession->getPdo()->prepare("UPDATE $this->tableName SET " .
                 "name = :name, " .
                 "code = :code, " .
                 "sample_quantity = :sample_quantity, " .
@@ -312,6 +314,17 @@ class ModTest extends FRegistry
     public function undelete(FUserSession $userSession)
     {
 
+    }
+
+    /** Overriden method.
+     */
+    public function resetAutoIncrement(FUserSession $userSession)
+    {
+        parent::resetAutoIncrement($userSession);
+
+        if (count($this->childTestEntitys) > 0) {
+            $this->childTestEntitys[0]->resetAutoIncrement($userSession);
+        }
     }
 
     public static function readFkProcessArea(FUserSession $userSession, int $idTest)

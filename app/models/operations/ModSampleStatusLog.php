@@ -25,7 +25,7 @@ class ModSampleStatusLog extends FRegistry
 
     function __construct()
     {
-        parent::__construct(AppConsts::O_SAMPLE_STATUS_LOG, AppConsts::$tableIds[AppConsts::O_SAMPLE_STATUS_LOG]);
+        parent::__construct(AppConsts::O_SAMPLE_STATUS_LOG, AppConsts::$tables[AppConsts::O_SAMPLE_STATUS_LOG], AppConsts::$tableIds[AppConsts::O_SAMPLE_STATUS_LOG]);
 
         $this->id_sample_status_log = new FItem(FItem::DATA_TYPE_INT, "id_sample_status_log", "ID cambio estatus muestra", "", false, true);
         $this->status_datetime = new FItem(FItem::DATA_TYPE_DATETIME, "status_datetime", "Fecha-hr cambio estatus", "aaaa-mm-ddTHH:mm", true);
@@ -62,7 +62,7 @@ class ModSampleStatusLog extends FRegistry
     {
         $this->initialize();
 
-        $sql = "SELECT * FROM o_sample_status_log WHERE id_sample_status_log = $id;";
+        $sql = "SELECT * FROM $this->tableName WHERE id_sample_status_log = $id;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->id = intval($row["id_sample_status_log"]);
@@ -96,7 +96,7 @@ class ModSampleStatusLog extends FRegistry
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $userSession->getPdo()->prepare("INSERT INTO o_sample_status_log (" .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO $this->tableName (" .
                 "id_sample_status_log, " .
                 "status_datetime, " .
                 "status_temperat_n, " .
@@ -126,7 +126,7 @@ class ModSampleStatusLog extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $userSession->getPdo()->prepare("UPDATE o_sample_status_log SET " .
+            $statement = $userSession->getPdo()->prepare("UPDATE $this->tableName SET " .
                 "status_datetime = :status_datetime, " .
                 "status_temperat_n = :status_temperat_n, " .
                 "status_notes = :status_notes, " .
@@ -143,7 +143,7 @@ class ModSampleStatusLog extends FRegistry
         }
 
         //$id_sample_status_log = $this->id_sample_status_log->getValue();
-        $status_datetime = FUtils::formatStdDatetime($this->status_datetime->getValue());
+        $status_datetime = FLibUtils::formatStdDatetime($this->status_datetime->getValue());
         $status_temperat_n = $this->status_temperat_n->getValue();
         $status_notes = $this->status_notes->getValue();
         $is_system = $this->is_system->getValue();

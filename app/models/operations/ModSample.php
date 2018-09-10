@@ -3,13 +3,15 @@ namespace app\models\operations;
 
 use Fraphe\App\FUserSession;
 use Fraphe\App\FGuiUtils;
-use Fraphe\Lib\FUtils;
+use Fraphe\Lib\FLibUtils;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
 
 class ModSample extends FRegistry
 {
+    public const PREFIX = "sample_";
+
     protected $id_sample;
     protected $sample_num;
     protected $sample_name;
@@ -84,10 +86,12 @@ class ModSample extends FRegistry
 
     protected $parentRecept;
     protected $dbmsContainerUnitCode;
+    protected $auxChildJobs;
+    protected $auxChildReport;
 
     function __construct()
     {
-        parent::__construct(AppConsts::O_SAMPLE, AppConsts::$tableIds[AppConsts::O_SAMPLE]);
+        parent::__construct(AppConsts::O_SAMPLE, AppConsts::$tables[AppConsts::O_SAMPLE], AppConsts::$tableIds[AppConsts::O_SAMPLE]);
 
         $this->id_sample = new FItem(FItem::DATA_TYPE_INT, "id_sample", "ID muestra", "", false, true);
         $this->sample_num = new FItem(FItem::DATA_TYPE_STRING, "sample_num", "Folio muestra", "", true);
@@ -255,6 +259,8 @@ class ModSample extends FRegistry
 
         $this->parentRecept = null;
         $this->dbmsContainerUnitCode = null;
+        $this->auxChildJobs = array();
+        $this->auxChildReport = null;
     }
 
     public function setParentRecept(ModRecept $recept)
@@ -282,7 +288,7 @@ class ModSample extends FRegistry
     {
         $this->validateParentRecept();
 
-        $sql = "SELECT COALESCE(MAX(recept_sample), 0) AS _max_recept_sample FROM o_sample WHERE nk_recept = " . $this->parentRecept->getId() . ";";
+        $sql = "SELECT COALESCE(MAX(recept_sample), 0) AS _max_recept_sample FROM $this->tableName WHERE nk_recept = " . $this->parentRecept->getId() . ";";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->recept_sample->setValue(intval($row["_max_recept_sample"]) + 1);
@@ -375,6 +381,16 @@ class ModSample extends FRegistry
         $this->childSamplingImages = array();
     }
 
+    public function &getAuxChildJobs(): array
+    {
+        return $this->auxChildJobs;
+    }
+
+    public function setAuxChildReport(ModReport $report)
+    {
+        $this->auxChildReport = $report;
+    }
+
     /** Overriden method.
      */
     public function forceRegistryNew()
@@ -388,13 +404,9 @@ class ModSample extends FRegistry
             $child->forceRegistryNew();
         }
 
-        foreach ($this->childSampleStatusLogs as $child) {
-            $child->forceRegistryNew();
-        }
+        $this->clearChildSampleStatusLogs();
 
-        foreach ($this->childSamplingImages as $child) {
-            $child->forceRegistryNew();
-        }
+        $this->clearChildSamplingImages();
     }
 
     /** Overriden method.
@@ -485,6 +497,7 @@ class ModSample extends FRegistry
             $data = array();
             $data["fk_sample"] = $this->isRegistryNew ? -1 : $this->id;  // bypass validation
             $child->setData($data);
+            $child->setParentSample($this);
             $child->validate($userSession);
         }
     }
@@ -495,7 +508,7 @@ class ModSample extends FRegistry
     {
         $this->initialize();
 
-        $sql = "SELECT * FROM o_sample WHERE id_sample = $id;";
+        $sql = "SELECT * FROM $this->tableName WHERE id_sample = $id;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->id = intval($row["id_sample"]);
@@ -625,7 +638,7 @@ class ModSample extends FRegistry
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $userSession->getPdo()->prepare("INSERT INTO o_sample (" .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO $this->tableName (" .
                 "id_sample, " .
                 "sample_num, " .
                 "sample_name, " .
@@ -763,7 +776,7 @@ class ModSample extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $userSession->getPdo()->prepare("UPDATE o_sample SET " .
+            $statement = $userSession->getPdo()->prepare("UPDATE $this->tableName SET " .
                 "sample_num = :sample_num, " .
                 "sample_name = :sample_name, " .
                 "sample_lot = :sample_lot, " .
@@ -837,14 +850,14 @@ class ModSample extends FRegistry
         $sample_num = $this->sample_num->getValue();
         $sample_name = $this->sample_name->getValue();
         $sample_lot = $this->sample_lot->getValue();
-        $sample_date_mfg_n = empty($this->sample_date_mfg_n->getValue()) ? "" : FUtils::formatStdDate($this->sample_date_mfg_n->getValue());
-        $sample_date_sell_by_n = empty($this->sample_date_sell_by_n->getValue()) ? "" : FUtils::formatStdDate($this->sample_date_sell_by_n->getValue());
+        $sample_date_mfg_n = empty($this->sample_date_mfg_n->getValue()) ? "" : FLibUtils::formatStdDate($this->sample_date_mfg_n->getValue());
+        $sample_date_sell_by_n = empty($this->sample_date_sell_by_n->getValue()) ? "" : FLibUtils::formatStdDate($this->sample_date_sell_by_n->getValue());
         $sample_quantity = $this->sample_quantity->getValue();
         $sample_quantity_orig = $this->sample_quantity_orig->getValue();
         $sample_child = $this->sample_child->getValue();
         $sample_released = $this->sample_released->getValue();
         $is_sampling_company = $this->is_sampling_company->getValue();
-        $sampling_datetime_n = empty($this->sampling_datetime_n->getValue()) ? "" : FUtils::formatStdDatetime($this->sampling_datetime_n->getValue());
+        $sampling_datetime_n = empty($this->sampling_datetime_n->getValue()) ? "" : FLibUtils::formatStdDatetime($this->sampling_datetime_n->getValue());
         $sampling_temperat_n = $this->sampling_temperat_n->getValue();
         $sampling_area = $this->sampling_area->getValue();
         $sampling_guide = $this->sampling_guide->getValue();
@@ -852,14 +865,14 @@ class ModSample extends FRegistry
         $sampling_notes = $this->sampling_notes->getValue();
         $sampling_imgs = $this->sampling_imgs->getValue();
         $recept_sample = $this->recept_sample->getValue();
-        $recept_datetime_n = empty($this->recept_datetime_n->getValue()) ? "" : FUtils::formatStdDatetime($this->recept_datetime_n->getValue());
+        $recept_datetime_n = empty($this->recept_datetime_n->getValue()) ? "" : FLibUtils::formatStdDatetime($this->recept_datetime_n->getValue());
         $recept_temperat_n = $this->recept_temperat_n->getValue();
         $recept_deviats = $this->recept_deviats->getValue();
         $recept_notes = $this->recept_notes->getValue();
         $service_type = $this->service_type->getValue();
         $process_days = $this->process_days->getValue();
-        $process_start_date = FUtils::formatStdDate($this->process_start_date->getValue());
-        $process_deadline = FUtils::formatStdDate($this->process_deadline->getValue());
+        $process_start_date = FLibUtils::formatStdDate($this->process_start_date->getValue());
+        $process_deadline = FLibUtils::formatStdDate($this->process_deadline->getValue());
         $is_customer_custom = $this->is_customer_custom->getValue();
         $customer_name = $this->customer_name->getValue();
         $customer_street = $this->customer_street->getValue();
@@ -1082,8 +1095,30 @@ class ModSample extends FRegistry
             $data["fk_sample"] = $this->id;
 
             // save child:
+            $child->setParentSample($this);
             $child->setData($data);
             $child->save($userSession);
+        }
+
+        // save aswell auxiliar child jobs:
+        foreach ($this->auxChildJobs as $auxChild) {
+            // ensure link to parent:
+            $data = array();
+            $data["fk_sample"] = $this->id;
+
+            // save child:
+            $auxChild->setData($data);
+            $auxChild->save($userSession);
+        }
+
+        if (isset($this->auxChildReport)) {
+            // ensure link to parent:
+            $data = array();
+            $data["fk_sample"] = $this->id;
+
+            // save child:
+            $this->auxChildReport->setData($data);
+            $this->auxChildReport->save($userSession);
         }
     }
 
@@ -1095,5 +1130,32 @@ class ModSample extends FRegistry
     public function undelete(FUserSession $userSession)
     {
 
+    }
+
+    /** Overriden method.
+     */
+    public function resetAutoIncrement(FUserSession $userSession)
+    {
+        parent::resetAutoIncrement($userSession);
+
+        if (count($this->childSampleTests) > 0) {
+            $this->childSampleTests[0]->resetAutoIncrement($userSession);
+        }
+
+        if (count($this->childSampleStatusLogs) > 0) {
+            $this->childSampleStatusLogs[0]->resetAutoIncrement($userSession);
+        }
+
+        if (count($this->childSamplingImages) > 0) {
+            $this->childSamplingImages[0]->resetAutoIncrement($userSession);
+        }
+
+        if (count($this->auxChildJobs) > 0) {
+            $this->auxChildJobs[0]->resetAutoIncrement($userSession);
+        }
+
+        if (isset($this->auxChildReport)) {
+            $this->auxChildReport->resetAutoIncrement($userSession);
+        }
     }
 }

@@ -13,6 +13,7 @@ abstract class FRegistry
     public const ERR_MSG_REGISTRY_NON_UPDATABLE = "El registro no se puede modificar.";
 
     protected $registryType;
+    protected $tableName;
     protected $idName;
     protected $items;   // associative array of FItem objects
 
@@ -24,9 +25,10 @@ abstract class FRegistry
 
     /* Creates new base registry. Each field of registry must be contained in member array $items.
      */
-    public function __construct(int $registryType, string $idName)
+    public function __construct(int $registryType, string $tableName, string $idName)
     {
         $this->registryType = $registryType;
+        $this->tableName = $tableName;
         $this->idName = $idName;
         $this->items = array();
 
@@ -67,7 +69,7 @@ abstract class FRegistry
     public function validate(FUserSession $userSession)
     {
         $this->tailorMembers(); // tailor registry members according to current data status and values
-        
+
         foreach ($this->items as $item) {
             $item->validate();
         }
@@ -90,6 +92,7 @@ abstract class FRegistry
      */
     public function forceRegistryNew()
     {
+        //$this->id = 0;
         $this->isRegistryNew = true;
     }
 
@@ -167,6 +170,11 @@ abstract class FRegistry
         return $this->registryType;
     }
 
+    public function getTableName(): string
+    {
+        return $this->tableName;
+    }
+
     public function getIdName(): string
     {
         return $this->idName;
@@ -234,4 +242,10 @@ abstract class FRegistry
     }
 
     abstract public function undelete(FUserSession $userSession);
+
+    public function resetAutoIncrement(FUserSession $userSession)
+    {
+        $sql = "ALTER TABLE $this->tableName AUTO_INCREMENT = 1;";
+        $userSession->getPdo()->exec($sql);
+    }
 }

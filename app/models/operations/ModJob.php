@@ -3,6 +3,7 @@ namespace app\models\operations;
 
 use Fraphe\App\FUserSession;
 use Fraphe\App\FGuiUtils;
+use Fraphe\Lib\FLibUtils;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
@@ -32,7 +33,7 @@ class ModJob extends FRegistry
 
     function __construct()
     {
-        parent::__construct(AppConsts::O_JOB, AppConsts::$tableIds[AppConsts::O_JOB]);
+        parent::__construct(AppConsts::O_JOB, AppConsts::$tables[AppConsts::O_JOB], AppConsts::$tableIds[AppConsts::O_JOB]);
 
         $this->id_job = new FItem(FItem::DATA_TYPE_INT, "id_job", "ID orden trabajo", "", false, true);
         $this->job_num = new FItem(FItem::DATA_TYPE_STRING, "job_num", "Folio orden trabajo", "", true);
@@ -96,20 +97,57 @@ class ModJob extends FRegistry
         $this->childJobStatusLogs = array();
     }
 
+    public function computeProcessDays()
+    {
+        $maxDays = 0;
+        $minStartDate = $this->process_start_date->getValue();  // must be already set
+        $maxDeadline = $this->process_start_date->getValue();   // must be already set
+
+        foreach ($this->childJobTests as $test) {
+            if ($test->getDatum("process_days") > $maxDays) {
+                $maxDays = $test->getDatum("process_days");
+            }
+
+            if (!isset($minStartDate)) {
+                $minStartDate = $test->getDatum("process_start_date");
+            }
+            else {
+                if ($test->getDatum("process_start_date") < $minStartDate) {
+                    $minStartDate = $test->getDatum("process_start_date");
+                }
+            }
+
+            if ($test->getDatum("process_deadline") > $maxDeadline) {
+                $maxDeadline = $test->getDatum("process_deadline");
+            }
+        }
+
+        $this->process_days->setValue($maxDays);
+        $this->process_start_date->setValue($minStartDate);
+        $this->process_deadline->setValue($maxDeadline);
+    }
+
+    /** Overriden method.
+     */
     public function validate(FUserSession $userSession)
     {
+        // compute data:
+        $this->computeProcessDays();
+
         // validate registry:
 
         parent::validate($userSession);
 
+        $test = 0;
         foreach ($this->childJobTests as $child) {
             $data = array();
             $data["fk_job"] = $this->isRegistryNew ? -1 : $this->id; // bypass validation
+            $data["job_test"] = ++$test;
             $child->setData($data);
             $child->validate($userSession);
         }
 
-        foreach ($this->$childJobStatusLogs as $child) {
+        foreach ($this->childJobStatusLogs as $child) {
             $data = array();
             $data["fk_job"] = $this->isRegistryNew ? -1 : $this->id; // bypass validation
             $child->setData($data);
@@ -121,7 +159,7 @@ class ModJob extends FRegistry
     {
         $this->initialize();
 
-        $sql = "SELECT * FROM o_job WHERE id_job = $id;";
+        $sql = "SELECT * FROM $this->tableName WHERE id_job = $id;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->id = intval($row["id_job"]);
@@ -180,7 +218,7 @@ class ModJob extends FRegistry
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $userSession->getPdo()->prepare("INSERT INTO o_job (" .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO $this->tableName (" .
                 "id_job, " .
                 "job_num, " .
                 "job_date, " .
@@ -218,7 +256,7 @@ class ModJob extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $userSession->getPdo()->prepare("UPDATE o_job SET " .
+            $statement = $userSession->getPdo()->prepare("UPDATE $this->tableName SET " .
                 "job_num = :job_num, " .
                 "job_date = :job_date, " .
                 "process_days = :process_days, " .
@@ -240,10 +278,10 @@ class ModJob extends FRegistry
 
         //$id_job = $this->id_job->getValue();
         $job_num = $this->job_num->getValue();
-        $job_date = FUtils::formatStdDate($this->job_date->getValue());
+        $job_date = FLibUtils::formatStdDate($this->job_date->getValue());
         $process_days = $this->process_days->getValue();
-        $process_start_date = FUtils::formatStdDate($this->process_start_date->getValue());
-        $process_deadline = FUtils::formatStdDate($this->process_deadline->getValue());
+        $process_start_date = FLibUtils::formatStdDate($this->process_start_date->getValue());
+        $process_deadline = FLibUtils::formatStdDate($this->process_deadline->getValue());
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();
         $fk_company_branch = $this->fk_company_branch->getValue();
@@ -292,10 +330,12 @@ class ModJob extends FRegistry
         }
 
         // save child job tests:
-        foreach ($this->childJobTests as $test) {
-            // ensure link to parent:
+        $test = 0;
+        foreach ($this->childJobTests as $child) {
+            // ensure link to parent and set other data:
             $data = array();
             $data["fk_job"] = $this->id;
+            $data["job_test"] = ++$test;
 
             // save child:
             $child->setData($data);
@@ -322,5 +362,20 @@ class ModJob extends FRegistry
     public function undelete(FUserSession $userSession)
     {
 
+    }
+
+    /** Overriden method.
+     */
+    public function resetAutoIncrement(FUserSession $userSession)
+    {
+        parent::resetAutoIncrement($userSession);
+
+        if (count($this->childJobTests) > 0) {
+            $this->childJobTests[0]->resetAutoIncrement($userSession);
+        }
+
+        if (count($this->childJobStatusLogs) > 0) {
+            $this->childJobStatusLogs[0]->resetAutoIncrement($userSession);
+        }
     }
 }

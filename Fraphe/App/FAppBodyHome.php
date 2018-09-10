@@ -65,9 +65,12 @@ abstract class FAppBodyHome
                 $html .= '      <p>Recepción de muestras. Generación de órdenes de trabajo.</p>';
                 $html .= '    </div>';
 
+                $module = FGuiUtils::getModule("process");
                 $html .= '    <div class="col-sm-4">';
+                $html .= '      <a href="' . $module->getHref() . '">';
                 $html .= '      <h1><span class="glyphicon glyphicon-screenshot"></span></h1>';
                 $html .= '      <h4>PROCESO</h4>';
+                $html .= '      </a>';
                 $html .= '      <p>Procesamiento de órdenes de trabajo.</p>';
                 $html .= '    </div>';
 

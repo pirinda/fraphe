@@ -139,4 +139,23 @@ abstract class FApp
 
         header("Location: " .  $rootDirWeb . "index.php");
     }
+
+    /**
+    *
+    */
+    public static function getVariable($variable) {
+        $value;
+
+        if (!empty($_GET[$variable])) {
+            $value = $_GET[$variable];
+        }
+        else if (!empty($_POST[$variable])) {
+            $value = $_POST[$variable];
+        }
+        else if (!empty($_SESSION[$variable])) {
+            $value = $_SESSION[$variable];
+        }
+
+        return $value;
+    }
 }

@@ -40,7 +40,7 @@ class ModEntityAddress extends FRegistry
 
     function __construct()
     {
-        parent::__construct(AppConsts::CC_ENTITY_ADDRESS, AppConsts::$tableIds[AppConsts::CC_ENTITY_ADDRESS]);
+        parent::__construct(AppConsts::CC_ENTITY_ADDRESS, AppConsts::$tables[AppConsts::CC_ENTITY_ADDRESS], AppConsts::$tableIds[AppConsts::CC_ENTITY_ADDRESS]);
 
         $this->id_entity_address = new FItem(FItem::DATA_TYPE_INT, "id_entity_address", "ID domicilio", "", false, true);
         $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", "", true);
@@ -198,6 +198,8 @@ class ModEntityAddress extends FRegistry
         return $address;
     }
 
+    /** Overriden method.
+     */
     public function validate(FUserSession $userSession)
     {
         // validate registry:
@@ -217,7 +219,7 @@ class ModEntityAddress extends FRegistry
     {
         $this->initialize();
 
-        $sql = "SELECT * FROM cc_entity_address WHERE id_entity_address = $id;";
+        $sql = "SELECT * FROM $this->tableName WHERE id_entity_address = $id;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->id = intval($row["id_entity_address"]);
@@ -273,7 +275,7 @@ class ModEntityAddress extends FRegistry
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $userSession->getPdo()->prepare("INSERT INTO cc_entity_address (" .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO $this->tableName (" .
                 "id_entity_address, " .
                 "name, " .
                 "street, " .
@@ -323,7 +325,7 @@ class ModEntityAddress extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $userSession->getPdo()->prepare("UPDATE cc_entity_address SET " .
+            $statement = $userSession->getPdo()->prepare("UPDATE $this->tableName SET " .
                 "name = :name, " .
                 "street = :street, " .
                 "district = :district, " .
@@ -435,6 +437,17 @@ class ModEntityAddress extends FRegistry
     public function undelete(FUserSession $userSession)
     {
 
+    }
+
+    /** Overriden method.
+     */
+    public function resetAutoIncrement(FUserSession $userSession)
+    {
+        parent::resetAutoIncrement($userSession);
+
+        if (count($this->childContacts) > 0) {
+            $this->childContacts[0]->resetAutoIncrement($userSession);
+        }
     }
 
     public static function createContactTypes(): array

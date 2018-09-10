@@ -3,12 +3,15 @@ namespace app\models\operations;
 
 use Fraphe\App\FUserSession;
 use Fraphe\App\FGuiUtils;
+use Fraphe\Lib\FFiles;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
 
 class ModSamplingImage extends FRegistry
 {
+    public const PATH_IMG = "../../img/sample/";
+
     protected $id_sampling_img;
     protected $sampling_img;
     protected $is_system;
@@ -19,9 +22,12 @@ class ModSamplingImage extends FRegistry
     protected $ts_user_ins;
     protected $ts_user_upd;
 
+    protected $parentSample;
+    protected $orig_sampling_img;
+
     function __construct()
     {
-        parent::__construct(AppConsts::O_SAMPLING_IMG, AppConsts::$tableIds[AppConsts::O_SAMPLING_IMG]);
+        parent::__construct(AppConsts::O_SAMPLING_IMG, AppConsts::$tables[AppConsts::O_SAMPLING_IMG], AppConsts::$tableIds[AppConsts::O_SAMPLING_IMG]);
 
         $this->id_sampling_img = new FItem(FItem::DATA_TYPE_INT, "id_sampling_img", "ID imagen muestreo", "", false, true);
         $this->sampling_img = new FItem(FItem::DATA_TYPE_STRING, "sampling_img", "Imagen muestreo", "", true);
@@ -44,13 +50,71 @@ class ModSamplingImage extends FRegistry
         $this->items["ts_user_upd"] = $this->ts_user_upd;
 
         $this->sampling_img->setRangeLength(1, 250);
+
+        $this->parentSample = null;
+        $this->orig_sampling_img = null;
+    }
+
+    public function setParentSample(ModSample $sample)
+    {
+        $this->parentSample = $sample;
+    }
+
+    protected function validateParentSample() {
+        if (!isset($this->parentSample)) {
+            throw new \Exception("El objeto 'muestra' no ha sido asignado.");
+        }
+    }
+
+    protected function generateSamplingImg($userSession)
+    {
+        $this->validateParentSample();
+
+        $img = 0;
+        $sql = "SELECT COUNT(*) _count FROM $this->tableName WHERE fk_sample = " . $this->parentSample->getId() . " AND id_sampling_img <> " . $this->id . ";";
+        $statement = $userSession->getPdo()->query($sql);
+        if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $img = intval($row["_count"]) + 1;
+        }
+
+        $this->sampling_img->setValue(FFiles::createFileNameForName(ModSample::PREFIX, $this->parentSample->getDatum("sample_num"), $img, "jpg"));
+    }
+
+    public function getTargetFile(): string
+    {
+        return self::PATH_IMG . $this->sampling_img->getValue();
+    }
+
+    /** Overriden method.
+     */
+    public function forceRegistryNew()
+    {
+        parent::forceRegistryNew();
+
+        $this->sampling_img->reset();
+    }
+
+    /** Overriden method.
+     */
+    public function validate(FUserSession $userSession)
+    {
+        // compute data:
+
+        $this->validateParentSample();
+
+        if (empty($this->sampling_img->getValue())) {
+            $this->generateSamplingImg($userSession);
+        }
+
+        // validate registry:
+        parent::validate($userSession);
     }
 
     public function read(FUserSession $userSession, int $id, int $mode)
     {
         $this->initialize();
 
-        $sql = "SELECT * FROM o_sampling_img WHERE id_sampling_img = $id;";
+        $sql = "SELECT * FROM $this->tableName WHERE id_sampling_img = $id;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->id = intval($row["id_sampling_img"]);
@@ -67,6 +131,8 @@ class ModSamplingImage extends FRegistry
 
             $this->isRegistryNew = false;
             $this->mode = $mode;
+
+            $this->orig_sampling_img = $this->sampling_img->getValue();
         }
         else {
             throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
@@ -80,7 +146,7 @@ class ModSamplingImage extends FRegistry
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $userSession->getPdo()->prepare("INSERT INTO o_sampling_img (" .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO $this->tableName (" .
                 "id_sampling_img, " .
                 "sampling_img, " .
                 "is_system, " .
@@ -102,13 +168,13 @@ class ModSamplingImage extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $userSession->getPdo()->prepare("UPDATE o_sampling_img SET " .
+            $statement = $userSession->getPdo()->prepare("UPDATE $this->tableName SET " .
                 "sampling_img = :sampling_img, " .
                 "is_system = :is_system, " .
                 "is_deleted = :is_deleted, " .
                 "fk_sample = :fk_sample, " .
                 //"fk_user_ins = :fk_user_ins, " .
-                "fk_user_upd = :fk_user_upd, " .
+                "fk_user_upd = :fk_user, " .
                 //"ts_user_ins = NOW(), " .
                 "ts_user_upd = NOW() " .
                 "WHERE id_sampling_img = :id;");

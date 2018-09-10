@@ -13,9 +13,9 @@ use Fraphe\App\FAppConsts;
 use Fraphe\App\FAppNavbar;
 use Fraphe\App\FGuiUtils;
 use Fraphe\Lib\FFiles;
-use Fraphe\Lib\FUtils;
+use Fraphe\Lib\FLibUtils;
 use Fraphe\Model\FItem;
-use Fraphe\Model\FModel;
+use Fraphe\Model\FModelUtils;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
 use app\AppUtils;
@@ -42,8 +42,8 @@ $entitySamplingImage;
 $entityAddress;
 $entityAddressCheckboxes = array("is_main", "is_recept", "is_process");
 $contact;
+$loadImage;
 $errmsg = "";
-$targetFile = "";
 
 switch ($_SERVER["REQUEST_METHOD"]) {
     case "GET":
@@ -73,8 +73,6 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             if (count($entity->getChildEntityAddresses()) > 0) {
                 $entityAddress = $entity->getChildEntityAddresses()[0];
             }
-
-            $targetFile = "../../img/entity/" . $entity->composeTargetFileDefSamplingImage(1);
         }
         else {
             // registry creation to taylor entity object:
@@ -87,10 +85,11 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
         if (!isset($entityAddress)) {
             $entityAddress = new ModEntityAddress();
+            $entity->getChildEntityAddresses()[0] = $entityAddress;
+
             $entityAddress->getItem("name")->setValue("Matriz");
             $entityAddress->getItem("country")->setValue("MEX"); // TODO: parameterize this configurable value!
             $entityAddress->getItem("is_main")->setValue(true);
-            $entity->getChildEntityAddresses()[0] = $entityAddress;
         }
         break;
 
@@ -125,9 +124,6 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
         if (!isset($entityAddress)) {
             $entityAddress = new ModEntityAddress();
-            $entityAddress->getItem("name")->setValue("Matriz");
-            $entityAddress->getItem("country")->setValue("MEX"); // TODO: parameterize this configurable value!
-            $entityAddress->getItem("is_main")->setValue(true);
             $entity->getChildEntityAddresses()[0] = $entityAddress;
         }
 
@@ -177,8 +173,9 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             }
         }
 
-        // entity image:
-        if (!empty($_POST["load_def_sampling_img"]) && boolval($_POST["load_def_sampling_img"])) {
+        // entity sampling image:
+        $loadImage = !empty($_POST["load_def_sampling_img"]) && boolval($_POST["load_def_sampling_img"]);
+        if ($loadImage) {
             if (!isset($entitySamplingImage)) {
                 $entitySamplingImage = new ModEntitySamplingImage();
                 $entity->getChildEntitySamplingImages()[0] = $entitySamplingImage;
@@ -186,11 +183,10 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
             $dataImage = array();
             $dataImage["id_entity_sampling_img"] = intval($_POST[ModEntitySamplingImage::PREFIX . "id_entity_sampling_img"]);
-            //$dataImage["sampling_img"] = $_POST[ModEntitySamplingImage::PREFIX . "def_file"]; XXX!!!
-            $dataImage["sampling_img"] = $_FILES[ModEntitySamplingImage::PREFIX . "def_file"]["name"];
-            //$data["is_system"] = $_POST["is_system"];
-            //$data["is_deleted"] = $_POST["is_deleted"];
-            //$data["fk_entity"] = $_POST["fk_entity"];
+            $dataImage["sampling_img"] = "temp"; // bypass validation, value will be reset when entity saved
+            //$dataImage["is_system"] = $_POST["is_system"];
+            //$dataImage["is_deleted"] = $_POST["is_deleted"];
+            //$dataImage["fk_entity"] = $_POST["fk_entity"];
         }
 
         // entity address:
@@ -241,7 +237,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         }
 
         try {
-            if (!empty($_POST["load_def_sampling_img"]) && boolval($_POST["load_def_sampling_img"])) {
+            if ($loadImage) {
                 $entitySamplingImage->setData($dataImage);
             }
 
@@ -255,11 +251,10 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
             $entity->setData($data);
 
-            FModel::save($userSession, $entity);
+            FModelUtils::save($userSession, $entity);
 
-            if (!empty($_POST["load_def_sampling_img"]) && boolval($_POST["load_def_sampling_img"])) {
-                $targetFile = "../../img/entity/" . $entity->composeTargetFileDefSamplingImage(1);
-                FFiles::uploadFile($_FILES[ModEntitySamplingImage::PREFIX . "def_file"], $targetFile);
+            if ($loadImage) {
+                FFiles::uploadFile($_FILES[ModEntitySamplingImage::PREFIX . "def_file"], $entitySamplingImage->getTargetFile());
             }
 
             header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/catalogs/view_entity.php?class=$entityClass");
@@ -288,7 +283,7 @@ if (!empty($errmsg)) {
 // Input Form for Entity
 ////////////////////////////////////////////////////////////////////////////////
 
-echo '<form class="form-horizontal" method="post" action="' . FUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '" onsubmit="return validateForm()" enctype="multipart/form-data">';
+echo '<form class="form-horizontal" method="post" action="' . FLibUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '" onsubmit="return validateForm();" enctype="multipart/form-data">';
 
 // preserve entity class and nature and registry ID in post:
 echo '<input type="hidden" name="class" value="' . $entityClass . '">';
@@ -369,8 +364,13 @@ if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
     echo '</div>';
     echo '<div class="col-sm-8 text-center small">';
     echo '<div class="thumbnail">';
-    echo '<img src="' . $targetFile . '" alt="Sin imagen" width="150" height="100">';
-    echo '<p>' . (!isset($entitySamplingImage) ? "n/d" : $entitySamplingImage->getItem("sampling_img")->getValue()) . '</p>';
+    if (!isset($entitySamplingImage)) {
+        echo "<p>ND</p>";
+    }
+    else {
+        echo '<img src="' . $entitySamplingImage->getTargetFile() . '" alt="' . $entitySamplingImage->getItem("sampling_img")->getName() . '" width="150" height="100">';
+        echo '<p>' . $entitySamplingImage->getItem("sampling_img")->getValue() . '</p>';
+    }
     echo '</div>';
     echo '</div>';
     echo '</div>';
@@ -378,7 +378,7 @@ if ($entityClass == ModUtils::ENTITY_CLASS_CUST) {
     echo '<div class="form-group">';
     echo '<div class="col-sm-12">';
     echo '<div class="checkbox">';
-    echo '<label class="small"><input type="checkbox" name="load_def_sampling_img" id="load_def_sampling_img" onclick="switchInputFile();" value="1">Subir nueva imagen muestreo x def.</label>';
+    echo '<label class="small"><input type="checkbox" name="load_def_sampling_img" id="load_def_sampling_img" onclick="switchInputFile();" value="1">Subir imagen muestreo x def.</label>';
     echo '</div>';
     echo '</div>';
     echo '</div>';

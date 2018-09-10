@@ -3,7 +3,7 @@ namespace app\models\operations;
 
 use Fraphe\App\FUserSession;
 use Fraphe\App\FGuiUtils;
-use Fraphe\Lib\FUtils;
+use Fraphe\Lib\FLibUtils;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
@@ -46,7 +46,7 @@ class ModRecept extends FRegistry
 
     function __construct()
     {
-        parent::__construct(AppConsts::O_RECEPT, AppConsts::$tableIds[AppConsts::O_RECEPT]);
+        parent::__construct(AppConsts::O_RECEPT, AppConsts::$tables[AppConsts::O_RECEPT], AppConsts::$tableIds[AppConsts::O_RECEPT]);
 
         $this->id_recept = new FItem(FItem::DATA_TYPE_INT, "id_recept", "ID recepción", "", false, true);
         $this->recept_num = new FItem(FItem::DATA_TYPE_STRING, "recept_num", "Folio recepción", "", true);
@@ -105,14 +105,17 @@ class ModRecept extends FRegistry
         $this->ref_agreet->setRangeLength(0, 25);
 
         $this->clearChildSamples();
+
+        $this->orig_recept_datetime = null;
+        $this->orig_fk_user_receiver = null;
     }
 
     protected function generateNumber(FUserSession $userSession): string
     {
         // get count of receptions:
         $count = 0;
-        $date = FUtils::formatStdDate($this->recept_datetime->getValue());
-        $sql = "SELECT COUNT(*) AS _count FROM o_recept WHERE DATE(recept_datetime) = '$date';";
+        $date = FLibUtils::formatStdDate($this->recept_datetime->getValue());
+        $sql = "SELECT COUNT(*) AS _count FROM $this->tableName WHERE DATE(recept_datetime) = '$date';";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $count = intval($row["_count"]) + 1;
@@ -135,7 +138,7 @@ class ModRecept extends FRegistry
 
         // compute extra days:
         $extraDays = 0;
-        $receptDate = FUtils::extractDate($this->recept_datetime->getValue());
+        $receptDate = FLibUtils::extractDate($this->recept_datetime->getValue());
         $date = getdate($receptDate);
         if ($date["wday"] == 0) { // Sunday
             $extraDays += 1;
@@ -205,7 +208,7 @@ class ModRecept extends FRegistry
         $this->process_deadline->setValue($maxDeadline);
 
         // add additional process days for reporting and report validation:
-        $dt = new \DateTime(FUtils::formatStdDate($maxDeadline));
+        $dt = new \DateTime(FLibUtils::formatStdDate($maxDeadline));
         $dt->add(new \DateInterval("P2D")); // TODO: parameterize this configurable variable!
         $this->recept_deadline->setValue($dt->getTimestamp());
     }
@@ -251,12 +254,14 @@ class ModRecept extends FRegistry
         return $sample;
     }
 
+    /** Overriden method.
+     */
     public function validate(FUserSession $userSession)
     {
         // compute data:
 
         if ($this->isRegistryNew) {
-            $this->recept_datetime->setValue(FUtils::getLocalDatetime()); // set datetime before than number!
+            $this->recept_datetime->setValue(FLibUtils::getLocalDatetime()); // set datetime before than number!
             $this->recept_num->setValue($this->generateNumber($userSession));
         }
 
@@ -279,7 +284,7 @@ class ModRecept extends FRegistry
     {
         $this->initialize();
 
-        $sql = "SELECT * FROM o_recept WHERE id_recept = $id;";
+        $sql = "SELECT * FROM $this->tableName WHERE id_recept = $id;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->id = intval($row["id_recept"]);
@@ -338,7 +343,7 @@ class ModRecept extends FRegistry
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $userSession->getPdo()->prepare("INSERT INTO o_recept (" .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO $this->tableName (" .
                 "id_recept, " .
                 "recept_num, " .
                 "recept_datetime, " .
@@ -388,7 +393,7 @@ class ModRecept extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $userSession->getPdo()->prepare("UPDATE o_recept SET " .
+            $statement = $userSession->getPdo()->prepare("UPDATE $this->tableName SET " .
                 "recept_num = :recept_num, " .
                 "recept_datetime = :recept_datetime, " .
                 "process_days = :process_days, " .
@@ -416,11 +421,11 @@ class ModRecept extends FRegistry
 
         //$id_recept = $this->id_recept->getValue();
         $recept_num = $this->recept_num->getValue();
-        $recept_datetime = FUtils::formatStdDatetime($this->recept_datetime->getValue());
+        $recept_datetime = FLibUtils::formatStdDatetime($this->recept_datetime->getValue());
         $process_days = $this->process_days->getValue();
-        $process_start_date = FUtils::formatStdDate($this->process_start_date->getValue());
-        $process_deadline = FUtils::formatStdDate($this->process_deadline->getValue());
-        $recept_deadline = FUtils::formatStdDate($this->recept_deadline->getValue());
+        $process_start_date = FLibUtils::formatStdDate($this->process_start_date->getValue());
+        $process_deadline = FLibUtils::formatStdDate($this->process_deadline->getValue());
+        $recept_deadline = FLibUtils::formatStdDate($this->recept_deadline->getValue());
         $recept_deviats = $this->recept_deviats->getValue();
         $recept_notes = $this->recept_notes->getValue();
         $service_type = $this->service_type->getValue();
@@ -512,5 +517,16 @@ class ModRecept extends FRegistry
     public function undelete(FUserSession $userSession)
     {
 
+    }
+
+    /** Overriden method.
+     */
+    public function resetAutoIncrement(FUserSession $userSession)
+    {
+        parent::resetAutoIncrement($userSession);
+
+        if (count($this->childSamples) > 0) {
+            $this->childSamples[0]->resetAutoIncrement($userSession);
+        }
     }
 }

@@ -1,6 +1,6 @@
 {
     "catalogs":{
-        "module":"Catálogos",
+        "module":"<span class='glyphicon glyphicon-th-list'></span> Catálogos",
         "href":"app/modules.php?module=catalogs",
         "menus":{
             "customer":{
@@ -90,16 +90,52 @@
         }
     },
     "recept":{
-        "module":"Recepción",
+        "module":"<span class='glyphicon glyphicon-bell'></span> Recepción",
         "href":"app/modules.php?module=recept",
         "menus":{
             "recept":{
                 "menu":"Recepción",
                 "href":"menu=recept",
                 "submenus":{
-                    "recept":{
-                        "submenu":"Recepciones muestras",
-                        "href":"app/views/operations/view_recept.php"
+                    "receptNew":{
+                        "submenu":"Recepciones de muestras nuevas",
+                        "href":"app/views/operations/view_recept.php?recept_st=1"
+                    },
+                    "receptProc":{
+                        "submenu":"Recepciones de muestras en proceso",
+                        "href":"app/views/operations/view_recept.php?recept_st=2"
+                    },
+                    "receptAll":{
+                        "submenu":"Recepciones de muestras (todas)",
+                        "href":"app/views/operations/view_recept.php?recept_st=all"
+                    }
+                }
+            }
+        }
+    },
+    "process":{
+        "module":"<span class='glyphicon glyphicon-screenshot'></span> Proceso",
+        "href":"app/modules.php?module=process",
+        "menus":{
+            "job":{
+                "menu":"Proceso",
+                "href":"menu=process",
+                "submenus":{
+                    "jobPend":{
+                        "submenu":"Órdenes de trabajo pendientes",
+                        "href":"app/views/operations/view_job.php?job_st=1"
+                    },
+                    "jobProc":{
+                        "submenu":"Órdenes de trabajo en proceso",
+                        "href":"app/views/operations/view_job.php?job_st=2"
+                    },
+                    "jobFin":{
+                        "submenu":"Órdenes de trabajo terminadas",
+                        "href":"app/views/operations/view_job.php?job_st=3"
+                    },
+                    "jobAll":{
+                        "submenu":"Órdenes de trabajo (todas)",
+                        "href":"app/views/operations/view_job.php?job_st=0"
                     }
                 }
             }

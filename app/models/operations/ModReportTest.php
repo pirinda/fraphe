@@ -2,88 +2,104 @@
 namespace app\models\operations;
 
 use Fraphe\App\FUserSession;
+use Fraphe\Lib\FLibUtils;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
 
-class ModTestEntity extends FRegistry
+class ModReportTest extends FRegistry
 {
-    public const PREFIX = "test_entity_";
-
-    protected $id_test_entity;
-    protected $process_days_min;
-    protected $process_days_max;
-    protected $cost;
-    protected $is_default;
+    protected $id_report_test;
+    protected $report_test;
+    protected $result;
     protected $is_system;
     protected $is_deleted;
+    protected $fk_report;
     protected $fk_test;
-    protected $fk_entity;
+    protected $fk_job_test;
+    protected $fk_sample_test;
+    protected $nk_result_unit;
     protected $fk_user_ins;
     protected $fk_user_upd;
     protected $ts_user_ins;
     protected $ts_user_upd;
 
-    protected $dbmsFkProcessArea;
-
     function __construct()
     {
-        parent::__construct(AppConsts::OC_TEST_ENTITY, AppConsts::$tables[AppConsts::OC_TEST_ENTITY], AppConsts::$tableIds[AppConsts::OC_TEST_ENTITY]);
+        parent::__construct(AppConsts::O_REPORT_TEST, AppConsts::$tables[AppConsts::O_REPORT_TEST], AppConsts::$tableIds[AppConsts::O_REPORT_TEST]);
 
-        $this->id_test_entity = new FItem(FItem::DATA_TYPE_INT, "id_test_entity", "ID ensayo entidad", "", false, true);
-        $this->process_days_min = new FItem(FItem::DATA_TYPE_INT, "process_days_min", "Días mín. proceso", "", false);
-        $this->process_days_max = new FItem(FItem::DATA_TYPE_INT, "process_days_max", "Días máx. proceso", "", false);
-        $this->cost = new FItem(FItem::DATA_TYPE_FLOAT, "cost", "Costo", "", false);
-        $this->is_default = new FItem(FItem::DATA_TYPE_BOOL, "is_default", "Predeterminado", "", false);
+        $this->id_report_test = new FItem(FItem::DATA_TYPE_INT, "id_report_test", "ID reporte + ensayo", "", false, true);
+        $this->report_test = new FItem(FItem::DATA_TYPE_INT, "report_test", "Núm. ensayo reporte", "", true);
+        $this->result = new FItem(FItem::DATA_TYPE_STRING, "result", "Resultado", "", false);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
+        $this->fk_report = new FItem(FItem::DATA_TYPE_INT, "fk_report", "Reporte", "", true);
         $this->fk_test = new FItem(FItem::DATA_TYPE_INT, "fk_test", "Ensayo", "", true);
-        $this->fk_entity = new FItem(FItem::DATA_TYPE_INT, "fk_entity", "Entidad", "", true);
+        $this->fk_job_test = new FItem(FItem::DATA_TYPE_INT, "fk_job_test", "Orden trabajo + ensayo", "", true);
+        $this->fk_sample_test = new FItem(FItem::DATA_TYPE_INT, "fk_sample_test", "Muestra + ensayo", "", true);
+        $this->nk_result_unit = new FItem(FItem::DATA_TYPE_INT, "nk_result_unit", "Unidad medida resultado", "", false);
         $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", "", false);
         $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", "", false);
         $this->ts_user_ins = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_ins", "Creado", "", false);
         $this->ts_user_upd = new FItem(FItem::DATA_TYPE_TIMESTAMP, "ts_user_upd", "Modificado", "", false);
 
-        $this->items["id_test_entity"] = $this->id_test_entity;
-        $this->items["process_days_min"] = $this->process_days_min;
-        $this->items["process_days_max"] = $this->process_days_max;
-        $this->items["cost"] = $this->cost;
-        $this->items["is_default"] = $this->is_default;
+        $this->items["id_report_test"] = $this->id_report_test;
+        $this->items["report_test"] = $this->report_test;
+        $this->items["result"] = $this->result;
         $this->items["is_system"] = $this->is_system;
         $this->items["is_deleted"] = $this->is_deleted;
+        $this->items["fk_report"] = $this->fk_report;
         $this->items["fk_test"] = $this->fk_test;
-        $this->items["fk_entity"] = $this->fk_entity;
+        $this->items["fk_job_test"] = $this->fk_job_test;
+        $this->items["fk_sample_test"] = $this->fk_sample_test;
+        $this->items["nk_result_unit"] = $this->nk_result_unit;
         $this->items["fk_user_ins"] = $this->fk_user_ins;
         $this->items["fk_user_upd"] = $this->fk_user_upd;
         $this->items["ts_user_ins"] = $this->ts_user_ins;
         $this->items["ts_user_upd"] = $this->ts_user_upd;
 
-        $this->dbmsFkProcessArea = null;
+        $this->result->setRangeLength(1, 100);
     }
 
-    public function getDbmsFkProcessArea()
+    protected function updateJobTest(FUserSession $userSession)
     {
-        return $this->dbmsFkProcessArea;
+        $sql = "SELECT id_job_test FROM o_job_test WHERE fk_sample_test = " . $this->fk_sample_test->getValue() . " AND NOT is_deleted;";
+        $statement = $userSession->getPdo()->query($sql);
+        if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $this->fk_job_test->setValue(intval($row["id_job_test"]));
+        }
+    }
+
+    /** Overriden method.
+     */
+    public function validate(FUserSession $userSession)
+    {
+        // compute data:
+        $this->updateJobTest($userSession);
+
+        // validate registry:
+        parent::validate($userSession);
     }
 
     public function read(FUserSession $userSession, int $id, int $mode)
     {
         $this->initialize();
 
-        $sql = "SELECT * FROM $this->tableName WHERE id_test_entity = $id;";
+        $sql = "SELECT * FROM $this->tableName WHERE id_report_test = $id;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->id = intval($row["id_test_entity"]);
+            $this->id = intval($row["id_report_test"]);
 
-            $this->id_test_entity->setValue($row["id_test_entity"]);
-            $this->process_days_min->setValue($row["process_days_min"]);
-            $this->process_days_max->setValue($row["process_days_max"]);
-            $this->cost->setValue($row["cost"]);
-            $this->is_default->setValue($row["is_default"]);
+            $this->id_report_test->setValue($row["id_report_test"]);
+            $this->report_test->setValue($row["report_test"]);
+            $this->result->setValue($row["result"]);
             $this->is_system->setValue($row["is_system"]);
             $this->is_deleted->setValue($row["is_deleted"]);
+            $this->fk_report->setValue($row["fk_report"]);
             $this->fk_test->setValue($row["fk_test"]);
-            $this->fk_entity->setValue($row["fk_entity"]);
+            $this->fk_job_test->setValue($row["fk_job_test"]);
+            $this->fk_sample_test->setValue($row["fk_sample_test"]);
+            $this->nk_result_unit->setValue($row["nk_result_unit"]);
             $this->fk_user_ins->setValue($row["fk_user_ins"]);
             $this->fk_user_upd->setValue($row["fk_user_upd"]);
             $this->ts_user_ins->setValue($row["ts_user_ins"]);
@@ -95,9 +111,6 @@ class ModTestEntity extends FRegistry
         else {
             throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
         }
-
-        // read DBMS complementary data:
-        $this->dbmsFkProcessArea = ModTest::readFkProcessArea($userSession, $this->fk_test->getValue());
     }
 
     public function save(FUserSession $userSession)
@@ -108,29 +121,31 @@ class ModTestEntity extends FRegistry
 
         if ($this->isRegistryNew) {
             $statement = $userSession->getPdo()->prepare("INSERT INTO $this->tableName (" .
-                "id_test_entity, " .
-                "process_days_min, " .
-                "process_days_max, " .
-                "cost, " .
-                "is_default, " .
+                "id_report_test, " .
+                "report_test, " .
+                "result, " .
                 "is_system, " .
                 "is_deleted, " .
+                "fk_report, " .
                 "fk_test, " .
-                "fk_entity, " .
+                "fk_job_test, " .
+                "fk_sample_test, " .
+                "nk_result_unit, " .
                 "fk_user_ins, " .
                 "fk_user_upd, " .
                 "ts_user_ins, " .
                 "ts_user_upd) " .
                 "VALUES (" .
                 "0, " .
-                ":process_days_min, " .
-                ":process_days_max, " .
-                ":cost, " .
-                ":is_default, " .
+                ":report_test, " .
+                ":result, " .
                 ":is_system, " .
                 ":is_deleted, " .
+                ":fk_report, " .
                 ":fk_test, " .
-                ":fk_entity, " .
+                ":fk_job_test, " .
+                ":fk_sample_test, " .
+                ":nk_result_unit, " .
                 ":fk_user, " .
                 "1, " .
                 "NOW(), " .
@@ -138,30 +153,32 @@ class ModTestEntity extends FRegistry
         }
         else {
             $statement = $userSession->getPdo()->prepare("UPDATE $this->tableName SET " .
-                "process_days_min = :process_days_min, " .
-                "process_days_max = :process_days_max, " .
-                "cost = :cost, " .
-                "is_default = :is_default, " .
+                "report_test = :report_test, " .
+                "result = :result, " .
                 "is_system = :is_system, " .
                 "is_deleted = :is_deleted, " .
+                "fk_report = :fk_report, " .
                 "fk_test = :fk_test, " .
-                "fk_entity = :fk_entity, " .
+                "fk_job_test = :fk_job_test, " .
+                "fk_sample_test = :fk_sample_test, " .
+                "nk_result_unit = :nk_result_unit, " .
                 //"fk_user_ins = :fk_user_ins, " .
                 "fk_user_upd = :fk_user, " .
                 //"ts_user_ins = :ts_user_ins, " .
                 "ts_user_upd = NOW() " .
-                "WHERE id_test_entity = :id;");
+                "WHERE id_report_test = :id;");
         }
 
-        //$id_test_entity = $this->id_test_entity->getValue();
-        $process_days_min = $this->process_days_min->getValue();
-        $process_days_max = $this->process_days_max->getValue();
-        $cost = $this->cost->getValue();
-        $is_default = $this->is_default->getValue();
+        //$id_report_test = $this->id_report_test->getValue();
+        $report_test = $this->report_test->getValue();
+        $result = $this->result->getValue();
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();
+        $fk_report = $this->fk_report->getValue();
         $fk_test = $this->fk_test->getValue();
-        $fk_entity = $this->fk_entity->getValue();
+        $fk_job_test = $this->fk_job_test->getValue();
+        $fk_sample_test = $this->fk_sample_test->getValue();
+        $nk_result_unit = $this->nk_result_unit->getValue();
         $fk_user_ins = $this->fk_user_ins->getValue();
         $fk_user_upd = $this->fk_user_upd->getValue();
         //$ts_user_ins = $this->ts_user_ins->getValue();
@@ -169,21 +186,27 @@ class ModTestEntity extends FRegistry
 
         $fk_user = $userSession->getCurUser()->getId();
 
-        //$statement->bindParam(":id_test_entity", $id_test_entity, \PDO::PARAM_INT);
-        $statement->bindParam(":process_days_min", $process_days_min, \PDO::PARAM_INT);
-        $statement->bindParam(":process_days_max", $process_days_max, \PDO::PARAM_INT);
-        $statement->bindParam(":cost", $cost);
-        $statement->bindParam(":is_default", $is_default, \PDO::PARAM_BOOL);
+        //$statement->bindParam(":id_report_test", $id_report_test, \PDO::PARAM_INT);
+        $statement->bindParam(":report_test", $report_test, \PDO::PARAM_INT);
+        $statement->bindParam(":result", $result);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
+        $statement->bindParam(":fk_report", $fk_report, \PDO::PARAM_INT);
         $statement->bindParam(":fk_test", $fk_test, \PDO::PARAM_INT);
-        $statement->bindParam(":fk_entity", $fk_entity, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_job_test", $fk_job_test, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_sample_test", $fk_sample_test, \PDO::PARAM_INT);
+        if (empty($nk_result_unit)) {
+            $statement->bindValue(":nk_result_unit", null, \PDO::PARAM_NULL);
+        }
+        else {
+            $statement->bindParam(":nk_result_unit", $nk_result_unit, \PDO::PARAM_INT);
+        }
         //$statement->bindParam(":fk_user_ins", $fk_user_ins, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_upd", $fk_user_upd, \PDO::PARAM_INT);
         //$statement->bindParam(":ts_user_ins", $ts_user_ins);
         //$statement->bindParam(":ts_user_upd", $ts_user_upd);
 
-        $statement->bindParam(":fk_user", $fk_user);
+        $statement->bindParam(":fk_user", $fk_user, \PDO::PARAM_INT);
 
         if (!$this->isRegistryNew) {
             $statement->bindParam(":id", $this->id, \PDO::PARAM_INT);
@@ -194,13 +217,8 @@ class ModTestEntity extends FRegistry
         $this->isRegistryModified = false;
         if ($this->isRegistryNew) {
             $this->id = intval($userSession->getPdo()->lastInsertId());
-            $this->id_test_entity->setValue($this->id);
+            $this->id_report_test->setValue($this->id);
             $this->isRegistryNew = false;
-        }
-
-        // ensure uniqueness of the "is default" flag for current test:
-        if ($is_default) {
-            $userSession->getPdo()->exec("UPDATE $this->tableName SET is_default = 0 WHERE fk_test = $fk_test AND is_default AND id_test_entity <> $this->id;");
         }
     }
 
@@ -212,19 +230,5 @@ class ModTestEntity extends FRegistry
     public function undelete(FUserSession $userSession)
     {
 
-    }
-
-    public static function readTestEntity(FUserSession $userSession, int $idTest, int $idEntity)
-    {
-        $testEntity = null;
-
-        $sql = "SELECT id_test_entity FROM oc_test_entity WHERE fk_test = $idTest AND fk_entity = $idEntity;";
-        $statement = $userSession->getPdo()->query($sql);
-        if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $testEntity = new ModTestEntity();
-            $testEntity->read($userSession, intval($row["id_test_entity"]), FRegistry::MODE_READ);
-        }
-
-        return $testEntity;
     }
 }

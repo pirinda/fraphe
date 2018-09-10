@@ -24,7 +24,7 @@ class ModProcessArea extends FRegistry
 
     function __construct()
     {
-        parent::__construct(AppConsts::OC_PROCESS_AREA, AppConsts::$tableIds[AppConsts::OC_PROCESS_AREA]);
+        parent::__construct(AppConsts::OC_PROCESS_AREA, AppConsts::$tables[AppConsts::OC_PROCESS_AREA], AppConsts::$tableIds[AppConsts::OC_PROCESS_AREA]);
 
         $this->id_process_area = new FItem(FItem::DATA_TYPE_INT, "id_process_area", "ID área proceso", "", false, true);
         $this->name = new FItem(FItem::DATA_TYPE_STRING, "name", "Nombre", "", true);
@@ -56,7 +56,7 @@ class ModProcessArea extends FRegistry
     {
         $this->initialize();
 
-        $sql = "SELECT * FROM oc_process_area WHERE id_process_area = $id;";
+        $sql = "SELECT * FROM $this->tableName WHERE id_process_area = $id;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->id = intval($row["id_process_area"]);
@@ -87,7 +87,7 @@ class ModProcessArea extends FRegistry
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $userSession->getPdo()->prepare("INSERT INTO oc_process_area (" .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO $this->tableName (" .
                 "id_process_area, " .
                 "name, " .
                 "code, " .
@@ -111,7 +111,7 @@ class ModProcessArea extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $userSession->getPdo()->prepare("UPDATE oc_process_area SET " .
+            $statement = $userSession->getPdo()->prepare("UPDATE $this->tableName SET " .
                 "name = :name, " .
                 "code = :code, " .
                 "sorting = :sorting, " .

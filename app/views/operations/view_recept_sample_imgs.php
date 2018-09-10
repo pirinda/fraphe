@@ -15,6 +15,7 @@ use Fraphe\App\FGuiUtils;
 use Fraphe\Lib\FLibUtils;
 use Fraphe\Model\FRegistry;
 use app\models\operations\ModSample;
+use app\models\operations\ModSamplingImage;
 
 echo '<!DOCTYPE html>';
 echo '<html>';
@@ -28,7 +29,7 @@ $sample->read($userSession, intval($_GET[FRegistry::ID]), FRegistry::MODE_READ);
 
 //------------------------------------------------------------------------------
 echo '<div class="container" style="margin-top:50px">';
-echo '<h3><span class="glyphicon glyphicon-th-list"></span> Muestra</h3>';
+echo '<h3><span class="glyphicon glyphicon-picture"></span> Muestra</h3>';
 
 //------------------------------------------------------------------------------
 echo '<div class="panel panel-default">';
@@ -55,39 +56,28 @@ echo '</div>';
 echo '</div>';
 //------------------------------------------------------------------------------
 
-echo '<h4>Ensayos de la muestra</h4>';
+echo '<h4>Imágenes de muestreo de la muestra</h4>';
 
-echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample_test.php?sample=' . $sample->getId() . '" class="btn btn-primary btn-sm" role="button">Crear</a>&nbsp;';
+echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample_img.php?sample=' . $sample->getId() . '" class="btn btn-primary btn-sm" role="button">Crear</a>&nbsp;';
 echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept_samples.php?id=' . $sample->getDatum("nk_recept") . '" class="btn btn-danger btn-sm" role="button">Volver</a>';
 
 $sql = <<<SQL
-SELECT st.sample_test, st.id_sample_test, st.process_days, st.process_start_date, st.process_deadline,
-st.ts_user_ins AS _ts_user_ins, st.ts_user_upd AS _ts_user_upd,
-t.name AS _t_name,
-IF(e.alias <> '', e.alias, e.name) AS _entity,
-pa.code AS _pa_code,
+SELECT si.sampling_img, si.id_sampling_img,
+si.ts_user_ins AS _ts_user_ins, si.ts_user_upd AS _ts_user_upd,
 ui.name AS _ui_name, uu.name AS _uu_name
-FROM o_sample_test AS st
-INNER JOIN oc_test AS t ON st.fk_test = t.id_test
-INNER JOIN cc_entity AS e ON st.fk_entity = e.id_entity
-INNER JOIN oc_process_area AS pa ON st.fk_process_area = pa.id_process_area
-INNER JOIN cc_user AS ui ON st.fk_user_ins = ui.id_user
-INNER JOIN cc_user AS uu ON st.fk_user_upd = uu.id_user
+FROM o_sampling_img AS si
+INNER JOIN cc_user AS ui ON si.fk_user_ins = ui.id_user
+INNER JOIN cc_user AS uu ON si.fk_user_upd = uu.id_user
 SQL;
 $sql .= " ";
-$sql .= "WHERE NOT st.is_deleted AND st.fk_sample = " . $_GET[FRegistry::ID] . " ";
-$sql .= "ORDER BY st.sample_test, st.id_sample_test;";
+$sql .= "WHERE NOT si.is_deleted AND si.fk_sample = " . $_GET[FRegistry::ID] . " ";
+$sql .= "ORDER BY si.sampling_img, si.id_sampling_img;";
 
 echo '<table class="table table-striped">';
 echo '<thead>';
 echo '<tr>';
-echo '<th><abbr title="Número">Núm.</abbr></th>';
-echo '<th><abbr title="Área proceso">AP</abbr></th>';
-echo '<th>Ensayo</th>';
-echo '<th>Entidad</th>';
-echo '<th><abbr title="Días proceso">DP</abbr></th>';
-echo '<th>Inicio proceso</th>';
-echo '<th>Límite proceso</th>';
+echo '<th>Nombre</th>';
+echo '<th>Imagen</th>';
 echo '<th class="small">Creador</th>';
 echo '<th class="small">Creación</th>';
 echo '<th class="small">Modificador</th>';
@@ -100,19 +90,15 @@ echo '<tbody>';
 $pdo = FGuiUtils::createPdo();
 foreach ($pdo->query($sql) as $row) {
     echo '<tr>';
-    echo '<td>' . $row['sample_test'] . '</td>';
-    echo '<td>' . $row['_pa_code'] . '</td>';
-    echo '<td>' . $row['_t_name'] . '</td>';
-    echo '<td>' . $row['_entity'] . '</td>';
-    echo '<td>' . $row['process_days'] . '</td>';
-    echo '<td>' . $row['process_start_date'] . '</td>';
-    echo '<td>' . $row['process_deadline'] . '</td>';
+    echo '<td>' . $row['sampling_img'] . '</td>';
+    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample_img.php?id=' . $row['id_sampling_img'] . '">';
+    echo '<img src="' . ModSamplingImage::PATH_IMG . $row['sampling_img'] . '" alt="' . $row['sampling_img'] . '" width="150" height="100"></a></td>';
     echo '<td class="small">' . $row['_ui_name'] . '</td>';
     echo '<td class="small">' . $row['_ts_user_ins'] . '</td>';
     echo '<td class="small">' . $row['_uu_name'] . '</td>';
     echo '<td class="small">' . $row['_ts_user_upd'] . '</td>';
     echo '<td><nobr>';
-    echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample_test.php?id=' . $row['id_sample_test'] . '" class="btn btn-success btn-xs" role="button"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;';
+    echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample_img.php?id=' . $row['id_sampling_img'] . '" class="btn btn-success btn-xs" role="button"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;';
     echo '<a href="#" class="btn btn-danger btn-xs" role="button"><span class="glyphicon glyphicon-ban-circle"></span></a>';
     echo '</nobr></td>';
     echo '</tr>';

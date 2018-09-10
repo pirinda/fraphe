@@ -12,9 +12,9 @@ use Fraphe\App\FApp;
 use Fraphe\App\FAppConsts;
 use Fraphe\App\FAppNavbar;
 use Fraphe\App\FGuiUtils;
-use Fraphe\Lib\FUtils;
+use Fraphe\Lib\FLibUtils;
 use Fraphe\Model\FItem;
-use Fraphe\Model\FModel;
+use Fraphe\Model\FModelUtils;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
 use app\AppUtils;
@@ -74,7 +74,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         try {
             $recept->setData($data);
 
-            FModel::save($userSession, $recept);
+            FModelUtils::save($userSession, $recept);
 
             header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/operations/view_recept_samples.php?id=" . $recept->getId());
         }
@@ -102,7 +102,7 @@ if (!empty($errmsg)) {
 // Input Form for Reception
 ////////////////////////////////////////////////////////////////////////////////
 
-echo '<form class="form-horizontal" method="post" action="' . FUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '" onsubmit="return validateForm()">';
+echo '<form class="form-horizontal" method="post" action="' . FLibUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '" onsubmit="return validateForm();">';
 
 // preserve registry ID in post:
 echo '<input type="hidden" name="' . FRegistry::ID . '" value="' . $recept->getId() . '">';

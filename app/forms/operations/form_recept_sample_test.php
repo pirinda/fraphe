@@ -12,9 +12,9 @@ use Fraphe\App\FApp;
 use Fraphe\App\FAppConsts;
 use Fraphe\App\FAppNavbar;
 use Fraphe\App\FGuiUtils;
-use Fraphe\Lib\FUtils;
+use Fraphe\Lib\FLibUtils;
 use Fraphe\Model\FItem;
-use Fraphe\Model\FModel;
+use Fraphe\Model\FModelUtils;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
 use app\AppUtils;
@@ -73,7 +73,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         try {
             $sampleTest->setData($data);
 
-            FModel::save($userSession, $sampleTest);
+            FModelUtils::save($userSession, $sampleTest);
 
             header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/operations/view_recept_sample_tests.php?id=" . $sample->getId());
         }
@@ -101,7 +101,7 @@ if (!empty($errmsg)) {
 // Input Form for Samples
 ////////////////////////////////////////////////////////////////////////////////
 
-echo '<form class="form-horizontal" method="post" action="' . FUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '" onsubmit="return validateForm()">';
+echo '<form class="form-horizontal" method="post" action="' . FLibUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '" onsubmit="return validateForm();">';
 
 // preserve registry ID in post:
 echo '<input type="hidden" name="' . FRegistry::ID . '" value="' . $sampleTest->getId() . '">';
@@ -117,7 +117,7 @@ echo '<div class="row">';
 echo '<div class="col-sm-2"><b>' . $sample->getItem("sample_num")->getName() . ':</b></div>';
 echo '<div class="col-sm-3"><span class="bg-info lead">' . $sample->getDatum("sample_num") . '</span></div>';
 echo '<div class="col-sm-2"><b>' . $sample->getItem("recept_datetime_n")->getName() . ':</b></div>';
-echo '<div class="col-sm-3"><span class="bg-info">' . FUtils::formatStdDatetime($sample->getDatum("recept_datetime_n")) . '</span></div>';
+echo '<div class="col-sm-3"><span class="bg-info">' . FLibUtils::formatStdDatetime($sample->getDatum("recept_datetime_n")) . '</span></div>';
 echo '</div>';
 
 echo '<div class="row">';

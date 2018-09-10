@@ -2,7 +2,7 @@
 namespace app\models\operations;
 
 use Fraphe\App\FUserSession;
-use Fraphe\Lib\FUtils;
+use Fraphe\Lib\FLibUtils;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
@@ -30,7 +30,7 @@ class ModSampleTest extends FRegistry
 
     function __construct()
     {
-        parent::__construct(AppConsts::O_SAMPLE_TEST, AppConsts::$tableIds[AppConsts::O_SAMPLE_TEST]);
+        parent::__construct(AppConsts::O_SAMPLE_TEST, AppConsts::$tables[AppConsts::O_SAMPLE_TEST], AppConsts::$tableIds[AppConsts::O_SAMPLE_TEST]);
 
         $this->id_sample_test = new FItem(FItem::DATA_TYPE_INT, "id_sample_test", "ID muestra", "", false, true);
         $this->sample_test = new FItem(FItem::DATA_TYPE_INT, "sample_test", "Núm. ensayo muestra", "", false);
@@ -74,7 +74,7 @@ class ModSampleTest extends FRegistry
     protected function generateSampleTest(FUserSession $userSession) {
         $this->fk_sample->validate();
 
-        $sql = "SELECT COALESCE(MAX(sample_test), 0) AS _max_sample_test FROM o_sample_test WHERE fk_sample = " . $this->fk_sample->getValue() . ";";
+        $sql = "SELECT COALESCE(MAX(sample_test), 0) AS _max_sample_test FROM $this->tableName WHERE fk_sample = " . $this->fk_sample->getValue() . ";";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->sample_test->setValue(intval($row["_max_sample_test"]) + 1);
@@ -98,7 +98,7 @@ class ModSampleTest extends FRegistry
         $this->process_days->setValue($processDays);
 
         // compute process deadline:
-        $dt = new \DateTime(FUtils::formatStdDate($this->process_start_date->getValue()));
+        $dt = new \DateTime(FLibUtils::formatStdDate($this->process_start_date->getValue()));
         $dt->add(new \DateInterval("P" . $processDays . "D"));
         $this->process_deadline->setValue($dt->getTimestamp()); // TODO: improve deadline computation!
     }
@@ -108,10 +108,12 @@ class ModSampleTest extends FRegistry
     public function forceRegistryNew()
     {
         parent::forceRegistryNew();
-        
+
         $this->sample_test->reset();
     }
 
+    /** Overriden method.
+     */
     public function validate(FUserSession $userSession)
     {
         // compute data:
@@ -132,7 +134,7 @@ class ModSampleTest extends FRegistry
     {
         $this->initialize();
 
-        $sql = "SELECT * FROM o_sample_test WHERE id_sample_test = $id;";
+        $sql = "SELECT * FROM $this->tableName WHERE id_sample_test = $id;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->id = intval($row["id_sample_test"]);
@@ -171,7 +173,7 @@ class ModSampleTest extends FRegistry
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $userSession->getPdo()->prepare("INSERT INTO o_sample_test (" .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO $this->tableName (" .
                 "id_sample_test, " .
                 "sample_test, " .
                 "process_days_min, " .
@@ -211,7 +213,7 @@ class ModSampleTest extends FRegistry
                 "NOW());");
         }
         else {
-            $statement = $userSession->getPdo()->prepare("UPDATE o_sample_test SET " .
+            $statement = $userSession->getPdo()->prepare("UPDATE $this->tableName SET " .
                 "sample_test = :sample_test, " .
                 "process_days_min = :process_days_min, " .
                 "process_days_max = :process_days_max, " .
@@ -237,8 +239,8 @@ class ModSampleTest extends FRegistry
         $process_days_min = $this->process_days_min->getValue();
         $process_days_max = $this->process_days_max->getValue();
         $process_days = $this->process_days->getValue();
-        $process_start_date = FUtils::formatStdDate($this->process_start_date->getValue());
-        $process_deadline = FUtils::formatStdDate($this->process_deadline->getValue());
+        $process_start_date = FLibUtils::formatStdDate($this->process_start_date->getValue());
+        $process_deadline = FLibUtils::formatStdDate($this->process_deadline->getValue());
         $cost = $this->cost->getValue();
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();

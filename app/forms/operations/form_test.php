@@ -13,9 +13,9 @@ use Fraphe\App\FAppConsts;
 use Fraphe\App\FAppNavbar;
 use Fraphe\App\FGuiUtils;
 use Fraphe\Lib\FDevUtils;
-use Fraphe\Lib\FUtils;
+use Fraphe\Lib\FLibUtils;
 use Fraphe\Model\FItem;
-use Fraphe\Model\FModel;
+use Fraphe\Model\FModelUtils;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
 use app\AppUtils;
@@ -97,7 +97,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $test->setDefaultChildTestEntity($testEntity);
             $test->setData($data);
 
-            FModel::save($userSession, $test);
+            FModelUtils::save($userSession, $test);
 
             header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/operations/view_test.php");
         }
@@ -123,7 +123,7 @@ if (!empty($errmsg)) {
 
 // test:
 
-echo '<form class="form-horizontal" method="post" action="' . FUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '" onsubmit="return validateForm()">';
+echo '<form class="form-horizontal" method="post" action="' . FLibUtils::sanitizeInput($_SERVER["PHP_SELF"]) . '" onsubmit="return validateForm();">';
 
 // preserve entity class and nature and registry ID in post:
 echo '<input type="hidden" name="' . FRegistry::ID . '" value="' . $test->getId() . '">';

@@ -9,6 +9,11 @@ abstract class FFiles
         return $filePrefix . (strlen($idAsString) >= $idDigits ? "" : str_repeat("0", $idDigits - strlen($idAsString))) . "$idAsString" . ($num == 0 ? "" : "_$num") . ".$ext";
     }
 
+    public static function createFileNameForName(string $filePrefix, string $name, int $num, string $ext): string
+    {
+        return $filePrefix . $name . ($num == 0 ? "" : "_$num") . ".$ext";
+    }
+
     /* Uploads file. Requires $_POST["submit"]
      */
     public static function uploadFile($file, string $targetFile, bool $overwrite = true, int $maxSize = 500000)

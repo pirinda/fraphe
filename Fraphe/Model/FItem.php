@@ -1,7 +1,7 @@
 <?php
 namespace Fraphe\Model;
 
-use Fraphe\Lib\FUtils;
+use Fraphe\Lib\FLibUtils;
 
 class FItem
 {
@@ -123,19 +123,19 @@ class FItem
                     switch ($this->dataType) {
                         case self::DATA_TYPE_DATE:
                             // parse timestamp from string value in format "yyyy-mm-dd"
-                            $this->value = FUtils::parseStdDate($value);
+                            $this->value = FLibUtils::parseStdDate($value);
                             break;
                         case self::DATA_TYPE_DATETIME:
                             // parse timestamp from string value in format "yyyy-mm-dd hh:mm:ss"
-                            $this->value = FUtils::parseStdDatetime($value);
+                            $this->value = FLibUtils::parseStdDatetime($value);
                             break;
                         case self::DATA_TYPE_TIME:
                             // parse timestamp from string value in format "hh:mm:ss"
-                            $this->value = FUtils::parseStdTime($value);
+                            $this->value = FLibUtils::parseStdTime($value);
                             break;
                         case self::DATA_TYPE_TIMESTAMP:
                             // parse timestamp from string value in format "yyyy-mm-dd hh:mm:ss"
-                            $this->value = FUtils::parseStdTimestamp($value);
+                            $this->value = FLibUtils::parseStdTimestamp($value);
                             break;
                         default:
                     }
@@ -303,10 +303,10 @@ class FItem
                     else if (!$this->canBeEmpty && empty($this->value)) {
                         throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser cero.");
                     }
-                    else if (isset($this->valueMin) && is_int($this->valueMin) && $this->value < $this->valueMin) {
+                    else if (!empty($this->value) && isset($this->valueMin) && is_int($this->valueMin) && $this->value < $this->valueMin) {
                         throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser menor a $this->valueMin.");
                     }
-                    else if (isset($this->valueMax) && is_int($this->valueMax) && $this->value > $this->valueMax) {
+                    else if (!empty($this->value) && isset($this->valueMax) && is_int($this->valueMax) && $this->value > $this->valueMax) {
                         throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser mayor a $this->valueMax.");
                     }
                     break;
@@ -318,10 +318,10 @@ class FItem
                     else if (!$this->canBeEmpty && empty($this->value)) {
                         throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser cero.");
                     }
-                    else if (isset($this->valueMin) && is_float($this->valueMin) && $this->value < $this->valueMin) {
+                    else if (!empty($this->value) && isset($this->valueMin) && is_float($this->valueMin) && $this->value < $this->valueMin) {
                         throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser menor a $this->valueMin.");
                     }
-                    else if (isset($this->valueMax) && is_float($this->valueMax) && $this->value > $this->valueMax) {
+                    else if (!empty($this->value) && isset($this->valueMax) && is_float($this->valueMax) && $this->value > $this->valueMax) {
                         throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede ser mayor a $this->valueMax.");
                     }
                     break;
@@ -333,10 +333,10 @@ class FItem
                     else if (!$this->canBeEmpty && empty($this->value)) {
                         throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede estar vacío.");
                     }
-                    else if (isset($this->lengthMin) && is_int($this->lengthMin) && strlen($this->value) < $this->lengthMin) {
+                    else if (!empty($this->value) && isset($this->lengthMin) && is_int($this->lengthMin) && strlen($this->value) < $this->lengthMin) {
                         throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede tener longitud menor a $this->lengthMin.");
                     }
-                    else if (isset($this->lengthMax) && is_int($this->lengthMax) && strlen($this->value) > $this->lengthMax) {
+                    else if (!empty($this->value) && isset($this->lengthMax) && is_int($this->lengthMax) && strlen($this->value) > $this->lengthMax) {
                         throw new \Exception(__METHOD__ . ": " . $this->composeItemName() . "no puede tener longitud mayor a $this->lengthMax.");
                     }
                     break;
@@ -430,7 +430,7 @@ class FItem
                 $html .= '<label class="control-label small" for="' . $key . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
                 $html .= '</div>';
                 $html .= '<div class="col-sm-' . $lengthInput . '">';
-                $html .= '<input type="date" class="form-control input-sm" name="' . $key . '" id="' . $key . '" value="' . (empty($this->value) ? '' : FUtils::formatStdDate($this->value)) . '"' . $required . $placeholder .
+                $html .= '<input type="date" class="form-control input-sm" name="' . $key . '" id="' . $key . '" value="' . (empty($this->value) ? '' : FLibUtils::formatStdDate($this->value)) . '"' . $required . $placeholder .
                     ($this->guiReadOnly ? ' readonly' : '') .
                     (!empty($this->guiEvents) ? ' ' . $this->guiEvents : '') . '>';
                 $html .= '</div>';
@@ -445,7 +445,7 @@ class FItem
                 $html .= '<label class="control-label small" for="' . $key . '">' . $this->name . ':' . ($this->canBeEmpty ? '' : ' *') . '</label>';
                 $html .= '</div>';
                 $html .= '<div class="col-sm-' . $lengthInput . '">';
-                $html .= '<input type="datetime-local" class="form-control input-sm" name="' . $key . '" id="' . $key . '" value="' . (empty($this->value) ? '' : FUtils::formatHtmlDatetime($this->value)) . '"' . $required . $placeholder .
+                $html .= '<input type="datetime-local" class="form-control input-sm" name="' . $key . '" id="' . $key . '" value="' . (empty($this->value) ? '' : FLibUtils::formatHtmlDatetime($this->value)) . '"' . $required . $placeholder .
                     ($this->guiReadOnly ? ' readonly' : '') .
                     (!empty($this->guiEvents) ? ' ' . $this->guiEvents : '') . '>';
                 $html .= '</div>';

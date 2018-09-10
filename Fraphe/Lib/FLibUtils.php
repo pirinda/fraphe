@@ -1,7 +1,7 @@
 <?php
 namespace Fraphe\Lib;
 
-abstract class FUtils
+abstract class FLibUtils
 {
     public static function sanitizeInput(string $input): string
     {

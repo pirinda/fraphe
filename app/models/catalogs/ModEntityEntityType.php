@@ -16,7 +16,7 @@ class ModEntityEntityType extends FRelation
 
     function __construct()
     {
-        parent::__construct(AppConsts::CC_ENTITY_ENTITY_TYPE);
+        parent::__construct(AppConsts::CC_ENTITY_ENTITY_TYPE, AppConsts::$tables[AppConsts::CC_ENTITY_ENTITY_TYPE]);
 
         $this->id_entity = new FItem(FItem::DATA_TYPE_INT, "id_entity", "ID entidad", "", false, true);
         $this->id_entity_type = new FItem(FItem::DATA_TYPE_INT, "id_entity_type", "ID tipo entidad", "", false, true);
@@ -37,7 +37,7 @@ class ModEntityEntityType extends FRelation
         $id_entity = $ids["id_entity"];
         $id_entity_type = $ids["id_entity_type"];
 
-        $sql = "SELECT * FROM cc_entity_entity_type WHERE id_entity = $id_entity AND id_entity_type = $id_entity_type;";
+        $sql = "SELECT * FROM $this->tableName WHERE id_entity = $id_entity AND id_entity_type = $id_entity_type;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->id_entity->setValue($row["id_entity"]);
@@ -58,7 +58,7 @@ class ModEntityEntityType extends FRelation
         $statement;
 
         if ($this->isRegistryNew) {
-            $statement = $userSession->getPdo()->prepare("INSERT INTO cc_entity_entity_type (" .
+            $statement = $userSession->getPdo()->prepare("INSERT INTO $this->tableName (" .
                 "id_entity, " .
                 "id_entity_type) " .
                 "VALUES (" .

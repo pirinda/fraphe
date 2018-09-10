@@ -9,11 +9,11 @@ abstract class FRelation extends FRegistry
 
     /* Creates new base registry. Each field of registry must be contained in member array $items. Relation IDs are a "subset" of this registry items.
      */
-    public function __construct(int $registryType)
+    public function __construct(int $registryType, string $tableName)
     {
         $this->ids = array();
 
-        parent::__construct($registryType, "");
+        parent::__construct($registryType, $tableName, "");
     }
 
     /* Initializes registry data.
