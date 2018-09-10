@@ -27,7 +27,7 @@ echo '<!DOCTYPE html>';
 echo '<html>';
 echo FApp::composeHtmlHead();
 echo '<body>';
-echo FAppNavbar::compose("recept");
+echo FAppNavbar::compose("report");
 
 $userSession = FGuiUtils::createUserSession();
 $reportTest = new ModReportTest();
@@ -70,7 +70,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
 echo '<div class="container" style="margin-top:50px">';
 echo '<div class="page-header">';
-echo '<h3>Ensayo de la muestra</h3>';
+echo '<h3>Ensayo del informe de resultados</h3>';
 echo '</div>';
 
 if (!empty($errmsg)) {
