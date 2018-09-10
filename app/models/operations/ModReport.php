@@ -19,6 +19,7 @@ class ModReport extends FRegistry
     protected $is_system;
     protected $is_deleted;
     protected $fk_company_branch;
+    protected $fk_customer;
     protected $fk_sample;
     protected $fk_recept;
     protected $fk_report_delivery_type;
@@ -50,20 +51,21 @@ class ModReport extends FRegistry
     {
         parent::__construct(AppConsts::O_REPORT, AppConsts::$tables[AppConsts::O_REPORT], AppConsts::$tableIds[AppConsts::O_REPORT]);
 
-        $this->id_report = new FItem(FItem::DATA_TYPE_INT, "id_report", "ID informe resultados", "", false, true);
-        $this->report_num = new FItem(FItem::DATA_TYPE_STRING, "report_num", "Folio informe resultados", "", true);
-        $this->report_date = new FItem(FItem::DATA_TYPE_DATE, "report_date", "Fecha informe resultados", "", true);
+        $this->id_report = new FItem(FItem::DATA_TYPE_INT, "id_report", "ID IR", "", false, true);
+        $this->report_num = new FItem(FItem::DATA_TYPE_STRING, "report_num", "Folio IR", "", true);
+        $this->report_date = new FItem(FItem::DATA_TYPE_DATE, "report_date", "Fecha IR", "", true);
         $this->process_deviats = new FItem(FItem::DATA_TYPE_STRING, "process_deviats", "Desviaciones proceso", "", false);
         $this->process_notes = new FItem(FItem::DATA_TYPE_STRING, "process_notes", "Observaciones proceso", "", false);
         $this->reissue = new FItem(FItem::DATA_TYPE_INT, "reissue", "Reimpresión núm.", "", false);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
         $this->fk_company_branch = new FItem(FItem::DATA_TYPE_INT, "fk_company_branch", "Sucursal empresa", "", true);
+        $this->fk_customer = new FItem(FItem::DATA_TYPE_INT, "fk_customer", "Cliente", "", true);
         $this->fk_sample = new FItem(FItem::DATA_TYPE_INT, "fk_sample", "Muestra", "", true);
         $this->fk_recept = new FItem(FItem::DATA_TYPE_INT, "fk_recept", "Recepción", "", true);
         $this->fk_report_delivery_type = new FItem(FItem::DATA_TYPE_INT, "fk_report_delivery_type", "Tipo entrega IR", "", true);
         $this->nk_report_reissue_cause = new FItem(FItem::DATA_TYPE_INT, "nk_report_reissue_cause", "Causa reemisión IR", "", false);
-        $this->fk_report_status = new FItem(FItem::DATA_TYPE_INT, "fk_report_status", "Estatus reporte", "", true);
+        $this->fk_report_status = new FItem(FItem::DATA_TYPE_INT, "fk_report_status", "Estatus IR", "", true);
         $this->fk_user_finish = new FItem(FItem::DATA_TYPE_INT, "fk_user_finish", "Usuario terminación", "", false);
         $this->fk_user_verif = new FItem(FItem::DATA_TYPE_INT, "fk_user_verif", "Usuario verificación", "", false);
         $this->fk_user_valid = new FItem(FItem::DATA_TYPE_INT, "fk_user_valid", "Usuario validación", "", false);
@@ -90,6 +92,7 @@ class ModReport extends FRegistry
         $this->items["is_system"] = $this->is_system;
         $this->items["is_deleted"] = $this->is_deleted;
         $this->items["fk_company_branch"] = $this->fk_company_branch;
+        $this->items["fk_customer"] = $this->fk_customer;
         $this->items["fk_sample"] = $this->fk_sample;
         $this->items["fk_recept"] = $this->fk_recept;
         $this->items["fk_report_delivery_type"] = $this->fk_report_delivery_type;
@@ -185,6 +188,7 @@ class ModReport extends FRegistry
             $this->is_system->setValue($row["is_system"]);
             $this->is_deleted->setValue($row["is_deleted"]);
             $this->fk_company_branch->setValue($row["fk_company_branch"]);
+            $this->fk_customer->setValue($row["fk_customer"]);
             $this->fk_sample->setValue($row["fk_sample"]);
             $this->fk_recept->setValue($row["fk_recept"]);
             $this->fk_report_delivery_type->setValue($row["fk_report_delivery_type"]);
@@ -255,6 +259,7 @@ class ModReport extends FRegistry
                 "is_system, " .
                 "is_deleted, " .
                 "fk_company_branch, " .
+                "fk_customer, " .
                 "fk_sample, " .
                 "fk_recept, " .
                 "fk_report_delivery_type, " .
@@ -286,6 +291,7 @@ class ModReport extends FRegistry
                 ":is_system, " .
                 ":is_deleted, " .
                 ":fk_company_branch, " .
+                ":fk_customer, " .
                 ":fk_sample, " .
                 ":fk_recept, " .
                 ":fk_report_delivery_type, " .
@@ -318,6 +324,7 @@ class ModReport extends FRegistry
                 "is_system = :is_system, " .
                 "is_deleted = :is_deleted, " .
                 "fk_company_branch = :fk_company_branch, " .
+                "fk_customer = :fk_customer, " .
                 "fk_sample = :fk_sample, " .
                 "fk_recept = :fk_recept, " .
                 "fk_report_delivery_type = :fk_report_delivery_type, " .
@@ -351,6 +358,7 @@ class ModReport extends FRegistry
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();
         $fk_company_branch = $this->fk_company_branch->getValue();
+        $fk_customer = $this->fk_customer->getValue();
         $fk_sample = $this->fk_sample->getValue();
         $fk_recept = $this->fk_recept->getValue();
         $fk_report_delivery_type = $this->fk_report_delivery_type->getValue();
@@ -384,6 +392,7 @@ class ModReport extends FRegistry
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
         $statement->bindParam(":fk_company_branch", $fk_company_branch, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_customer", $fk_customer, \PDO::PARAM_INT);
         $statement->bindParam(":fk_sample", $fk_sample, \PDO::PARAM_INT);
         $statement->bindParam(":fk_recept", $fk_recept, \PDO::PARAM_INT);
         $statement->bindParam(":fk_report_delivery_type", $fk_report_delivery_type, \PDO::PARAM_INT);

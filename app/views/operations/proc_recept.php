@@ -156,6 +156,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
                     //$data["is_system"] = ?;
                     //$data["is_deleted"] = ?;
                     $data["fk_company_branch"] = $sample->getDatum("fk_company_branch");
+                    $data["fk_customer"] = $sample->getDatum("fk_customer");
                     $data["fk_sample"] = $sample->getId();
                     $data["fk_recept"] = $recept->getId();
                     $data["fk_report_delivery_type"] = $sample->getDatum("fk_report_delivery_type");

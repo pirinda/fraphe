@@ -142,8 +142,8 @@ echo '<label class="radio-inline small"><input type="radio" name="service_type" 
 echo '</div>';
 echo '</div>';
 
-echo $recept->getItem("recept_notes")->composeHtmlTextArea(4, 8, 1);
 echo $recept->getItem("recept_deviats")->composeHtmlTextArea(4, 8, 1);
+echo $recept->getItem("recept_notes")->composeHtmlTextArea(4, 8, 1);
 
 $params = array();
 $params["id_user_role"] = ModConsts::CC_USER_ROLE_RECEPT;
@@ -174,7 +174,6 @@ echo '</div>';  //echo '<div class="panel panel-default">';
 echo '</div>';  // right panel
 
 echo '</div>';  // row
-
 
 //echo '<div class="row">';
 echo '<button type="submit" class="btn btn-sm btn-primary">Guardar</button>&nbsp;';

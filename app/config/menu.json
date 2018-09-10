@@ -11,10 +11,6 @@
                         "submenu":"Clientes",
                         "href":"app/views/catalogs/view_entity.php?class=2"
                     },
-                    "customerAddress":{
-                        "submenu":"Domicilios clientes",
-                        "href":"app/views.php?view=customerAddress"
-                    },
                     "marketSegment":{
                         "submenu":"Segmentos mercado",
                         "href":"app/views/catalogs/view_market_segment.php"
@@ -28,10 +24,6 @@
                     "customer":{
                         "submenu":"Proveedores",
                         "href":"app/views/catalogs/view_entity.php?class=3"
-                    },
-                    "customerAddress":{
-                        "submenu":"Domicilios proveedores",
-                        "href":"app/views.php?view=providerAddress"
                     }
                 }
             },
@@ -43,14 +35,6 @@
                         "submenu":"Ensayos",
                         "href":"app/views/operations/view_test.php"
                     },
-                    "testProfile":{
-                        "submenu":"Perfiles ensayos",
-                        "href":"app/views.php?view=testProfile"
-                    },
-                    "testPackage":{
-                        "submenu":"Paquetes ensayos",
-                        "href":"app/views.php?view=testPackage"
-                    },
                     "testingMethod":{
                         "submenu":"Métodos ensayo",
                         "href":"app/views/operations/view_testing_method.php"
@@ -61,17 +45,13 @@
                     }
                 }
             },
-            "results":{
+            "report":{
                 "menu":"Informes resultados",
-                "href":"menu=results",
+                "href":"menu=report",
                 "submenus":{
                     "resultUnit":{
                         "submenu":"Unidades resultados",
                         "href":"app/views/operations/view_result_unit.php"
-                    },
-                    "resultUnitValue":{
-                        "submenu":"Valores unidades resultados",
-                        "href":"php.php"
                     },
                     "resultPermissLimit":{
                         "submenu":"Límites permisibles",
@@ -141,45 +121,45 @@
             }
         }
     },
-    "result":{
+    "report":{
         "module":"<span class='glyphicon glyphicon-file'></span> Resultados",
-        "href":"app/modules.php?module=result",
+        "href":"app/modules.php?module=report",
         "menus":{
             "job":{
                 "menu":"Resultados",
-                "href":"menu=result",
+                "href":"menu=report",
                 "submenus":{
-                    "resultPend":{
+                    "reportPend":{
                         "submenu":"Informes de resultados pendientes",
-                        "href":"app/views/operations/view_result.php?job_st=1"
+                        "href":"app/views/operations/view_report.php?report_st=1"
                     },
-                    "resultProc":{
+                    "reportProc":{
                         "submenu":"Informes de resultados en proceso",
-                        "href":"app/views/operations/view_result.php?job_st=2"
+                        "href":"app/views/operations/view_report.php?report_st=2"
                     },
-                    "resultFin":{
+                    "reportFin":{
                         "submenu":"Informes de resultados terminados",
-                        "href":"app/views/operations/view_result.php?job_st=3"
+                        "href":"app/views/operations/view_report.php?report_st=3"
                     },
-                    "resultVer":{
+                    "reportVer":{
                         "submenu":"Informes de resultados verificados",
-                        "href":"app/views/operations/view_result.php?job_st=3"
+                        "href":"app/views/operations/view_report.php?report_st=4"
                     },
-                    "resultVal":{
+                    "reportVal":{
                         "submenu":"Informes de resultados validados",
-                        "href":"app/views/operations/view_result.php?job_st=3"
+                        "href":"app/views/operations/view_report.php?report_st=5"
                     },
-                    "resultRel":{
+                    "reportRel":{
                         "submenu":"Informes de resultados liberados",
-                        "href":"app/views/operations/view_result.php?job_st=3"
+                        "href":"app/views/operations/view_report.php?report_st=6"
                     },
-                    "resultDel":{
+                    "reportDel":{
                         "submenu":"Informes de resultados entregados",
-                        "href":"app/views/operations/view_result.php?job_st=3"
+                        "href":"app/views/operations/view_report.php?report_st=7"
                     },
                     "jobAll":{
                         "submenu":"Informes de resultados (todos)",
-                        "href":"app/views/operations/view_result.php?job_st=all"
+                        "href":"app/views/operations/view_report.php?report_st=all"
                     }
                 }
             }

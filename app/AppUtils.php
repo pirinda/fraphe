@@ -55,6 +55,7 @@ abstract class AppUtils
 
             // "code" sorted by code + ID:
             case AppConsts::OC_CONTAINER_UNIT:
+            case AppConsts::OC_RESULT_UNIT:
                 $sql = "SELECT $tableId AS _val, code AS _opt FROM $table WHERE NOT is_deleted ORDER BY code, $tableId;";
                 break;
 

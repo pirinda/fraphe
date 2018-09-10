@@ -103,7 +103,7 @@ echo '<tr>';
 echo '<th>Folio</th>';
 echo '<th>Nombre</th>';
 echo '<th>Cantidad</th>';
-echo '<th>Unidad</th>';
+echo '<th><abbr title="Unidad medida">UM</abbr></th>';
 echo '<th>Lote</th>';
 echo '<th>Estatus</th>';
 echo '<th><abbr title="Realizador muestreo">Mtr.</abbr></th>';

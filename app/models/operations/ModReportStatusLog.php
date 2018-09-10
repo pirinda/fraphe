@@ -29,14 +29,14 @@ class ModReportStatusLog extends FRegistry
     {
         parent::__construct(AppConsts::O_REPORT_STATUS_LOG, AppConsts::$tables[AppConsts::O_REPORT_STATUS_LOG], AppConsts::$tableIds[AppConsts::O_REPORT_STATUS_LOG]);
 
-        $this->id_report_status_log = new FItem(FItem::DATA_TYPE_INT, "id_report_status_log", "ID cambio estatus reporte", "", false, true);
+        $this->id_report_status_log = new FItem(FItem::DATA_TYPE_INT, "id_report_status_log", "ID cambio estatus IR", "", false, true);
         $this->status_datetime = new FItem(FItem::DATA_TYPE_DATETIME, "status_datetime", "Fecha-hr cambio estatus", "", true);
         $this->status_notes = new FItem(FItem::DATA_TYPE_STRING, "status_notes", "Observaciones cambio estatus", "", false);
         $this->reissue = new FItem(FItem::DATA_TYPE_INT, "reissue", "Reimpresión núm.", "", false);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
         $this->fk_report = new FItem(FItem::DATA_TYPE_INT, "fk_report", "Reporte", "", true);
-        $this->fk_report_status = new FItem(FItem::DATA_TYPE_INT, "fk_report_status", "Estatus reporte", "", true);
+        $this->fk_report_status = new FItem(FItem::DATA_TYPE_INT, "fk_report_status", "Estatus IR", "", true);
         $this->nk_report_reissue_cause = new FItem(FItem::DATA_TYPE_INT, "nk_report_reissue_cause", "Causa reemisión IR", "", false);
         $this->fk_user_status = new FItem(FItem::DATA_TYPE_INT, "fk_user_status", "Usuario estatus", "", true);
         $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", "", false);

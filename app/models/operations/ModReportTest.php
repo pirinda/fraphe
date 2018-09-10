@@ -28,8 +28,8 @@ class ModReportTest extends FRegistry
     {
         parent::__construct(AppConsts::O_REPORT_TEST, AppConsts::$tables[AppConsts::O_REPORT_TEST], AppConsts::$tableIds[AppConsts::O_REPORT_TEST]);
 
-        $this->id_report_test = new FItem(FItem::DATA_TYPE_INT, "id_report_test", "ID reporte + ensayo", "", false, true);
-        $this->report_test = new FItem(FItem::DATA_TYPE_INT, "report_test", "Núm. ensayo reporte", "", true);
+        $this->id_report_test = new FItem(FItem::DATA_TYPE_INT, "id_report_test", "ID IR + ensayo", "", false, true);
+        $this->report_test = new FItem(FItem::DATA_TYPE_INT, "report_test", "Núm. ensayo IR", "", true);
         $this->result = new FItem(FItem::DATA_TYPE_STRING, "result", "Resultado", "", false);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);

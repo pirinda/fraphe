@@ -20,29 +20,29 @@ echo FApp::composeHtmlHead();
 echo '<body>';
 echo FAppNavbar::compose("process");
 
-$job_st = intval(FApp::getVariable("job_st")); // URL status
+$job_st = intval(FApp::getVariable("job_st")); // URL or session parameter
 $_SESSION["job_st"] = $job_st;
 
 $stName = "";
 switch ($job_st) {
     case ModConsts::OC_JOB_STATUS_PENDING:
-        $stName = " pendientes";
+        $stName = "pendientes";
         break;
     case ModConsts::OC_JOB_STATUS_PROCESSING:
-        $stName = " en proceso";
+        $stName = "en proceso";
         break;
     case ModConsts::OC_JOB_STATUS_FINISHED:
-        $stName = " terminadas";
+        $stName = "terminadas";
         break;
     case ModConsts::OC_JOB_STATUS_CANCELLED:
-        $stName = " canceladas";
+        $stName = "canceladas";
         break;
     default:
-        $stName = " (todas)";
+        $stName = "(todas)";
 }
 
 echo '<div class="container" style="margin-top:50px">';
-echo '<h3>Órdenes de trabajo' . $stName . '</h3>';
+echo '<h3>Órdenes de trabajo <span class="label label-default">' . $stName . '</span></h3>';
 //echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept.php" class="btn btn-primary btn-sm" role="button">Crear</a>';
 
 $sql = <<<SQL
