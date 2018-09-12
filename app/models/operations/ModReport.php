@@ -13,7 +13,7 @@ class ModReport extends FRegistry
     protected $id_report;
     protected $report_num;
     protected $report_date;
-    protected $process_deviats;
+    protected $process_deviations;
     protected $process_notes;
     protected $reissue;
     protected $is_system;
@@ -54,7 +54,7 @@ class ModReport extends FRegistry
         $this->id_report = new FItem(FItem::DATA_TYPE_INT, "id_report", "ID IR", "", false, true);
         $this->report_num = new FItem(FItem::DATA_TYPE_STRING, "report_num", "Folio IR", "", true);
         $this->report_date = new FItem(FItem::DATA_TYPE_DATE, "report_date", "Fecha IR", "", true);
-        $this->process_deviats = new FItem(FItem::DATA_TYPE_STRING, "process_deviats", "Desviaciones proceso", "", false);
+        $this->process_deviations = new FItem(FItem::DATA_TYPE_STRING, "process_deviations", "Desviaciones proceso", "", false);
         $this->process_notes = new FItem(FItem::DATA_TYPE_STRING, "process_notes", "Observaciones proceso", "", false);
         $this->reissue = new FItem(FItem::DATA_TYPE_INT, "reissue", "Reimpresión núm.", "", false);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
@@ -86,7 +86,7 @@ class ModReport extends FRegistry
         $this->items["id_report"] = $this->id_report;
         $this->items["report_num"] = $this->report_num;
         $this->items["report_date"] = $this->report_date;
-        $this->items["process_deviats"] = $this->process_deviats;
+        $this->items["process_deviations"] = $this->process_deviations;
         $this->items["process_notes"] = $this->process_notes;
         $this->items["reissue"] = $this->reissue;
         $this->items["is_system"] = $this->is_system;
@@ -116,7 +116,7 @@ class ModReport extends FRegistry
         $this->items["ts_user_upd"] = $this->ts_user_upd;
 
         $this->report_num->setRangeLength(1, 25);
-        $this->process_deviats->setRangeLength(0, 500);
+        $this->process_deviations->setRangeLength(0, 500);
         $this->process_notes->setRangeLength(0, 500);
 
         $this->clearChildReportTests();
@@ -182,7 +182,7 @@ class ModReport extends FRegistry
             $this->id_report->setValue($row["id_report"]);
             $this->report_num->setValue($row["report_num"]);
             $this->report_date->setValue($row["report_date"]);
-            $this->process_deviats->setValue($row["process_deviats"]);
+            $this->process_deviations->setValue($row["process_deviations"]);
             $this->process_notes->setValue($row["process_notes"]);
             $this->reissue->setValue($row["reissue"]);
             $this->is_system->setValue($row["is_system"]);
@@ -253,7 +253,7 @@ class ModReport extends FRegistry
                 "id_report, " .
                 "report_num, " .
                 "report_date, " .
-                "process_deviats, " .
+                "process_deviations, " .
                 "process_notes, " .
                 "reissue, " .
                 "is_system, " .
@@ -285,7 +285,7 @@ class ModReport extends FRegistry
                 "0, " .
                 ":report_num, " .
                 ":report_date, " .
-                ":process_deviats, " .
+                ":process_deviations, " .
                 ":process_notes, " .
                 ":reissue, " .
                 ":is_system, " .
@@ -318,7 +318,7 @@ class ModReport extends FRegistry
             $statement = $userSession->getPdo()->prepare("UPDATE $this->tableName SET " .
                 "report_num = :report_num, " .
                 "report_date = :report_date, " .
-                "process_deviats = :process_deviats, " .
+                "process_deviations = :process_deviations, " .
                 "process_notes = :process_notes, " .
                 "reissue = :reissue, " .
                 "is_system = :is_system, " .
@@ -352,7 +352,7 @@ class ModReport extends FRegistry
         //$id_report = $this->id_report->getValue();
         $report_num = $this->report_num->getValue();
         $report_date = FLibUtils::formatStdDate($this->report_date->getValue());
-        $process_deviats = $this->process_deviats->getValue();
+        $process_deviations = $this->process_deviations->getValue();
         $process_notes = $this->process_notes->getValue();
         $reissue = $this->reissue->getValue();
         $is_system = $this->is_system->getValue();
@@ -386,7 +386,7 @@ class ModReport extends FRegistry
         //$statement->bindParam(":id_report", $id_report, \PDO::PARAM_INT);
         $statement->bindParam(":report_num", $report_num);
         $statement->bindParam(":report_date", $report_date);
-        $statement->bindParam(":process_deviats", $process_deviats);
+        $statement->bindParam(":process_deviations", $process_deviations);
         $statement->bindParam(":process_notes", $process_notes);
         $statement->bindParam(":reissue", $reissue, \PDO::PARAM_INT);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);

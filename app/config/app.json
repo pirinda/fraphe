@@ -1,7 +1,7 @@
 {
   "appName":"AALIMS 1.0",
   "appVendor":"CEDIMI",
-  "appMode":"PROD",
+  "appMode":"DEV",
   "appCatalogs":["catalogs"],
   "dbHost":"localhost",
   "dbPort":"3306",

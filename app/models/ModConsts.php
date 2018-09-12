@@ -108,4 +108,6 @@ abstract class ModConsts
     public const OC_REPORT_STATUS_DELIVERED = 7;
     public const OC_REPORT_STATUS_CANCELLED = 9;
 
+    public const OC_RESULT_PERMISS_LIMIT_NA = 1;
+    public const OC_RESULT_PERMISS_LIMIT_CUSTOMER = 2;
 }

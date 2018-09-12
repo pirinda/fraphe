@@ -49,7 +49,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
         $data["report_num"] = $_POST["report_num"];
         $data["report_date"] = $_POST["report_date"];
-        $data["process_deviats"] = $_POST["process_deviats"];
+        $data["process_deviations"] = $_POST["process_deviations"];
         $data["process_notes"] = $_POST["process_notes"];
 
         try {
@@ -121,7 +121,7 @@ echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">Referencias</div>';
 echo '<div class="panel-body">';
 
-echo $report->getItem("process_deviats")->composeHtmlTextArea(4, 8, 3);
+echo $report->getItem("process_deviations")->composeHtmlTextArea(4, 8, 3);
 echo $report->getItem("process_notes")->composeHtmlTextArea(4, 8, 3);
 
 echo '</div>';  //echo '<div class="panel-body">';

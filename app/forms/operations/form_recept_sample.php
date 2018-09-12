@@ -86,7 +86,8 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $data["sampling_temperat_n"] = null;
             $data["sampling_area"] = "";
             $data["sampling_guide"] = 0;
-            $data["sampling_deviats"] = "";
+            $data["sampling_conditions"] = "";
+            $data["sampling_deviations"] = "";
             $data["sampling_notes"] = "";
             //$data["sampling_imgs"] = $_POST["sampling_imgs"];
             $data["fk_sampling_method"] = ModConsts::OC_SAMPLING_METHOD_CUSTOMER;
@@ -101,7 +102,8 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $data["sampling_temperat_n"] = floatval($_POST["sampling_temperat_n"]);
             $data["sampling_area"] = $_POST["sampling_area"];
             $data["sampling_guide"] = intval($_POST["sampling_guide"]);
-            $data["sampling_deviats"] = $_POST["sampling_deviats"];
+            $data["sampling_conditions"] = $_POST["sampling_conditions"];
+            $data["sampling_deviations"] = $_POST["sampling_deviations"];
             $data["sampling_notes"] = $_POST["sampling_notes"];
             //$data["sampling_imgs"] = $_POST["sampling_imgs"];
             $data["fk_sampling_method"] = intval($_POST["fk_sampling_method"]);
@@ -113,7 +115,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         //$data["recept_sample"] = $_POST["recept_sample"];
         //$data["recept_datetime_n"] = $_POST["recept_datetime_n"];
         $data["recept_temperat_n"] = floatval($_POST["recept_temperat_n"]);
-        $data["recept_deviats"] = $_POST["recept_deviats"];
+        $data["recept_deviations"] = $_POST["recept_deviations"];
         $data["recept_notes"] = $_POST["recept_notes"];
         $data["service_type"] = $_POST["service_type"];
         //$data["process_days"] = $_POST["process_days"];
@@ -315,8 +317,9 @@ echo $sample->getItem("nk_sampling_equipt_2")->composeHtmlSelect($options, 4, 8)
 $options = AppUtils::getSelectOptions($userSession, AppConsts::OC_SAMPLING_EQUIPT, $sample->getDatum("nk_sampling_equipt_3"));
 echo $sample->getItem("nk_sampling_equipt_3")->composeHtmlSelect($options, 4, 8);
 
+echo $sample->getItem("sampling_conditions")->composeHtmlTextArea(4, 8, 1);
+echo $sample->getItem("sampling_deviations")->composeHtmlTextArea(4, 8, 1);
 echo $sample->getItem("sampling_notes")->composeHtmlTextArea(4, 8, 1);
-echo $sample->getItem("sampling_deviats")->composeHtmlTextArea(4, 8, 1);
 
 $params = array();
 $params["id_user_role"] = ModConsts::CC_USER_ROLE_SAMPLING;
@@ -361,8 +364,8 @@ echo '<label class="radio-inline small"><input type="radio" name="service_type" 
 echo '</div>';
 echo '</div>';
 
+echo $sample->getItem("recept_deviations")->composeHtmlTextArea(4, 8, 1);
 echo $sample->getItem("recept_notes")->composeHtmlTextArea(4, 8, 1);
-echo $sample->getItem("recept_deviats")->composeHtmlTextArea(4, 8, 1);
 
 $params = array();
 $params["id_user_role"] = ModConsts::CC_USER_ROLE_RECEPT;
@@ -484,7 +487,7 @@ function changedCustomerCustom(element) {
 }
 
 function changedSamplingCompany(element) {
-    var inputs = ["sampling_datetime_n", "sampling_area", "sampling_temperat_n", "sampling_guide", "sampling_notes", "sampling_deviats"];
+    var inputs = ["sampling_datetime_n", "sampling_area", "sampling_temperat_n", "sampling_guide", "sampling_conditions", "sampling_deviations", "sampling_notes"];
     var selects = ["fk_sampling_method", "nk_sampling_equipt_1", "nk_sampling_equipt_2", "nk_sampling_equipt_3", "fk_user_sampler"];
     if (element.checked) {
         for (var input of inputs) {

@@ -34,6 +34,7 @@ abstract class AppUtils
             case AppConsts::OC_SAMPLING_METHOD:
             case AppConsts::OC_TESTING_METHOD:
             case AppConsts::OC_CONTAINER_TYPE:
+            case AppConsts::OC_RESULT_PERMISS_LIMIT:
                 $sql = "SELECT $tableId AS _val, name AS _opt FROM $table WHERE NOT is_deleted ORDER BY name, $tableId;";
                 break;
 

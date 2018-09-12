@@ -150,7 +150,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
                     $data["report_num"] = $sample->getDatum("sample_num");
                     $data["report_date"] = $recept->getDatum("recept_datetime");
-                    $data["process_deviats"] = "";
+                    $data["process_deviations"] = "";
                     $data["process_notes"] = "";
                     $data["reissue"] = 0;
                     //$data["is_system"] = ?;
@@ -172,12 +172,14 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
                         //$data["report_test"] = ?;
                         $data["result"] = "";
+                        $data["uncertainty"] = "";
                         //$data["is_system"] = ?;
                         //$data["is_deleted"] = ?;
                         //$data["fk_report"] = ?;
                         $data["fk_test"] = $sampleTest->getDatum("fk_test");
                         //$data["fk_job_test"] = ?;
                         $data["fk_sample_test"] = $sampleTest->getId();
+                        $data["fk_result_permiss_limit"] = ModConsts::OC_RESULT_PERMISS_LIMIT_NA;
                         $data["nk_result_unit"] = null;
                         $reportTest = new ModReportTest();
                         $reportTest->setData($data);

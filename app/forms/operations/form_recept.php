@@ -58,7 +58,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         //$data["process_start_date"] = $_POST["process_start_date"];
         //$data["process_deadline"] = $_POST["process_deadline"];
         //$data["recept_deadline"] = $_POST["recept_deadline"];
-        $data["recept_deviats"] = $_POST["recept_deviats"];
+        $data["recept_deviations"] = $_POST["recept_deviations"];
         $data["recept_notes"] = $_POST["recept_notes"];
         $data["service_type"] = $_POST["service_type"];
         $data["ref_chain_custody"] = $_POST["ref_chain_custody"];
@@ -142,7 +142,7 @@ echo '<label class="radio-inline small"><input type="radio" name="service_type" 
 echo '</div>';
 echo '</div>';
 
-echo $recept->getItem("recept_deviats")->composeHtmlTextArea(4, 8, 1);
+echo $recept->getItem("recept_deviations")->composeHtmlTextArea(4, 8, 1);
 echo $recept->getItem("recept_notes")->composeHtmlTextArea(4, 8, 1);
 
 $params = array();

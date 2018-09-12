@@ -28,13 +28,14 @@ class ModSample extends FRegistry
     protected $sampling_temperat_n;
     protected $sampling_area;
     protected $sampling_guide;
-    protected $sampling_deviats;
+    protected $sampling_conditions;
+    protected $sampling_deviations;
     protected $sampling_notes;
     protected $sampling_imgs;
     protected $recept_sample;
     protected $recept_datetime_n;
     protected $recept_temperat_n;
-    protected $recept_deviats;
+    protected $recept_deviations;
     protected $recept_notes;
     protected $service_type;
     protected $process_days;
@@ -110,13 +111,14 @@ class ModSample extends FRegistry
         $this->sampling_temperat_n = new FItem(FItem::DATA_TYPE_FLOAT, "sampling_temperat_n", "Temp. muestreo °C", "", false);
         $this->sampling_area = new FItem(FItem::DATA_TYPE_STRING, "sampling_area", "Área muestreo", "", true);
         $this->sampling_guide = new FItem(FItem::DATA_TYPE_INT, "sampling_guide", "Núm. guía muestreo", "", false);
-        $this->sampling_deviats = new FItem(FItem::DATA_TYPE_STRING, "sampling_deviats", "Desviaciones muestreo", "", false);
+        $this->sampling_conditions = new FItem(FItem::DATA_TYPE_STRING, "sampling_conditions", "Condiciones muestreo", "", false);
+        $this->sampling_deviations = new FItem(FItem::DATA_TYPE_STRING, "sampling_deviations", "Desviaciones muestreo", "", false);
         $this->sampling_notes = new FItem(FItem::DATA_TYPE_STRING, "sampling_notes", "Observaciones muestreo", "", false);
         $this->sampling_imgs = new FItem(FItem::DATA_TYPE_INT, "sampling_imgs", "Imágenes muestreo", "", false);
         $this->recept_sample = new FItem(FItem::DATA_TYPE_INT, "recept_sample", "Núm. muestra recepción", "", false);
         $this->recept_datetime_n = new FItem(FItem::DATA_TYPE_DATETIME, "recept_datetime_n", "Fecha-hr recepción", "aaaa-mm-ddTHH:mm", false);
         $this->recept_temperat_n = new FItem(FItem::DATA_TYPE_FLOAT, "recept_temperat_n", "Temp. recepción °C", "", false);
-        $this->recept_deviats = new FItem(FItem::DATA_TYPE_STRING, "recept_deviats", "Desviaciones recepción", "", false);
+        $this->recept_deviations = new FItem(FItem::DATA_TYPE_STRING, "recept_deviations", "Desviaciones recepción", "", false);
         $this->recept_notes = new FItem(FItem::DATA_TYPE_STRING, "recept_notes", "Observaciones recepción", "", false);
         $this->service_type = new FItem(FItem::DATA_TYPE_STRING, "service_type", "Tipo servicio", "", true);
         $this->process_days = new FItem(FItem::DATA_TYPE_INT, "process_days", "Días proceso", "", false);
@@ -178,13 +180,14 @@ class ModSample extends FRegistry
         $this->items["sampling_temperat_n"] = $this->sampling_temperat_n;
         $this->items["sampling_area"] = $this->sampling_area;
         $this->items["sampling_guide"] = $this->sampling_guide;
-        $this->items["sampling_deviats"] = $this->sampling_deviats;
+        $this->items["sampling_conditions"] = $this->sampling_conditions;
+        $this->items["sampling_deviations"] = $this->sampling_deviations;
         $this->items["sampling_notes"] = $this->sampling_notes;
         $this->items["sampling_imgs"] = $this->sampling_imgs;
         $this->items["recept_sample"] = $this->recept_sample;
         $this->items["recept_datetime_n"] = $this->recept_datetime_n;
         $this->items["recept_temperat_n"] = $this->recept_temperat_n;
-        $this->items["recept_deviats"] = $this->recept_deviats;
+        $this->items["recept_deviations"] = $this->recept_deviations;
         $this->items["recept_notes"] = $this->recept_notes;
         $this->items["service_type"] = $this->service_type;
         $this->items["process_days"] = $this->process_days;
@@ -236,9 +239,10 @@ class ModSample extends FRegistry
         $this->sample_lot->setRangeLength(0, 50);
         $this->sample_released->setRangeLength(0, 1);
         $this->sampling_area->setRangeLength(1, 100);
-        $this->sampling_deviats->setRangeLength(0, 500);
+        $this->sampling_conditions->setRangeLength(0, 100);
+        $this->sampling_deviations->setRangeLength(0, 500);
         $this->sampling_notes->setRangeLength(0, 500);
-        $this->recept_deviats->setRangeLength(0, 500);
+        $this->recept_deviations->setRangeLength(0, 500);
         $this->recept_notes->setRangeLength(0, 500);
         $this->service_type->setRangeLength(1, 1);
         $this->customer_name->setRangeLength(1, 201);
@@ -526,13 +530,14 @@ class ModSample extends FRegistry
             $this->sampling_temperat_n->setValue($row["sampling_temperat_n"]);
             $this->sampling_area->setValue($row["sampling_area"]);
             $this->sampling_guide->setValue($row["sampling_guide"]);
-            $this->sampling_deviats->setValue($row["sampling_deviats"]);
+            $this->sampling_conditions->setValue($row["sampling_conditions"]);
+            $this->sampling_deviations->setValue($row["sampling_deviations"]);
             $this->sampling_notes->setValue($row["sampling_notes"]);
             $this->sampling_imgs->setValue($row["sampling_imgs"]);
             $this->recept_sample->setValue($row["recept_sample"]);
             $this->recept_datetime_n->setValue($row["recept_datetime_n"]);
             $this->recept_temperat_n->setValue($row["recept_temperat_n"]);
-            $this->recept_deviats->setValue($row["recept_deviats"]);
+            $this->recept_deviations->setValue($row["recept_deviations"]);
             $this->recept_notes->setValue($row["recept_notes"]);
             $this->service_type->setValue($row["service_type"]);
             $this->process_days->setValue($row["process_days"]);
@@ -644,13 +649,14 @@ class ModSample extends FRegistry
                 "sampling_temperat_n, " .
                 "sampling_area, " .
                 "sampling_guide, " .
-                "sampling_deviats, " .
+                "sampling_conditions, " .
+                "sampling_deviations, " .
                 "sampling_notes, " .
                 "sampling_imgs, " .
                 "recept_sample, " .
                 "recept_datetime_n, " .
                 "recept_temperat_n, " .
-                "recept_deviats, " .
+                "recept_deviations, " .
                 "recept_notes, " .
                 "service_type, " .
                 "process_days, " .
@@ -712,13 +718,14 @@ class ModSample extends FRegistry
                 ":sampling_temperat_n, " .
                 ":sampling_area, " .
                 ":sampling_guide, " .
-                ":sampling_deviats, " .
+                ":sampling_conditions, " .
+                ":sampling_deviations, " .
                 ":sampling_notes, " .
                 ":sampling_imgs, " .
                 ":recept_sample, " .
                 ":recept_datetime_n, " .
                 ":recept_temperat_n, " .
-                ":recept_deviats, " .
+                ":recept_deviations, " .
                 ":recept_notes, " .
                 ":service_type, " .
                 ":process_days, " .
@@ -781,13 +788,14 @@ class ModSample extends FRegistry
                 "sampling_temperat_n = :sampling_temperat_n, " .
                 "sampling_area = :sampling_area, " .
                 "sampling_guide = :sampling_guide, " .
-                "sampling_deviats = :sampling_deviats, " .
+                "sampling_conditions = :sampling_conditions, " .
+                "sampling_deviations = :sampling_deviations, " .
                 "sampling_notes = :sampling_notes, " .
                 "sampling_imgs = :sampling_imgs, " .
                 "recept_sample = :recept_sample, " .
                 "recept_datetime_n = :recept_datetime_n, " .
                 "recept_temperat_n = :recept_temperat_n, " .
-                "recept_deviats = :recept_deviats, " .
+                "recept_deviations = :recept_deviations, " .
                 "recept_notes = :recept_notes, " .
                 "service_type = :service_type, " .
                 "process_days = :process_days, " .
@@ -851,13 +859,14 @@ class ModSample extends FRegistry
         $sampling_temperat_n = $this->sampling_temperat_n->getValue();
         $sampling_area = $this->sampling_area->getValue();
         $sampling_guide = $this->sampling_guide->getValue();
-        $sampling_deviats = $this->sampling_deviats->getValue();
+        $sampling_conditions = $this->sampling_conditions->getValue();
+        $sampling_deviations = $this->sampling_deviations->getValue();
         $sampling_notes = $this->sampling_notes->getValue();
         $sampling_imgs = $this->sampling_imgs->getValue();
         $recept_sample = $this->recept_sample->getValue();
         $recept_datetime_n = empty($this->recept_datetime_n->getValue()) ? "" : FLibUtils::formatStdDatetime($this->recept_datetime_n->getValue());
         $recept_temperat_n = $this->recept_temperat_n->getValue();
-        $recept_deviats = $this->recept_deviats->getValue();
+        $recept_deviations = $this->recept_deviations->getValue();
         $recept_notes = $this->recept_notes->getValue();
         $service_type = $this->service_type->getValue();
         $process_days = $this->process_days->getValue();
@@ -941,7 +950,8 @@ class ModSample extends FRegistry
         }
         $statement->bindParam(":sampling_area", $sampling_area);
         $statement->bindParam(":sampling_guide", $sampling_guide, \PDO::PARAM_INT);
-        $statement->bindParam(":sampling_deviats", $sampling_deviats);
+        $statement->bindParam(":sampling_conditions", $sampling_conditions);
+        $statement->bindParam(":sampling_deviations", $sampling_deviations);
         $statement->bindParam(":sampling_notes", $sampling_notes);
         $statement->bindParam(":sampling_imgs", $sampling_imgs, \PDO::PARAM_INT);
         $statement->bindParam(":recept_sample", $recept_sample, \PDO::PARAM_INT);
@@ -957,7 +967,7 @@ class ModSample extends FRegistry
         else {
             $statement->bindParam(":recept_temperat_n", $recept_temperat_n);
         }
-        $statement->bindParam(":recept_deviats", $recept_deviats);
+        $statement->bindParam(":recept_deviations", $recept_deviations);
         $statement->bindParam(":recept_notes", $recept_notes);
         $statement->bindParam(":service_type", $service_type);
         $statement->bindParam(":process_days", $process_days, \PDO::PARAM_INT);
@@ -1118,7 +1128,7 @@ class ModSample extends FRegistry
         if ($this->orig_fk_sample_status != $this->fk_sample_status->getValue()) {
             $data = array();
             $data["status_datetime"] = time();
-            $data["status_temperat_n"] = $this->status_temperat_n->getValue();
+            $data["status_temperat_n"] = !isset($this->status_temperat_n) ? null : $this->status_temperat_n->getValue();
             $data["status_notes"] = "";
             $data["is_system"] = true;
             //$data["is_deleted"] = ?;
@@ -1126,7 +1136,7 @@ class ModSample extends FRegistry
             $data["fk_sample_status"] = $this->fk_sample_status->getValue();
             $data["fk_user_status"] = $fk_user;
 
-            $entry = new ModJobStatusLog();
+            $entry = new ModSampleStatusLog();
             $this->childSampleStatusLogs[] = $entry; // append entry
             $entry->setData($data);
             $entry->save($userSession);

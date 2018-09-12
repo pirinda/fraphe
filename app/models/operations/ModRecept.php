@@ -22,7 +22,7 @@ class ModRecept extends FRegistry
     protected $process_start_date;
     protected $process_deadline;
     protected $recept_deadline;
-    protected $recept_deviats;
+    protected $recept_deviations;
     protected $recept_notes;
     protected $service_type;
     protected $ref_chain_custody;
@@ -55,7 +55,7 @@ class ModRecept extends FRegistry
         $this->process_start_date = new FItem(FItem::DATA_TYPE_DATE, "process_start_date", "Fecha inicio proceso", "", true);
         $this->process_deadline = new FItem(FItem::DATA_TYPE_DATE, "process_deadline", "Fecha límite proceso", "", true);
         $this->recept_deadline = new FItem(FItem::DATA_TYPE_DATE, "recept_deadline", "Fecha límite recepción", "", true);
-        $this->recept_deviats = new FItem(FItem::DATA_TYPE_STRING, "recept_deviats", "Desviaciones recepción", "", false);
+        $this->recept_deviations = new FItem(FItem::DATA_TYPE_STRING, "recept_deviations", "Desviaciones recepción", "", false);
         $this->recept_notes = new FItem(FItem::DATA_TYPE_STRING, "recept_notes", "Observaciones recepción", "", false);
         $this->service_type = new FItem(FItem::DATA_TYPE_STRING, "service_type", "Tipo servicio", "", true);
         $this->ref_chain_custody = new FItem(FItem::DATA_TYPE_STRING, "ref_chain_custody", "Ref. cadena custodia", "", false);
@@ -79,7 +79,7 @@ class ModRecept extends FRegistry
         $this->items["process_start_date"] = $this->process_start_date;
         $this->items["process_deadline"] = $this->process_deadline;
         $this->items["recept_deadline"] = $this->recept_deadline;
-        $this->items["recept_deviats"] = $this->recept_deviats;
+        $this->items["recept_deviations"] = $this->recept_deviations;
         $this->items["recept_notes"] = $this->recept_notes;
         $this->items["service_type"] = $this->service_type;
         $this->items["ref_chain_custody"] = $this->ref_chain_custody;
@@ -97,7 +97,7 @@ class ModRecept extends FRegistry
         $this->items["ts_user_upd"] = $this->ts_user_upd;
 
         $this->recept_num->setRangeLength(1, 25);
-        $this->recept_deviats->setRangeLength(0, 500);
+        $this->recept_deviations->setRangeLength(0, 500);
         $this->recept_notes->setRangeLength(0, 500);
         $this->service_type->setRangeLength(1, 1);
         $this->ref_chain_custody->setRangeLength(0, 25);
@@ -228,7 +228,7 @@ class ModRecept extends FRegistry
         $data = array();
 
         $data["recept_datetime_n"] = $this->recept_datetime->getValue();
-        $data["recept_deviats"] = $this->recept_deviats->getValue();
+        $data["recept_deviations"] = $this->recept_deviations->getValue();
         $data["recept_notes"] = $this->recept_notes->getValue();
         $data["service_type"] = $this->service_type->getValue();
         $data["process_start_date"] = $this->process_start_date->getValue();
@@ -296,7 +296,7 @@ class ModRecept extends FRegistry
             $this->process_start_date->setValue($row["process_start_date"]);
             $this->process_deadline->setValue($row["process_deadline"]);
             $this->recept_deadline->setValue($row["recept_deadline"]);
-            $this->recept_deviats->setValue($row["recept_deviats"]);
+            $this->recept_deviations->setValue($row["recept_deviations"]);
             $this->recept_notes->setValue($row["recept_notes"]);
             $this->service_type->setValue($row["service_type"]);
             $this->ref_chain_custody->setValue($row["ref_chain_custody"]);
@@ -351,7 +351,7 @@ class ModRecept extends FRegistry
                 "process_start_date, " .
                 "process_deadline, " .
                 "recept_deadline, " .
-                "recept_deviats, " .
+                "recept_deviations, " .
                 "recept_notes, " .
                 "service_type, " .
                 "ref_chain_custody, " .
@@ -375,7 +375,7 @@ class ModRecept extends FRegistry
                 ":process_start_date, " .
                 ":process_deadline, " .
                 ":recept_deadline, " .
-                ":recept_deviats, " .
+                ":recept_deviations, " .
                 ":recept_notes, " .
                 ":service_type, " .
                 ":ref_chain_custody, " .
@@ -400,7 +400,7 @@ class ModRecept extends FRegistry
                 "process_start_date = :process_start_date, " .
                 "process_deadline = :process_deadline, " .
                 "recept_deadline = :recept_deadline, " .
-                "recept_deviats = :recept_deviats, " .
+                "recept_deviations = :recept_deviations, " .
                 "recept_notes = :recept_notes, " .
                 "service_type = :service_type, " .
                 "ref_chain_custody = :ref_chain_custody, " .
@@ -426,7 +426,7 @@ class ModRecept extends FRegistry
         $process_start_date = FLibUtils::formatStdDate($this->process_start_date->getValue());
         $process_deadline = FLibUtils::formatStdDate($this->process_deadline->getValue());
         $recept_deadline = FLibUtils::formatStdDate($this->recept_deadline->getValue());
-        $recept_deviats = $this->recept_deviats->getValue();
+        $recept_deviations = $this->recept_deviations->getValue();
         $recept_notes = $this->recept_notes->getValue();
         $service_type = $this->service_type->getValue();
         $ref_chain_custody = $this->ref_chain_custody->getValue();
@@ -452,7 +452,7 @@ class ModRecept extends FRegistry
         $statement->bindParam(":process_start_date", $process_start_date);
         $statement->bindParam(":process_deadline", $process_deadline);
         $statement->bindParam(":recept_deadline", $recept_deadline);
-        $statement->bindParam(":recept_deviats", $recept_deviats);
+        $statement->bindParam(":recept_deviations", $recept_deviations);
         $statement->bindParam(":recept_notes", $recept_notes);
         $statement->bindParam(":service_type", $service_type);
         $statement->bindParam(":ref_chain_custody", $ref_chain_custody);
