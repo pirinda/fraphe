@@ -10,7 +10,7 @@ use app\AppConsts;
 
 class ModSamplingImage extends FRegistry
 {
-    public const PATH_IMG = "../../img/sample/";
+    public const PATH_IMG = "../../images/sample/";
 
     protected $id_sampling_img;
     protected $sampling_img;

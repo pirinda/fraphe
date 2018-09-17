@@ -46,7 +46,7 @@ echo '</div>';
 
 echo '<div class="row">';
 echo '<div class="col-sm-2"><b>' . $sample->getItem("sample_name")->getName() . ':</b></div>';
-echo '<div class="col-sm-3">' . $sample->getDatum("sample_name") . '</div>';
+echo '<div class="col-sm-3"><mark>' . $sample->getDatum("sample_name") . '</mark></div>';
 echo '<div class="col-sm-2"><b>' . $sample->getItem("sample_quantity")->getName() . ':</b></div>';
 echo '<div class="col-sm-2">' . $sample->getDatum("sample_quantity") . ' ' . AppUtils::readField($userSession, "code", AppConsts::OC_CONTAINER_UNIT, $sample->getDatum("fk_container_unit")) . '</div>';
 echo '<div class="col-sm-2"><b>' . $sample->getItem("sample_lot")->getName() . ':</b></div>';

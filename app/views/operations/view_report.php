@@ -135,6 +135,7 @@ foreach ($pdo->query($sql) as $row) {
     echo '<td><nobr>';
     echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_report.php?id=' . $row['id_report'] . '" class="btn btn-success btn-xs" role="button"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;';
     echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_report_tests.php?id=' . $row['id_report'] . '" class="btn btn-warning btn-xs" role="button"><span class="glyphicon glyphicon-file"></span></a>&nbsp;';
+    echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/reports/operations/report.php?id=' . $row['id_report'] . '" class="btn btn-default btn-xs" role="button"><span class="glyphicon glyphicon-print"></span></a>&nbsp;';
     echo '<a href="#" class="btn btn-danger btn-xs" role="button"><span class="glyphicon glyphicon-ban-circle"></span></a>';
     echo '</nobr></td>';
     echo '</tr>';

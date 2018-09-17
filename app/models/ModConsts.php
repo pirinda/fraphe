@@ -63,13 +63,14 @@ abstract class ModConsts
     public const CC_CONTACT_TYPE_BILL = 9;
     public const CC_CONTACT_TYPE_COLL = 10;
 
-    public const CC_USER_ROLE_RECEPT = 1;
+    public const CC_USER_ROLE_ADMIN = 1;
     public const CC_USER_ROLE_SAMPLING = 2;
-    public const CC_USER_ROLE_PROCESS = 3;
-    public const CC_USER_ROLE_REPORT = 4;
-    public const CC_USER_ROLE_QUALITY = 5;
-    public const CC_USER_ROLE_MARKETING = 6;
-    public const CC_USER_ROLE_DIRECTION = 7;
+    public const CC_USER_ROLE_RECEPT = 3;
+    public const CC_USER_ROLE_PROCESS = 4;
+    public const CC_USER_ROLE_REPORT = 5;
+    public const CC_USER_ROLE_QUALITY = 6;
+    public const CC_USER_ROLE_MARKETING = 7;
+    public const CC_USER_ROLE_DIRECTION = 8;
 
     public const CC_USER_ATTRIB_SIGN_SAMPLING = 1;
     public const CC_USER_ATTRIB_SIGN_PROCESSING = 2;

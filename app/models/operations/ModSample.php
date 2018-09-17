@@ -393,6 +393,46 @@ class ModSample extends FRegistry
         $this->auxChildReport = $report;
     }
 
+    public function composeCustomerAddress(): string
+    {
+        $customer_street = $this->customer_street->getValue();
+        $customer_district = $this->customer_district->getValue();
+        $customer_postcode = $this->customer_postcode->getValue();
+        $customer_reference = $this->customer_reference->getValue();
+        $customer_city = $this->customer_city->getValue();
+        $customer_county = $this->customer_county->getValue();
+        $customer_state_region = $this->customer_state_region->getValue();
+        $customer_country = $this->customer_country->getValue();
+
+        $address = "";
+        if (!empty($street)) {
+            $address .= (empty($address) ? "" : ", ") . $customer_street;
+        }
+        if (!empty($district)) {
+            $address .= (empty($address) ? "" : ", ") . $customer_district;
+        }
+        if (!empty($postcode)) {
+            $address .= (empty($address) ? "" : ", ") . $customer_postcode;
+        }
+        if (!empty($reference)) {
+            $address .= (empty($address) ? "" : ", ") . $customer_reference;
+        }
+        if (!empty($city)) {
+            $address .= (empty($address) ? "" : ", ") . $customer_city;
+        }
+        if (!empty($county)) {
+            $address .= (empty($address) ? "" : ", ") . $customer_county;
+        }
+        if (!empty($state_region)) {
+            $address .= (empty($address) ? "" : ", ") . $customer_state_region;
+        }
+        if (!empty($country)) {
+            $address .= (empty($address) ? "" : ", ") . $customer_country;
+        }
+
+        return $address;
+    }
+
     /** Overriden method.
      */
     public function forceRegistryNew()

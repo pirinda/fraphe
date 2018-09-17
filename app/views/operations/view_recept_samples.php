@@ -68,7 +68,7 @@ echo '</div>';
 echo '</div>';
 //------------------------------------------------------------------------------
 
-echo '<h4>Muestras</h4>';
+echo '<h4>Muestras de la recepción de muestras</h4>';
 
 echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?recept=' . $recept->getId() . '" class="btn btn-primary btn-sm" role="button">Crear</a>&nbsp;';
 echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept.php?" class="btn btn-danger btn-sm" role="button">Volver</a>';
