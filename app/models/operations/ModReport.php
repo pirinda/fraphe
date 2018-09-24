@@ -23,6 +23,7 @@ class ModReport extends FRegistry
     protected $fk_sample;
     protected $fk_recept;
     protected $fk_report_delivery_type;
+    protected $fk_result_permiss_limit;
     protected $nk_report_reissue_cause;
     protected $fk_report_status;
     protected $fk_user_finish;
@@ -64,6 +65,7 @@ class ModReport extends FRegistry
         $this->fk_sample = new FItem(FItem::DATA_TYPE_INT, "fk_sample", "Muestra", "", true);
         $this->fk_recept = new FItem(FItem::DATA_TYPE_INT, "fk_recept", "Recepción", "", true);
         $this->fk_report_delivery_type = new FItem(FItem::DATA_TYPE_INT, "fk_report_delivery_type", "Tipo entrega IR", "", true);
+        $this->fk_result_permiss_limit = new FItem(FItem::DATA_TYPE_INT, "fk_result_permiss_limit", "Límites permisibles", "", true);
         $this->nk_report_reissue_cause = new FItem(FItem::DATA_TYPE_INT, "nk_report_reissue_cause", "Causa reemisión IR", "", false);
         $this->fk_report_status = new FItem(FItem::DATA_TYPE_INT, "fk_report_status", "Estatus IR", "", true);
         $this->fk_user_finish = new FItem(FItem::DATA_TYPE_INT, "fk_user_finish", "Usuario terminación", "", false);
@@ -96,6 +98,7 @@ class ModReport extends FRegistry
         $this->items["fk_sample"] = $this->fk_sample;
         $this->items["fk_recept"] = $this->fk_recept;
         $this->items["fk_report_delivery_type"] = $this->fk_report_delivery_type;
+        $this->items["fk_result_permiss_limit"] = $this->fk_result_permiss_limit;
         $this->items["nk_report_reissue_cause"] = $this->nk_report_reissue_cause;
         $this->items["fk_report_status"] = $this->fk_report_status;
         $this->items["fk_user_finish"] = $this->fk_user_finish;
@@ -192,6 +195,7 @@ class ModReport extends FRegistry
             $this->fk_sample->setValue($row["fk_sample"]);
             $this->fk_recept->setValue($row["fk_recept"]);
             $this->fk_report_delivery_type->setValue($row["fk_report_delivery_type"]);
+            $this->fk_result_permiss_limit->setValue($row["fk_result_permiss_limit"]);
             $this->nk_report_reissue_cause->setValue($row["nk_report_reissue_cause"]);
             $this->fk_report_status->setValue($row["fk_report_status"]);
             $this->fk_user_finish->setValue($row["fk_user_finish"]);
@@ -263,6 +267,7 @@ class ModReport extends FRegistry
                 "fk_sample, " .
                 "fk_recept, " .
                 "fk_report_delivery_type, " .
+                "fk_result_permiss_limit, " .
                 "nk_report_reissue_cause, " .
                 "fk_report_status, " .
                 "fk_user_finish, " .
@@ -295,6 +300,7 @@ class ModReport extends FRegistry
                 ":fk_sample, " .
                 ":fk_recept, " .
                 ":fk_report_delivery_type, " .
+                ":fk_result_permiss_limit, " .
                 ":nk_report_reissue_cause, " .
                 ":fk_report_status, " .
                 "1, " .
@@ -328,6 +334,7 @@ class ModReport extends FRegistry
                 "fk_sample = :fk_sample, " .
                 "fk_recept = :fk_recept, " .
                 "fk_report_delivery_type = :fk_report_delivery_type, " .
+                "fk_result_permiss_limit = :fk_result_permiss_limit, " .
                 "nk_report_reissue_cause = :nk_report_reissue_cause, " .
                 "fk_report_status = :fk_report_status, " .
                 //"fk_user_finish = :fk_user_finish, " .
@@ -362,6 +369,7 @@ class ModReport extends FRegistry
         $fk_sample = $this->fk_sample->getValue();
         $fk_recept = $this->fk_recept->getValue();
         $fk_report_delivery_type = $this->fk_report_delivery_type->getValue();
+        $fk_result_permiss_limit = $this->fk_result_permiss_limit->getValue();
         $nk_report_reissue_cause = $this->nk_report_reissue_cause->getValue();
         $fk_report_status = $this->fk_report_status->getValue();
         $fk_user_finish = $this->fk_user_finish->getValue();
@@ -396,6 +404,7 @@ class ModReport extends FRegistry
         $statement->bindParam(":fk_sample", $fk_sample, \PDO::PARAM_INT);
         $statement->bindParam(":fk_recept", $fk_recept, \PDO::PARAM_INT);
         $statement->bindParam(":fk_report_delivery_type", $fk_report_delivery_type, \PDO::PARAM_INT);
+        $statement->bindParam(":fk_result_permiss_limit", $fk_result_permiss_limit, \PDO::PARAM_INT);
         if (empty($nk_report_reissue_cause)) {
             $statement->bindValue(":nk_report_reissue_cause", null, \PDO::PARAM_NULL);
         }

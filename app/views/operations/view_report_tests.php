@@ -95,15 +95,13 @@ echo '<h4>Ensayos del informe de resultados</h4>';
 echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_report.php" class="btn btn-danger btn-sm" role="button">Volver</a>';
 
 $sql = <<<SQL
-SELECT rt.report_test, rt.id_report_test, rt.result, rt.uncertainty,
+SELECT rt.report_test, rt.id_report_test, rt.result, rt.uncertainty, rt.permiss_limit,
 rt.ts_user_ins AS _ts_user_ins, rt.ts_user_upd AS _ts_user_upd,
 t.name AS _t_name,
 ru.code AS _ru_code,
-rpl.name AS _rpl_name,
 ui.name AS _ui_name, uu.name AS _uu_name
 FROM o_report_test AS rt
 INNER JOIN oc_test AS t ON rt.fk_test = t.id_test
-INNER JOIN oc_result_permiss_limit AS rpl ON rt.fk_result_permiss_limit = rpl.id_result_permiss_limit
 INNER JOIN cc_user AS ui ON rt.fk_user_ins = ui.id_user
 INNER JOIN cc_user AS uu ON rt.fk_user_upd = uu.id_user
 LEFT OUTER JOIN oc_result_unit AS ru ON rt.nk_result_unit = ru.id_result_unit
@@ -138,7 +136,7 @@ foreach ($pdo->query($sql) as $row) {
     echo '<td>' . $row['result'] . '</td>';
     echo '<td>' . $row['_ru_code'] . '</td>';
     echo '<td>' . $row['uncertainty'] . '</td>';
-    echo '<td>' . $row['_rpl_name'] . '</td>';
+    echo '<td>' . $row['permiss_limit'] . '</td>';
     echo '<td class="small">' . $row['_ui_name'] . '</td>';
     echo '<td class="small">' . $row['_ts_user_ins'] . '</td>';
     echo '<td class="small">' . $row['_uu_name'] . '</td>';

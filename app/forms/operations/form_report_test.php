@@ -52,7 +52,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
         $data["result"] = $_POST["result"];
         $data["uncertainty"] = $_POST["uncertainty"];
-        $data["fk_result_permiss_limit"] = $_POST["fk_result_permiss_limit"];
+        $data["permiss_limit"] = $_POST["permiss_limit"];
         $data["nk_result_unit"] = $_POST["nk_result_unit"];
 
         try {
@@ -168,8 +168,7 @@ echo $reportTest->getItem("nk_result_unit")->composeHtmlSelect($options, 2, 4);
 
 echo $reportTest->getItem("uncertainty")->composeHtmlInput(FItem::INPUT_TEXT, 2, 2);
 
-$options = AppUtils::getSelectOptions($userSession, AppConsts::OC_RESULT_PERMISS_LIMIT, $reportTest->getDatum("fk_result_permiss_limit"));
-echo $reportTest->getItem("fk_result_permiss_limit")->composeHtmlSelect($options, 2, 6);
+echo $reportTest->getItem("permiss_limit")->composeHtmlInput(FItem::INPUT_TEXT, 2, 6);
 
 echo '</div>';
 echo '</div>';

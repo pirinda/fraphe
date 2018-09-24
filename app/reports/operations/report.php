@@ -192,6 +192,9 @@ $pdf->writeHTMLCell(90, 5, '', '', $txt, 0, 1, false, 0, '', true);
 $txt = "<b>T° DE RECEPCIÓN: </b>" . (empty($sample->getDatum("recept_temperat_n")) ? "NE" : $sample->getDatum("recept_temperat_n") . "°");
 $pdf->writeHTMLCell(90, 5, '', '', $txt, 0, 1, false, 0, '', true);
 
+$txt = "<b>FECHA RECEPCIÓN: </b>" . (empty($sample->getDatum("recept_datetime_n")) ? "NE" : FLibUtils::formatStdDate($sample->getDatum("recept_datetime_n")));
+$pdf->writeHTMLCell(90, 5, '', '', $txt, 0, 1, false, 0, '', true);
+
 $txt = "<b>FECHA DE ANÁLISIS: </b>" . (empty($sample->getDatum("process_start_date")) ? "NE" : FLibUtils::formatStdDate($sample->getDatum("process_start_date")));
 $pdf->writeHTMLCell(90, 5, '', '', $txt, 0, 1, false, 0, '', true);
 
@@ -220,10 +223,14 @@ $txt = "<b>FECHA DEL MUESTREO: </b>" . (empty($sample->getDatum("sampling_dateti
 $pdf->writeHTMLCell(90, 5, 111, '', $txt, 0, 1, false, 0, '', true);
 
 $name = AppUtils::readField($userSession, "name", AppConsts::CC_USER, $sample->getDatum("fk_user_sampler"));
-$txt = "<b>MUESTREADOR: </b>" . ($name ? "NE" : $name);
+$txt = "<b>MUESTREADOR: </b>" . (empty($name) ? "NE" : $name);
 $pdf->writeHTMLCell(90, 5, 111, '', $txt, 0, 1, false, 0, '', true);
 
 $txt = "<b>LUGAR DE LA TOMA: </b>" . (empty($sample->getDatum("sampling_area")) ? "NE" : $sample->getDatum("sampling_area"));
+$pdf->writeHTMLCell(90, 5, 111, '', $txt, 0, 1, false, 0, '', true);
+
+$name = AppUtils::readField($userSession, "name", AppConsts::OC_SAMPLING_METHOD, $sample->getDatum("fk_sampling_method"));
+$txt = "<b>MÉTODO DE MUESTREO: </b>" . (empty($name) ? "NE" : $name);
 $pdf->writeHTMLCell(90, 5, 111, '', $txt, 0, 1, false, 0, '', true);
 
 $txt = "<b>N° DE GUÍA: </b>" . (empty($sample->getDatum("sampling_guide")) ? "NE" : $sample->getDatum("sampling_guide"));
@@ -232,7 +239,7 @@ $pdf->writeHTMLCell(90, 5, 111, '', $txt, 0, 1, false, 0, '', true);
 $name = "";
 for ($i = 1; $i <= 3; $i++) {
     if (!empty($sample->getDatum("nk_sampling_equipt_$i"))) {
-        $name = (empty($name) ? "" : ", ") . AppUtils::readField($userSession, "name", AppConsts::OC_SAMPLING_EQUIPT, $sample->getDatum("nk_sampling_equipt_$i"));
+        $name .= (empty($name) ? "" : ", ") . AppUtils::readField($userSession, "name", AppConsts::OC_SAMPLING_EQUIPT, $sample->getDatum("nk_sampling_equipt_$i"));
     }
 }
 
@@ -288,7 +295,6 @@ foreach ($report->getChildReportTests() as $reportTest) {
     $test = new ModTest();
     $test->read($userSession, $reportTest->getDatum("fk_test"), FRegistry::MODE_READ);
     $aa = AppUtils::readField($userSession, "code", AppConsts::OC_TEST_ACREDIT_ATTRIB, $test->getDatum("fk_test_acredit_attrib"));
-    $rpl = AppUtils::readField($userSession, "name", AppConsts::OC_RESULT_PERMISS_LIMIT, $reportTest->getDatum("fk_result_permiss_limit"));
 
     $txt = $aa;
     $pdf->MultiCell(10, 5, $txt, 0, 'C', false, 0, '', '', true, 0, false, true, 0, 'B', false);
@@ -302,7 +308,7 @@ foreach ($report->getChildReportTests() as $reportTest) {
     $txt = $reportTest->getDatum("uncertainty");
     $pdf->MultiCell(10, 5, $txt, 0, 'C', false, 0, '', '', true, 0, false, true, 0, 'B', false);
 
-    $txt = $rpl;
+    $txt = $reportTest->getDatum("permiss_limit");
     $pdf->MultiCell(56, 5, $txt, 0, 'C', false, 1, '', '', true, 0, false, true, 0, 'B', false);
 }
 

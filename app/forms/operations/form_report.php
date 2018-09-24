@@ -51,6 +51,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         $data["report_date"] = $_POST["report_date"];
         $data["process_deviations"] = $_POST["process_deviations"];
         $data["process_notes"] = $_POST["process_notes"];
+        $data["fk_result_permiss_limit"] = intval($_POST["fk_result_permiss_limit"]);
 
         try {
             $report->setData($data);
@@ -121,6 +122,8 @@ echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">Referencias</div>';
 echo '<div class="panel-body">';
 
+$options = AppUtils::getSelectOptions($userSession, AppConsts::OC_RESULT_PERMISS_LIMIT, $report->getDatum("fk_result_permiss_limit"));
+echo $report->getItem("fk_result_permiss_limit")->composeHtmlSelect($options, 4, 8);
 echo $report->getItem("process_deviations")->composeHtmlTextArea(4, 8, 3);
 echo $report->getItem("process_notes")->composeHtmlTextArea(4, 8, 3);
 
