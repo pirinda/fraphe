@@ -12,6 +12,20 @@ abstract class FLibUtils
         return $input;
     }
 
+    /** Format used: "d/m/Y".
+      */
+    public static function formatLocDate(int $timestamp): string
+    {
+        return !isset($timestamp) ? "" : date("d/m/Y", $timestamp);
+    }
+
+    /** Format used: "d/m/Y H:i:s".
+      */
+    public static function formatLocDatetime(int $timestamp): string
+    {
+        return !isset($timestamp) ? "" : date("d/m/Y H:i:s", $timestamp);
+    }
+
     /** Format used: "Y-m-d".
       */
     public static function formatStdDate(int $timestamp): string

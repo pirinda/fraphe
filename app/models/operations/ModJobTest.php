@@ -39,10 +39,10 @@ class ModJobTest extends FRegistry
         $this->process_days = new FItem(FItem::DATA_TYPE_INT, "process_days", "Días proceso", "", false);
         $this->process_start_date = new FItem(FItem::DATA_TYPE_DATE, "process_start_date", "Fecha inicio proceso", "", true);
         $this->process_deadline = new FItem(FItem::DATA_TYPE_DATE, "process_deadline", "Fecha límite proceso", "", true);
-        $this->ext_job_num = new FItem(FItem::DATA_TYPE_STRING, "ext_job_num", "Externos. Folio orden trabajo", "", false);
-        $this->ext_tracking_num = new FItem(FItem::DATA_TYPE_STRING, "ext_tracking_num", "Externos. Núm. rastreo paquetería", "", false);
-        $this->ext_result_deadline_n = new FItem(FItem::DATA_TYPE_DATE, "ext_result_deadline_n", "Externos: Fecha límite resultados", "", false);
-        $this->ext_result_released_n = new FItem(FItem::DATA_TYPE_DATE, "ext_result_released_n", "Externos: Fecha liberación resultados", "", false);
+        $this->ext_job_num = new FItem(FItem::DATA_TYPE_STRING, "ext_job_num", "Externos: folio orden trabajo", "", false);
+        $this->ext_tracking_num = new FItem(FItem::DATA_TYPE_STRING, "ext_tracking_num", "Externos: núm. rastreo paquetería", "", false);
+        $this->ext_result_deadline_n = new FItem(FItem::DATA_TYPE_DATE, "ext_result_deadline_n", "Externos: fecha límite resultados", "", false);
+        $this->ext_result_released_n = new FItem(FItem::DATA_TYPE_DATE, "ext_result_released_n", "Externos: fecha liberación resultados", "", false);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
         $this->fk_job = new FItem(FItem::DATA_TYPE_INT, "fk_job", "Orden trabajo", "", true);

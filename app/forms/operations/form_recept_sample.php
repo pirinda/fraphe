@@ -80,16 +80,16 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         //$data["sample_child"] = $_POST["sample_child"];
         //$data["sample_released"] = $_POST["sample_released"];
         $isSamplingCompany =  empty($_POST["is_sampling_company"]) ? false : boolval($_POST["is_sampling_company"]);
+        $data["is_sampling_company"] = $isSamplingCompany;
+        $data["sampling_datetime_n"] = empty($_POST["sampling_datetime_n"]) ? null : FLibUtils::parseHtmlDatetime($_POST["sampling_datetime_n"]);
+        $data["sampling_temperat_n"] = floatval($_POST["sampling_temperat_n"]);
+        $data["sampling_area"] = $_POST["sampling_area"];
+        $data["sampling_conditions"] = $_POST["sampling_conditions"];
+        $data["sampling_deviations"] = $_POST["sampling_deviations"];
+        $data["sampling_notes"] = $_POST["sampling_notes"];
+        //$data["sampling_imgs"] = $_POST["sampling_imgs"];
         if (!$isSamplingCompany) {
-            $data["is_sampling_company"] = false;
-            $data["sampling_datetime_n"] = null;
-            $data["sampling_temperat_n"] = null;
-            $data["sampling_area"] = "";
             $data["sampling_guide"] = 0;
-            $data["sampling_conditions"] = "";
-            $data["sampling_deviations"] = "";
-            $data["sampling_notes"] = "";
-            //$data["sampling_imgs"] = $_POST["sampling_imgs"];
             $data["fk_sampling_method"] = ModConsts::OC_SAMPLING_METHOD_CUSTOMER;
             $data["nk_sampling_equipt_1"] = 0;
             $data["nk_sampling_equipt_2"] = 0;
@@ -97,15 +97,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             $data["fk_user_sampler"] = ModConsts::CC_USER_NA;
         }
         else {
-            $data["is_sampling_company"] = true;
-            $data["sampling_datetime_n"] = empty($_POST["sampling_datetime_n"]) ? null : FLibUtils::parseHtmlDatetime($_POST["sampling_datetime_n"]);
-            $data["sampling_temperat_n"] = floatval($_POST["sampling_temperat_n"]);
-            $data["sampling_area"] = $_POST["sampling_area"];
             $data["sampling_guide"] = intval($_POST["sampling_guide"]);
-            $data["sampling_conditions"] = $_POST["sampling_conditions"];
-            $data["sampling_deviations"] = $_POST["sampling_deviations"];
-            $data["sampling_notes"] = $_POST["sampling_notes"];
-            //$data["sampling_imgs"] = $_POST["sampling_imgs"];
             $data["fk_sampling_method"] = intval($_POST["fk_sampling_method"]);
             $data["nk_sampling_equipt_1"] = intval($_POST["nk_sampling_equipt_1"]);
             $data["nk_sampling_equipt_2"] = intval($_POST["nk_sampling_equipt_2"]);
@@ -450,7 +442,7 @@ echo <<<SCRIPT
 (function() {
     loadCustomer();
     changedCustomerCustom(document.getElementById("is_customer_custom"));
-    changedSamplingCompany(document.getElementById("is_sampling_company"))
+    changedSamplingCompany(document.getElementById("is_sampling_company"));
 })();
 
 var customer; // holds customer name and address
@@ -487,7 +479,7 @@ function changedCustomerCustom(element) {
 }
 
 function changedSamplingCompany(element) {
-    var inputs = ["sampling_datetime_n", "sampling_area", "sampling_temperat_n", "sampling_guide", "sampling_conditions", "sampling_deviations", "sampling_notes"];
+    var inputs = ["sampling_guide"];
     var selects = ["fk_sampling_method", "nk_sampling_equipt_1", "nk_sampling_equipt_2", "nk_sampling_equipt_3", "fk_user_sampler"];
     if (element.checked) {
         for (var input of inputs) {

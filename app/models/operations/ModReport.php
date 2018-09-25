@@ -7,6 +7,7 @@ use Fraphe\Lib\FLibUtils;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
+use app\models\ModConsts;
 
 class ModReport extends FRegistry
 {
@@ -305,7 +306,7 @@ class ModReport extends FRegistry
                 ":fk_report_status, " .
                 "1, " .
                 "1, " .
-                "1, " .
+                ":fk_user_valid, " .
                 "1, " .
                 "1, " .
                 "1, " .
@@ -339,7 +340,7 @@ class ModReport extends FRegistry
                 "fk_report_status = :fk_report_status, " .
                 //"fk_user_finish = :fk_user_finish, " .
                 //"fk_user_verif = :fk_user_verif, " .
-                //"fk_user_valid = :fk_user_valid, " .
+                "fk_user_valid = :fk_user_valid, " .
                 //"fk_user_release = :fk_user_release, " .
                 //"fk_user_deliver = :fk_user_deliver, " .
                 //"fk_user_cancel = :fk_user_cancel, " .
@@ -414,7 +415,10 @@ class ModReport extends FRegistry
         $statement->bindParam(":fk_report_status", $fk_report_status, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_finish", $fk_user_finish, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_verif", $fk_user_verif, \PDO::PARAM_INT);
-        //$statement->bindParam(":fk_user_valid", $fk_user_valid, \PDO::PARAM_INT);
+        if (empty($fk_user_valid)) {
+            $fk_user_valid = ModConsts::CC_USER_NA;
+        }
+        $statement->bindParam(":fk_user_valid", $fk_user_valid, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_release", $fk_user_release, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_deliver", $fk_user_deliver, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_cancel", $fk_user_cancel, \PDO::PARAM_INT);

@@ -49,9 +49,10 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
         $data["report_num"] = $_POST["report_num"];
         $data["report_date"] = $_POST["report_date"];
-        $data["process_deviations"] = $_POST["process_deviations"];
+        //$data["process_deviations"] = $_POST["process_deviations"]; by now, it seems that deviations are not required
         $data["process_notes"] = $_POST["process_notes"];
         $data["fk_result_permiss_limit"] = intval($_POST["fk_result_permiss_limit"]);
+        $data["fk_user_valid"] = empty(intval($_POST["fk_user_valid"])) ? ModConsts::CC_USER_NA : intval($_POST["fk_user_valid"]);
 
         try {
             $report->setData($data);
@@ -124,8 +125,13 @@ echo '<div class="panel-body">';
 
 $options = AppUtils::getSelectOptions($userSession, AppConsts::OC_RESULT_PERMISS_LIMIT, $report->getDatum("fk_result_permiss_limit"));
 echo $report->getItem("fk_result_permiss_limit")->composeHtmlSelect($options, 4, 8);
-echo $report->getItem("process_deviations")->composeHtmlTextArea(4, 8, 3);
+//echo $report->getItem("process_deviations")->composeHtmlTextArea(4, 8, 3); // by now, it seems that deviations are not required
 echo $report->getItem("process_notes")->composeHtmlTextArea(4, 8, 3);
+
+$params = array();
+$params["id_user_role"] = ModConsts::CC_USER_ROLE_REPORT;
+$options = AppUtils::getSelectOptions($userSession, AppConsts::CC_USER, $report->getDatum("fk_user_valid"), $params);
+echo $report->getItem("fk_user_valid")->composeHtmlSelect($options, 4, 8);
 
 echo '</div>';  //echo '<div class="panel-body">';
 echo '</div>';  //echo '<div class="panel panel-default">';

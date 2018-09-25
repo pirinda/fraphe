@@ -100,7 +100,7 @@ class ModSample extends FRegistry
         $this->sample_num = new FItem(FItem::DATA_TYPE_STRING, "sample_num", "Folio muestra", "", true);
         $this->sample_name = new FItem(FItem::DATA_TYPE_STRING, "sample_name", "Nombre muestra", "", true);
         $this->sample_lot = new FItem(FItem::DATA_TYPE_STRING, "sample_lot", "Lote muestra", "", false);
-        $this->sample_date_mfg_n = new FItem(FItem::DATA_TYPE_DATE, "sample_date_mfg_n", "Fecha elaboración", "", false);
+        $this->sample_date_mfg_n = new FItem(FItem::DATA_TYPE_DATE, "sample_date_mfg_n", "Fecha producción", "", false);
         $this->sample_date_sell_by_n = new FItem(FItem::DATA_TYPE_DATE, "sample_date_sell_by_n", "Fecha caducidad", "", false);
         $this->sample_quantity = new FItem(FItem::DATA_TYPE_FLOAT, "sample_quantity", "Cantidad muestra", "", true);
         $this->sample_quantity_orig = new FItem(FItem::DATA_TYPE_FLOAT, "sample_quantity_orig", "Cantidad muestra original", "", true);
@@ -157,8 +157,8 @@ class ModSample extends FRegistry
         $this->nk_sampling_equipt_1 = new FItem(FItem::DATA_TYPE_INT, "nk_sampling_equipt_1", "Equipo muestreo 1", "", false);
         $this->nk_sampling_equipt_2 = new FItem(FItem::DATA_TYPE_INT, "nk_sampling_equipt_2", "Equipo muestreo 2", "", false);
         $this->nk_sampling_equipt_3 = new FItem(FItem::DATA_TYPE_INT, "nk_sampling_equipt_3", "Equipo muestreo 3", "", false);
-        $this->nk_recept = new FItem(FItem::DATA_TYPE_INT, "nk_recept", "Recepción", "", false);
-        $this->fk_user_sampler = new FItem(FItem::DATA_TYPE_INT, "fk_user_sampler", "Realizador muestreo", "", true);
+        $this->nk_recept = new FItem(FItem::DATA_TYPE_INT, "nk_recept", "Recepción muestras", "", false);
+        $this->fk_user_sampler = new FItem(FItem::DATA_TYPE_INT, "fk_user_sampler", "Químico muestreo", "", true);
         $this->fk_user_receiver = new FItem(FItem::DATA_TYPE_INT, "fk_user_receiver", "Receptor", "", true);
         $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", "", false);
         $this->fk_user_upd = new FItem(FItem::DATA_TYPE_INT, "fk_user_upd", "Modificador", "", false);

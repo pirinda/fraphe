@@ -160,6 +160,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
                     $data["fk_sample"] = $sample->getId();
                     $data["fk_recept"] = $recept->getId();
                     $data["fk_report_delivery_type"] = $sample->getDatum("fk_report_delivery_type");
+                    $data["fk_result_permiss_limit"] = ModConsts::OC_RESULT_PERMISS_LIMIT_NA;
                     $data["nk_report_reissue_cause"] = null;
                     $data["fk_report_status"] = ModConsts::OC_REPORT_STATUS_PENDING;
                     $report = new ModReport();
@@ -173,13 +174,13 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
                         //$data["report_test"] = ?;
                         $data["result"] = "";
                         $data["uncertainty"] = "";
+                        $data["permiss_limit"] = "";
                         //$data["is_system"] = ?;
                         //$data["is_deleted"] = ?;
                         //$data["fk_report"] = ?;
                         $data["fk_test"] = $sampleTest->getDatum("fk_test");
                         //$data["fk_job_test"] = ?;
                         $data["fk_sample_test"] = $sampleTest->getId();
-                        $data["fk_result_permiss_limit"] = ModConsts::OC_RESULT_PERMISS_LIMIT_NA;
                         $data["nk_result_unit"] = null;
                         $reportTest = new ModReportTest();
                         $reportTest->setData($data);
