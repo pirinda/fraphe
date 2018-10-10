@@ -34,37 +34,35 @@ class AppPDF extends TCPDF {
 
 	//Page header
 	public function Header() {
-        //function Image($file, $x='', $y='', $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array()) {
+		// Logo
 		$image_file = K_PATH_IMAGES . 'report_header.jpg';
 		$this->Image($image_file, 10, 10, 196, '', 'JPG', '', 'T', false, 600, '', false, false, 0, false, false, false);
 	}
 
 	// Page footer
 	public function Footer() {
-		// Position at 25 mm from bottom:
+		// Position at 25 mm from bottom
 		$this->SetY(-25);
-
-        //function Image($file, $x='', $y='', $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array()) {
-        $image_file = K_PATH_IMAGES . 'report_footer.jpg';
+		// Set font
+        $image_file = K_PATH_IMAGES . 'cedimi_footer.jpg';
         $this->Image($image_file, 10, '', 196, '', 'JPG', '', 'T', false, 600, '', false, false, 0, false, false, false);
 
+		$this->SetFont('helvetica', 'I', 8);
 
-        // Position at 30 mm from bottom:
         $this->SetY(-30);
-
-        $this->SetFont('helvetica', 'I', 8);
 
         //public function MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x='', $y='', $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false) {
 
         $txt = "F1-P1IR R0";
         $this->MultiCell(75, 0, $txt, 0, 'L', false, 0, '', '', true, 0, false, true, 0, 'B', false);
-        /*
+
         $txt = "FECHA DE EMISIÓN: " . FLibUtils::formatLocDate($this->issueDate);
         $this->MultiCell(50, 0, $txt, 0, 'L', false, 0, '', '', true, 0, false, true, 0, 'B', false);
-        */
+
 		// Page number
-        $txt = 'Página ' . $this->getAliasNumPage() . ' de ' . $this->getAliasNbPages();
+        $txt = 'Página '.$this->getAliasNumPage().' de '.$this->getAliasNbPages();
         $this->MultiCell(75, 0, $txt, 0, 'R', false, 0, '', '', true, 0, false, true, 0, 'B', false);
+        //$this->Cell(0, 10, $txt, 0, false, 'C', 0, '', 0, false, 'T', 'T');
 	}
 }
 
