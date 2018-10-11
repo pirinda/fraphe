@@ -144,7 +144,7 @@ abstract class FApp
     *
     */
     public static function getVariable($variable) {
-        $value;
+        $value = null;
 
         if (!empty($_GET[$variable])) {
             $value = $_GET[$variable];

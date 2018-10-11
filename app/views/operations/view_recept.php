@@ -13,6 +13,7 @@ use Fraphe\App\FApp;
 use Fraphe\App\FAppConsts;
 use Fraphe\App\FAppNavbar;
 use Fraphe\App\FGuiUtils;
+use Fraphe\App\FViewFilterDateFlex;
 
 echo '<!DOCTYPE html>';
 echo '<html>';
@@ -24,6 +25,7 @@ $recept_st = intval(FApp::getVariable("recept_st")); // URL or session parameter
 $_SESSION["recept_st"] = $recept_st;
 
 $stName = "";
+
 switch ($recept_st) {
     case ModConsts::OC_RECEPT_STATUS_NEW:
         $stName = "nuevas";
@@ -38,9 +40,23 @@ switch ($recept_st) {
         $stName = "(todas)";
 }
 
+$dateFilterGui = "";
+$dateFilterSql = "";
+switch ($recept_st) {
+    case ModConsts::OC_RECEPT_STATUS_NEW:
+    case ModConsts::OC_RECEPT_STATUS_PROCESSING:
+        break;
+    case ModConsts::OC_RECEPT_STATUS_CANCELLED:
+    default:
+        $filter = new FViewFilterDateFlex("r.recept_datetime", FViewFilterDateFlex::TYPE_MON, time());
+        $dateFilterGui = "&nbsp;" . $filter->composeFilterGui();
+        $dateFilterSql = $filter->composeFilterSql();
+}
+
 echo '<div class="container" style="margin-top:50px">';
 echo '<h3>Recepciones de muestras <span class="label label-default">' . $stName . '</span></h3>';
 echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept.php" class="btn btn-primary btn-sm" role="button"' . ($recept_st != ModConsts::OC_RECEPT_STATUS_NEW ? ' disabled' : '') . '>Crear</a>';
+echo $dateFilterGui;
 
 $sql = <<<SQL
 SELECT r.recept_num, r.id_recept, r.recept_datetime,
@@ -62,10 +78,16 @@ INNER JOIN cc_user AS uu ON r.fk_user_upd = uu.id_user
 WHERE NOT r.is_deleted
 SQL;
 
-// add filter status, if any:
+// add filters:
+
 if (!empty($recept_st)) {
     $sql .= " AND r.fk_recept_status = $recept_st";
 }
+
+if (!empty($dateFilterSql)) {
+    $sql .= " AND $dateFilterSql";
+}
+
 $sql .= " ORDER BY r.recept_num, r.id_recept;";
 
 echo '<table class="table table-striped">';

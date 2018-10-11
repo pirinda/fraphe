@@ -12,7 +12,7 @@ abstract class AppUtils
         return '<option value="0"' . ($selectedId == 0 ? " selected" : "") . '>- seleccionar -</option>';
     }
 
-    public static function getSelectOptions(FUserSession $userSession, int $catalog, int $selectedId, array $params = null): array
+    public static function getSelectOptions(FUserSession $userSession, int $catalog, int $selectedId = 0, array $params = null): array
     {
         $sql;
         $options = array();
@@ -32,8 +32,10 @@ abstract class AppUtils
 
             // "name" sorted by name + ID:
             case AppConsts::OC_SAMPLING_METHOD:
-            case AppConsts::OC_TESTING_METHOD:
+            case AppConsts::OC_SAMPLING_NOTE:
             case AppConsts::OC_CONTAINER_TYPE:
+            case AppConsts::OC_TESTING_METHOD:
+            case AppConsts::OC_TESTING_NOTE:
             case AppConsts::OC_RESULT_PERMISS_LIMIT:
                 $sql = "SELECT $tableId AS _val, name AS _opt FROM $table WHERE NOT is_deleted ORDER BY name, $tableId;";
                 break;
@@ -131,6 +133,34 @@ abstract class AppUtils
         if (isset($sql)) {
             foreach ($userSession->getPdo()->query($sql) as $row) {
                 $options[] = '<option value="' . $row['_val'] . '"' . (!empty($selectedId) && $selectedId == intval($row['_val']) ? " selected" : "") . '>' . $row['_opt'] . '</option>';
+            }
+        }
+
+        return $options;
+    }
+
+
+    public static function getSelectRawOptions(FUserSession $userSession, int $catalog): array
+    {
+        $sql;
+        $options = array();
+        $table = AppConsts::$tables[$catalog];
+
+        switch ($catalog) {
+            // "name" sorted by name:
+            case AppConsts::OC_SAMPLING_NOTE:
+            case AppConsts::OC_TESTING_NOTE:
+                $sql = "SELECT name AS _opt FROM $table WHERE NOT is_deleted ORDER BY name;";
+                break;
+
+            default:
+        }
+
+        $options[] = self::composeSelectOption();
+
+        if (isset($sql)) {
+            foreach ($userSession->getPdo()->query($sql) as $row) {
+                $options[] = '<option>' . $row['_opt'] . '</option>';
             }
         }
 

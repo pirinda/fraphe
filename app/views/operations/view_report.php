@@ -13,6 +13,7 @@ use Fraphe\App\FApp;
 use Fraphe\App\FAppConsts;
 use Fraphe\App\FAppNavbar;
 use Fraphe\App\FGuiUtils;
+use Fraphe\App\FViewFilterDateFlex;
 
 echo '<!DOCTYPE html>';
 echo '<html>';
@@ -50,12 +51,30 @@ switch ($report_st) {
         $stName = "cancelados";
         break;
     default:
-        $stName = "(todas)";
+        $stName = "(todos)";
+}
+
+$dateFilterGui = "";
+$dateFilterSql = "";
+switch ($report_st) {
+    case ModConsts::OC_REPORT_STATUS_PENDING:
+    case ModConsts::OC_REPORT_STATUS_PROCESSING:
+    case ModConsts::OC_REPORT_STATUS_FINISHED:
+    case ModConsts::OC_REPORT_STATUS_VERIFIED:
+    case ModConsts::OC_REPORT_STATUS_VALIDATED:
+    case ModConsts::OC_REPORT_STATUS_RELEASED:
+        break;
+    case ModConsts::OC_REPORT_STATUS_DELIVERED:
+    case ModConsts::OC_REPORT_STATUS_CANCELLED:
+    default:
+        $filter = new FViewFilterDateFlex("r.report_date", FViewFilterDateFlex::TYPE_MON, time());
+        $dateFilterGui = "&nbsp;" . $filter->composeFilterGui();
+        $dateFilterSql = $filter->composeFilterSql();
 }
 
 echo '<div class="container" style="margin-top:50px">';
 echo '<h3>Informes de resultados <span class="label label-default">' . $stName . '</span></h3>';
-//echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept.php" class="btn btn-primary btn-sm" role="button">Crear</a>';
+echo $dateFilterGui;
 
 $sql = <<<SQL
 SELECT r.report_num, r.id_report, r.report_date, r.reissue,
@@ -77,9 +96,14 @@ INNER JOIN cc_user AS uu ON r.fk_user_upd = uu.id_user
 WHERE NOT r.is_deleted
 SQL;
 
-// add filter status, if any:
+// add filters:
+
 if (!empty($report_st)) {
     $sql .= " AND r.fk_report_status = $report_st";
+}
+
+if (!empty($dateFilterSql)) {
+    $sql .= " AND $dateFilterSql";
 }
 
 $sql .= " ORDER BY r.report_num, r.id_report;";

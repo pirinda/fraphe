@@ -309,9 +309,24 @@ echo $sample->getItem("nk_sampling_equipt_2")->composeHtmlSelect($options, 4, 8)
 $options = AppUtils::getSelectOptions($userSession, AppConsts::OC_SAMPLING_EQUIPT, $sample->getDatum("nk_sampling_equipt_3"));
 echo $sample->getItem("nk_sampling_equipt_3")->composeHtmlSelect($options, 4, 8);
 
-echo $sample->getItem("sampling_conditions")->composeHtmlTextArea(4, 8, 1);
-echo $sample->getItem("sampling_deviations")->composeHtmlTextArea(4, 8, 1);
-echo $sample->getItem("sampling_notes")->composeHtmlTextArea(4, 8, 1);
+echo $sample->getItem("sampling_conditions")->composeHtmlTextArea(4, 8, 2);
+echo $sample->getItem("sampling_deviations")->composeHtmlTextArea(4, 8, 2);
+echo $sample->getItem("sampling_notes")->composeHtmlTextArea(4, 8, 2);
+
+// sampling notes:
+$options = AppUtils::getSelectRawOptions($userSession, AppConsts::OC_SAMPLING_NOTE);
+echo '<div class="form-group">';
+echo '<div class="col-sm-4">';
+echo '<label class="control-label small" for="frequent_sampling_notes">Observaciones frecuentes:</label>';
+echo '</div>';
+echo '<div class="col-sm-8">';
+echo '<select class="form-control input-sm" name="frequent_sampling_notes" id="frequent_sampling_notes" onchange="changedNotes(this, \'sampling_notes\');">';
+foreach ($options as $option) {
+    echo $option;
+}
+echo '</select>';
+echo '</div>';
+echo '</div>';
 
 $params = array();
 $params["id_user_role"] = ModConsts::CC_USER_ROLE_SAMPLING;
@@ -356,8 +371,8 @@ echo '<label class="radio-inline small"><input type="radio" name="service_type" 
 echo '</div>';
 echo '</div>';
 
-echo $sample->getItem("recept_deviations")->composeHtmlTextArea(4, 8, 1);
-echo $sample->getItem("recept_notes")->composeHtmlTextArea(4, 8, 1);
+echo $sample->getItem("recept_deviations")->composeHtmlTextArea(4, 8, 2);
+echo $sample->getItem("recept_notes")->composeHtmlTextArea(4, 8, 2);
 
 $params = array();
 $params["id_user_role"] = ModConsts::CC_USER_ROLE_RECEPT;
@@ -498,6 +513,13 @@ function changedSamplingCompany(element) {
             document.getElementById(select).setAttribute("disabled", "");
             document.getElementById(select).value = 0;
         }
+    }
+}
+
+function changedNotes(element, targetId) {
+    if (element.selectedIndex > 0) {
+        var value = document.getElementById(targetId).value;
+        document.getElementById(targetId).value = value + (value.length == 0 ? "" : " ") + element.value;
     }
 }
 

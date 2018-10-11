@@ -128,6 +128,22 @@ echo $report->getItem("fk_result_permiss_limit")->composeHtmlSelect($options, 4,
 //echo $report->getItem("process_deviations")->composeHtmlTextArea(4, 8, 3); // by now, it seems that deviations are not required
 echo $report->getItem("process_notes")->composeHtmlTextArea(4, 8, 3);
 
+// sampling notes:
+$options = AppUtils::getSelectRawOptions($userSession, AppConsts::OC_TESTING_NOTE);
+echo '<div class="form-group">';
+echo '<div class="col-sm-4">';
+echo '<label class="control-label small" for="frequent_process_notes">Observaciones frecuentes:</label>';
+echo '</div>';
+echo '<div class="col-sm-8">';
+echo '<select class="form-control input-sm" name="frequent_process_notes" id="frequent_process_notes" onchange="changedNotes(this, \'process_notes\');">';
+foreach ($options as $option) {
+    echo $option;
+}
+echo '</select>';
+echo '</div>';
+echo '</div>';
+
+
 $params = array();
 $params["id_user_role"] = ModConsts::CC_USER_ROLE_REPORT;
 $options = AppUtils::getSelectOptions($userSession, AppConsts::CC_USER, $report->getDatum("fk_user_valid"), $params);
@@ -151,6 +167,14 @@ echo '</div>';  // echo '<div class="container" style="margin-top:50px">';
 echo FApp::composeFooter();
 echo <<<SCRIPT
 <script>
+function changedNotes(element, targetId) {
+    if (element.selectedIndex > 0) {
+        var value = document.getElementById(targetId).value;
+        document.getElementById(targetId).value = value + (value.length == 0 ? "" : " ") + element.value;
+    }
+    document.getElementById(targetId).focus();
+}
+
 function validateForm() {
     return checkBeforeSubmit(); // prevent multiple form submitions
 }
