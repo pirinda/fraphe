@@ -184,7 +184,7 @@ function writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, 
 */
 
 //$pdf->SetFillColor(180, 180, 180);
-$pdf->SetFillColor(127, 255, 212); // aquamarine
+$pdf->SetFillColor(102, 205, 170); // mediumaquamarine
 
 $pdf->SetFont('helvetica', 'B', 9);
 
