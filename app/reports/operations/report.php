@@ -27,6 +27,7 @@ require_once $_SESSION[FAppConsts::ROOT_DIR] . "app/reports/app_tcpdf_include.ph
 //------------------------------------------------------------------------------
 // extend class TCPDF
 //------------------------------------------------------------------------------
+// Letter page format maximum width: 8.5 in * 254 mm = 195.9 mm >>> 196 mm
 /*
 function Image($file, $x='', $y='', $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
 function Write($h, $txt, $link='', $fill=false, $align='', $ln=false, $stretch=0, $firstline=false, $firstblock=false, $maxh=0, $wadj=0, $margin='')
@@ -435,76 +436,90 @@ $pdf->MultiCell(0, $hTit09, $txt, 0, 'C', true, 1, '', '', true, 0, false, true,
 
 //------------------------------------------------------------------------------
 
-
-$txt = "<b>FECHA DE ANÁLISIS: </b>" . (empty($sample->getDatum("process_start_date")) ? "NE" : FLibUtils::formatLocDate($sample->getDatum("process_start_date")));
-$pdf->writeHTMLCell(90, 4, '', '', $txt, 0, 1, false, 0, '', true);
-
-$txt = "<b>TÉRMINO DEL ANÁLISIS: </b>" . (empty($sample->getDatum("process_deadline")) ? "NE" : FLibUtils::formatLocDate($sample->getDatum("process_deadline")));
-$pdf->writeHTMLCell(90, 4, '', '', $txt, 0, 1, false, 0, '', true);
-
-$yNotes = $pdf->getY();
-
-// LETTER PAGE FORMAT MAX WIDTH: 8.5 in * 254 mm = 195.9 mm >>> 196 mm
-
-$pdf->SetFont('helvetica', 'B', 9);
-
-$pdf->Ln(3);
+$pdf->Ln(1);
 
 $pdf->SetFont('helvetica', 'B', 9);
 
 $txt = "A/A";
-$pdf->MultiCell(10, 4, $txt, 0, 'C', true, 0, '', '', true, 0, false, true, 0, 'B', false);
+$pdf->MultiCell(10, $hTit09, $txt, 0, 'C', true, 0, '', '', true, 0, false, true, 0, 'B', false);
+
+$txt = "INICIO/TÉRMINO";
+$pdf->MultiCell(20, $hTit09, $txt, 0, 'C', true, 0, '', '', true, 0, false, true, 0, 'B', false);
 
 $txt = "ENSAYO";
-$pdf->MultiCell(70, 4, $txt, 0, 'C', true, 0, '', '', true, 0, false, true, 0, 'B', false);
+$pdf->MultiCell(55, $hTit09, $txt, 0, 'C', true, 0, '', '', true, 0, false, true, 0, 'B', false);
 
 $txt = "RESULTADO";
-$pdf->MultiCell(40, 4, $txt, 0, 'C', true, 0, '', '', true, 0, false, true, 0, 'B', false);
+$pdf->MultiCell(40, $hTit09, $txt, 0, 'C', true, 0, '', '', true, 0, false, true, 0, 'B', false);
 
 $txt = "U";
-$pdf->MultiCell(10, 4, $txt, 0, 'C', true, 0, '', '', true, 0, false, true, 0, 'B', false);
+$pdf->MultiCell(10, $hTit09, $txt, 0, 'C', true, 0, '', '', true, 0, false, true, 0, 'B', false);
 
 $txt = "LÍMITES PERMISIBLES";
-$pdf->MultiCell(56, 4, $txt, 0, 'C', true, 1, '', '', true, 0, false, true, 0, 'B', false);
+$pdf->MultiCell(51, $hTit09, $txt, 0, 'C', true, 1, '', '', true, 0, false, true, 0, 'B', false);
 
-$pdf->SetFont('helvetica', '', 8);
+//------------------------------------------------------------------------------
 
 $txt = "";
-$pdf->MultiCell(130, 4, $txt, 0, 'C', true, 0, '', '', true, 0, false, true, 0, 'B', false);
+$pdf->MultiCell(10, $hTit09, $txt, 0, 'C', true, 0, '', '', true, 0, false, true, 0, 'B', false);
+
+$txt = "ANÁLISIS";
+$pdf->MultiCell(20, $hTit09, $txt, 0, 'C', true, 0, '', '', true, 0, false, true, 0, 'B', false);
+
+$txt = "MÉTODO ANALÍTICO";
+$pdf->MultiCell(55, $hTit09, $txt, 0, 'C', true, 0, '', '', true, 0, false, true, 0, 'B', false);
+
+$txt = "";
+$pdf->MultiCell(40, $hTit09, $txt, 0, 'C', true, 0, '', '', true, 0, false, true, 0, 'B', false);
+
+$txt = "";
+$pdf->MultiCell(10, $hTit09, $txt, 0, 'C', true, 0, '', '', true, 0, false, true, 0, 'B', false);
 
 $txt = AppUtils::readField($userSession, "name", AppConsts::OC_RESULT_PERMISS_LIMIT, $report->getDatum("fk_result_permiss_limit"));
-$pdf->MultiCell(56, 4, $txt, 0, 'C', true, 1, '', '', true, 0, false, true, 0, 'B', false);
+$pdf->MultiCell(51, $hTit09, $txt, 0, 'C', true, 1, '', '', true, 0, false, true, 0, 'B', false);
+
+//------------------------------------------------------------------------------
+/*
+function Image($file, $x='', $y='', $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
+function Write($h, $txt, $link='', $fill=false, $align='', $ln=false, $stretch=0, $firstline=false, $firstblock=false, $maxh=0, $wadj=0, $margin='')
+function MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x='', $y='', $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
+function writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true) // uses MultiCell()
+*/
 
 $pdf->SetFont('helvetica', '', 8);
 
 foreach ($report->getChildReportTests() as $reportTest) {
+
     $test = new ModTest();
     $test->read($userSession, $reportTest->getDatum("fk_test"), FRegistry::MODE_READ);
 
     //public function MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x='', $y='', $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 
+    $y = $pdf->getY();
+
     $txt = AppUtils::readField($userSession, "code", AppConsts::OC_TEST_ACREDIT_ATTRIB, $test->getDatum("fk_test_acredit_attrib"));
-    $pdf->MultiCell(10, 4, $txt, 0, 'C', false, 0, '', '', true, 0, false, true, 0, 'T', false);
+    $pdf->MultiCell(10, $hTxt09, $txt, 0, 'C', false, 0, '', $y, true, 0, false, true, 0, 'T', false);
+
+    $txt = empty($sample->getDatum("process_start_date")) ? "NE" : FLibUtils::formatLocDate($sample->getDatum("process_start_date"));
+    $pdf->MultiCell(20, $hTxt09, $txt, 0, 'C', false, 0, '', $y, true, 0, false, true, 0, 'T', false);
+
+    $txt = empty($sample->getDatum("process_deadline")) ? "NE" : FLibUtils::formatLocDate($sample->getDatum("process_deadline"));
+    $pdf->MultiCell(20, $hTxt09, $txt, 0, 'C', false, 0, 10, $y + $hTxt09, true, 0, false, true, 0, 'T', false);
 
     $txt = $test->getDatum("name");
-    $pdf->MultiCell(70, 4, $txt, 0, 'C', false, 0, '', '', true, 0, false, true, 0, 'T', false);
-
-    $yTest = $pdf->getY();
-
-    $txt = $reportTest->getDatum("result");
-    if (!empty($reportTest->getDatum("nk_result_unit"))) {
-        $txt .= " " . AppUtils::readField($userSession, "code", AppConsts::OC_RESULT_UNIT, $reportTest->getDatum("nk_result_unit"));
-    }
-    $pdf->MultiCell(40, 4, $txt, 0, 'C', false, 0, '', '', true, 0, false, true, 0, 'T', false);
-
-    $txt = $reportTest->getDatum("uncertainty");
-    $pdf->MultiCell(10, 4, $txt, 0, 'C', false, 0, '', '', true, 0, false, true, 0, 'T', false);
-
-    $txt = $reportTest->getDatum("permiss_limit");
-    $pdf->MultiCell(56, 4, $txt, 0, 'C', false, 1, '', '', true, 0, false, true, 0, 'T', false);
+    $pdf->MultiCell(55, $hTxt09, $txt, 0, 'C', false, 0, '', $y, true, 0, false, true, 0, 'T', false);
 
     $txt = AppUtils::readField($userSession, "name", AppConsts::OC_TESTING_METHOD, $test->getDatum("fk_testing_method"));
-    $pdf->MultiCell(70, 4, $txt, 0, 'C', false, 1, 25, $yTest + 4, true, 0, false, true, 0, 'T', false);
+    $pdf->MultiCell(55, $hTxt09, $txt, 0, 'C', false, 0, 10 + 20, $y + $hTxt09, true, 0, false, true, 0, 'T', false);
+
+    $txt = $reportTest->getDatum("result") . (empty($reportTest->getDatum("nk_result_unit")) ? "" : AppUtils::readField($userSession, "code", AppConsts::OC_RESULT_UNIT, $reportTest->getDatum("nk_result_unit")));
+    $pdf->MultiCell(40, $hTxt09, $txt, 0, 'C', false, 0, '', $y, true, 0, false, true, 0, 'T', false);
+
+    $txt = $reportTest->getDatum("uncertainty");
+    $pdf->MultiCell(10, $hTxt09, $txt, 0, 'C', false, 0, '', $y, true, 0, false, true, 0, 'T', false);
+
+    $txt = $reportTest->getDatum("permiss_limit");
+    $pdf->MultiCell(51, $hTxt09, $txt, 0, 'C', false, 1, '', $y, true, 0, false, true, 0, 'T', false);
 
     $pdf->Ln(3);
 }
@@ -512,11 +527,6 @@ foreach ($report->getChildReportTests() as $reportTest) {
 //------------------------------------------------------------------------------
 
 $notes = $report->getDatum("process_notes");
-$annex = count($sample->getChildSamplingImages()) > 0 || $sample->getDatum("is_def_sampling_img");
-
-if ($annex) {
-    $notes .= (empty($notes) ? "" : " ") . "Se anexan imágenes del lugar de la toma de muestra.";
-}
 
 $txt = "<b>OBSERVACIONES DEL ANÁLISIS: </b>" . (empty($notes) ? "NA" : $notes);
 $pdf->writeHTMLCell(0, 4, '', '', $txt, 0, 1, false, 0, '', true);
@@ -530,13 +540,12 @@ if (!empty($report->getDatum("process_deviations"))) {
 
 $pdf->Ln(3);
 
-//public function writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
-//public function MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x='', $y='', $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
-
-$pdf->SetFont('helvetica', '', 7);
-
-$txt = "SIMBOLOGÍA:";
-$pdf->MultiCell(25, 3, $txt, 0, 'L', false, 0, '', '', true, 0, false, true, 0, 'T', false);
+/*
+function Image($file, $x='', $y='', $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
+function Write($h, $txt, $link='', $fill=false, $align='', $ln=false, $stretch=0, $firstline=false, $firstblock=false, $maxh=0, $wadj=0, $margin='')
+function MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x='', $y='', $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
+function writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true) // uses MultiCell()
+*/
 
 $pdf->SetFont('helvetica', '', 6);
 
