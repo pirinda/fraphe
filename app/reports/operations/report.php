@@ -352,10 +352,10 @@ $txt = "<b>Condiciones de toma: </b>" . (empty($sample->getDatum("sampling_condi
 $pdf->writeHTMLCell(0, $hTxt09, '', '', $txt, 0, 1, false, 0, '', true);
 
 $txt = "<b>Observaciones: </b>" . (empty($report->getDatum("process_notes")) ? "NA" : $report->getDatum("process_notes"));
-$pdf->writeHTMLCell(92.95, $hTxt09, '', '', $txt, 0, 0, false, 0, '', true);
+$pdf->writeHTMLCell(0, $hTxt09, '', '', $txt, 0, 1, false, 0, '', true);
 
 $txt = "<b>Desviaciones: </b>" . (empty($report->getDatum("process_deviations")) ? "NA" : $report->getDatum("process_deviations"));
-$pdf->writeHTMLCell(92.95, $hTxt09, '', '', $txt, 0, 1, false, 0, '', true);
+$pdf->writeHTMLCell(0, $hTxt09, '', '', $txt, 0, 1, false, 0, '', true);
 
 $txt = "<b>Lugar de toma: </b>" . (empty($sample->getDatum("sampling_area")) ? "NE" : $sample->getDatum("sampling_area"));
 $pdf->writeHTMLCell(0, $hTxt09, '', '', $txt, 0, 1, false, 0, '', true);
@@ -431,10 +431,10 @@ $pdf->writeHTMLCell(45.9, $hTxt09, '', '', $txt, 0, 1, false, 0, 'C', true); // 
 //------------------------------------------------------------------------------
 
 $txt = "<b>Observaciones: </b>" . (empty($sample->getDatum("recept_notes")) ? "NA" : $sample->getDatum("recept_notes"));
-$pdf->writeHTMLCell(92.95, $hTxt09, '', '', $txt, 0, 0, false, 0, '', true);
+$pdf->writeHTMLCell(0, $hTxt09, '', '', $txt, 0, 1, false, 0, '', true);
 
 $txt = "<b>Desviaciones: </b>" . (empty($sample->getDatum("recept_deviations")) ? "NA" : $sample->getDatum("recept_deviations"));
-$pdf->writeHTMLCell(92.95, $hTxt09, '', '', $txt, 0, 1, false, 0, '', true);
+$pdf->writeHTMLCell(0, $hTxt09, '', '', $txt, 0, 1, false, 0, '', true);
 
 //------------------------------------------------------------------------------
 

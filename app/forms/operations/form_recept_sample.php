@@ -521,6 +521,7 @@ function changedNotes(element, targetId) {
         var value = document.getElementById(targetId).value;
         document.getElementById(targetId).value = value + (value.length == 0 ? "" : " ") + element.value;
     }
+    document.getElementById(targetId).focus();
 }
 
 function validateForm() {

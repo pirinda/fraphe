@@ -8,8 +8,8 @@ class FViewFilterDateFlex
     public const TYPE_DAY = 1;
     public const TYPE_MON = 2;
     public const TYPE_YEAR = 3;
-    public const DATE_TYPE = "dateTp";
-    public const DATE_TIMESTAMP = "dateTs";
+    public const DATE_TYPE = "date_tp";
+    public const DATE_TIMESTAMP = "date_ts";
 
     private $dbColumn;
     private $type;
