@@ -8,18 +8,24 @@ if (!isset($_SESSION)) {
 require $_SESSION["rootDir"] . "Fraphe" . DIRECTORY_SEPARATOR . "fraphe.php";
 //------------------------------------------------------------------------------
 
+use app\AppConsts;
 use app\models\ModConsts;
+use app\models\catalogs\ModUser;
+use app\views\ViewFilterCatalog;
 use Fraphe\App\FApp;
 use Fraphe\App\FAppConsts;
 use Fraphe\App\FAppNavbar;
 use Fraphe\App\FGuiUtils;
 use Fraphe\App\FViewFilterDateFlex;
+use Fraphe\Model\FRegistry;
 
 echo '<!DOCTYPE html>';
 echo '<html>';
 echo FApp::composeHtmlHead();
 echo '<body>';
 echo FAppNavbar::compose("process");
+
+// job status label for view title:
 
 $job_st = intval(FApp::getVariable("job_st")); // URL or session parameter
 $_SESSION["job_st"] = $job_st;
@@ -39,8 +45,10 @@ switch ($job_st) {
         $stName = "canceladas";
         break;
     default:
-        $stName = "(todas)";
+        $stName = "todas";
 }
+
+// date filter:
 
 $dateFilterGui = "";
 $dateFilterSql = "";
@@ -56,9 +64,31 @@ switch ($job_st) {
         $dateFilterSql = $filter->composeFilterSql();
 }
 
+// process area filter:
+
+$paFilterGui = "";
+$paFilterSql = "";
+
+$userSession = FGuiUtils::createUserSession();
+$user = new ModUser();
+$user->read($userSession, $userSession->getCurUser()->getId(), FRegistry::MODE_READ);
+
+$optionsAllowed = null;
+
+if ($user->getDatum("fk_user_type") == ModConsts::CC_USER_TYPE_USER) {
+    $optionsAllowed = $user->getIdsProcessAreas();
+}
+
+$filter = new ViewFilterCatalog($userSession, AppConsts::OC_PROCESS_AREA, "j.fk_process_area", "processarea", $optionsAllowed);
+$paFilterGui = "&nbsp;" . $filter->composeFilterGui();
+$paFilterSql = $filter->composeFilterSql();
+
+// view:
+
 echo '<div class="container" style="margin-top:50px">';
 echo '<h3>Órdenes de trabajo <span class="label label-default">' . $stName . '</span></h3>';
 echo $dateFilterGui;
+echo $paFilterGui;
 
 $sql = <<<SQL
 SELECT j.job_num, j.id_job, j.job_date, j.process_days, j.process_start_date, j.process_deadline,
@@ -86,6 +116,10 @@ if (!empty($job_st)) {
 
 if (!empty($dateFilterSql)) {
     $sql .= " AND $dateFilterSql";
+}
+
+if (!empty($paFilterSql)) {
+    $sql .= " AND $paFilterSql";
 }
 
 $sql .= " ORDER BY j.job_num, pa.sorting, j.id_job;";

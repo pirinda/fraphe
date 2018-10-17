@@ -37,7 +37,7 @@ switch ($recept_st) {
         $stName = "canceladas";
         break;
     default:
-        $stName = "(todas)";
+        $stName = "todas";
 }
 
 $dateFilterGui = "";

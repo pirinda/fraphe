@@ -1,6 +1,8 @@
 <?php
 namespace Fraphe\App;
 
+use app\models\ModConsts; // TODO Move FAppBodyHome class to the implementation of Fraphe framework, or remove this from Fraphe framework!
+
 abstract class FAppBodyHome
 {
     public static function compose(): string
@@ -19,17 +21,17 @@ abstract class FAppBodyHome
                 case FAppConsts::PAGE_FEAT:
                     $html .= '<div class="container" style="margin-top:50px">';
                     $html .= '  <h1>Prestaciones</h1>';
-                    $html .= '  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>';
-                    $html .= '  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>';
+                    //$html .= '  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>';
+                    //$html .= '  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>';
                     $html .= '</div>';
                     break;
 
                 case FAppConsts::PAGE_HELP:
                     $html .= '<div class="container" style="margin-top:50px">';
                     $html .= '  <h1>Ayuda</h1>';
-                    $html .= '  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>';
-                    $html .= '  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>';
-                    $html .= '  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>';
+                    //$html .= '  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>';
+                    //$html .= '  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>';
+                    //$html .= '  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>';
                     $html .= '</div>';
                     break;
 
@@ -39,7 +41,7 @@ abstract class FAppBodyHome
                 default:
                     $html .= '<div class="container" style="margin-top:50px">';
                     $html .= '  <h1>Inicio</h1>';
-                    $html .= '  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>';
+                    //$html .= '  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>';
                     $html .= '</div>';
             }
         }
@@ -56,30 +58,42 @@ abstract class FAppBodyHome
                 $html .= '<div class="container text-center" style="margin-top:60px">';
                 $html .= '  <div class="row">';
 
+                $roles = array();
+                $roles[] = ModConsts::CC_USER_ROLE_RECEPT;
+                $roles[] = ModConsts::CC_USER_ROLE_DIRECTION;
+                $hasRole = FApp::hasUserSessionUserRoles($roles);
                 $module = FGuiUtils::getModule("recept");
                 $html .= '    <div class="col-sm-4">';
-                $html .= '      <a href="' . $module->getHref() . '">';
+                $html .= !$hasRole ? '' : '      <a href="' . $module->getHref() . '">';
                 $html .= '      <h1><span class="glyphicon glyphicon-bell"></span></h1>';
                 $html .= '      <h4>RECEPCIÓN</h4>';
-                $html .= '      </a>';
+                $html .= !$hasRole ? '' : '      </a>';
                 $html .= '      <p>Recepción de muestras. Generación de órdenes de trabajo.</p>';
                 $html .= '    </div>';
 
+                $roles = array();
+                $roles[] = ModConsts::CC_USER_ROLE_PROCESS;
+                $roles[] = ModConsts::CC_USER_ROLE_DIRECTION;
+                $hasRole = FApp::hasUserSessionUserRoles($roles);
                 $module = FGuiUtils::getModule("process");
                 $html .= '    <div class="col-sm-4">';
-                $html .= '      <a href="' . $module->getHref() . '">';
+                $html .= !$hasRole ? '' : '      <a href="' . $module->getHref() . '">';
                 $html .= '      <h1><span class="glyphicon glyphicon-screenshot"></span></h1>';
                 $html .= '      <h4>PROCESO</h4>';
-                $html .= '      </a>';
+                $html .= !$hasRole ? '' : '      </a>';
                 $html .= '      <p>Procesamiento de órdenes de trabajo.</p>';
                 $html .= '    </div>';
 
+                $roles = array();
+                $roles[] = ModConsts::CC_USER_ROLE_REPORT;
+                $roles[] = ModConsts::CC_USER_ROLE_DIRECTION;
+                $hasRole = FApp::hasUserSessionUserRoles($roles);
                 $module = FGuiUtils::getModule("report");
                 $html .= '    <div class="col-sm-4">';
-                $html .= '      <a href="' . $module->getHref() . '">';
+                $html .= !$hasRole ? '' : '      <a href="' . $module->getHref() . '">';
                 $html .= '      <h1><span class="glyphicon glyphicon-file"></span></h1>';
                 $html .= '      <h4>RESULTADOS</h4>';
-                $html .= '      </a>';
+                $html .= !$hasRole ? '' : '      </a>';
                 $html .= '      <p>Verificación, validación y liberación de informes de resultados.</p>';
                 $html .= '    </div>';
 
@@ -93,12 +107,16 @@ abstract class FAppBodyHome
                 $html .= '      <p>Generación de consultas, reportes y estadísticas.</p>';
                 $html .= '    </div>';
 
+                $roles = array();
+                $roles[] = ModConsts::CC_USER_ROLE_RECEPT;
+                $roles[] = ModConsts::CC_USER_ROLE_DIRECTION;
+                $hasRole = FApp::hasUserSessionUserRoles($roles);
                 $module = FGuiUtils::getModule("catalogs");
                 $html .= '    <div class="col-sm-4">';
-                $html .= '      <a href="' . $module->getHref() . '">';
+                $html .= !$hasRole ? '' : '      <a href="' . $module->getHref() . '">';
                 $html .= '      <h1><span class="glyphicon glyphicon-th-list"></span></h1>';
                 $html .= '      <h4>CATÁLOGOS</h4>';
-                $html .= '      </a>';
+                $html .= !$hasRole ? '' : '      </a>';
                 $html .= '      <p>Gestión de catálogos de la aplicación.</p>';
                 $html .= '    </div>';
 

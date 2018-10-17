@@ -86,6 +86,27 @@ abstract class FApp
         return array_key_exists(FAppConsts::USER_ID, $_SESSION);
     }
 
+    public static function hasUserSessionUserRoles(array $roles): bool
+    {
+        $has = false;
+
+        if (!empty($_SESSION[FAppConsts::USER_TYPE]) && ($_SESSION[FAppConsts::USER_TYPE] == FAppConsts::USER_TYPE_ADMIN || $_SESSION[FAppConsts::USER_TYPE] == FAppConsts::USER_TYPE_SUPER)) {
+            $has = true;
+        }
+        else {
+            if (!empty($_SESSION[FAppConsts::USER_ROLES])) {
+                foreach ($roles as $role) {
+                    if (in_array($role, $_SESSION[FAppConsts::USER_ROLES])) {
+                        $has = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $has;
+    }
+
     /*
     * Starts application.
     * Return: nothing.

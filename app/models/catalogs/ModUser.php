@@ -1,10 +1,12 @@
 <?php
 namespace app\models\catalogs;
 
+use Fraphe\App\FGuiUtils;
 use Fraphe\App\FUserSession;
 use Fraphe\Model\FItem;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
+use app\models\ModConsts;
 
 class ModUser extends FRegistry
 {
@@ -21,12 +23,17 @@ class ModUser extends FRegistry
     protected $user_pswd;
     protected $is_system;
     protected $is_deleted;
+    protected $fk_user_type;
     protected $nk_entity;
     protected $nk_user_job;
     protected $fk_user_ins;
     protected $fk_user_upd;
     protected $ts_user_ins;
     protected $ts_user_upd;
+
+    protected $childUserUserRoles;      // array of ModUserUserRole
+    protected $childUserUserAttribs;    // array of ModUserUserAttrib
+    protected $childUserProcessAreas;   // array of ModUserProcessArea
 
     function __construct()
     {
@@ -43,6 +50,7 @@ class ModUser extends FRegistry
         $this->user_pswd = new FItem(FItem::DATA_TYPE_STRING, "user_pswd", "Contraseña usuario", "", true);
         $this->is_system = new FItem(FItem::DATA_TYPE_BOOL, "is_system", "Registro sistema", "", false);
         $this->is_deleted = new FItem(FItem::DATA_TYPE_BOOL, "is_deleted", "Registro eliminado", "", false);
+        $this->fk_user_type = new FItem(FItem::DATA_TYPE_INT, "fk_user_type", "Tipo usuario", "", true);
         $this->nk_entity = new FItem(FItem::DATA_TYPE_INT, "nk_entity", "Entidad", "", false);
         $this->nk_user_job = new FItem(FItem::DATA_TYPE_INT, "nk_user_job", "Puesto", "", false);
         $this->fk_user_ins = new FItem(FItem::DATA_TYPE_INT, "fk_user_ins", "Creador", "", true);
@@ -61,6 +69,7 @@ class ModUser extends FRegistry
         $this->items["user_pswd"] = $this->user_pswd;
         $this->items["is_system"] = $this->is_system;
         $this->items["is_deleted"] = $this->is_deleted;
+        $this->items["fk_user_type"] = $this->fk_user_type;
         $this->items["nk_entity"] = $this->nk_entity;
         $this->items["nk_user_job"] = $this->nk_user_job;
         $this->items["fk_user_ins"] = $this->fk_user_ins;
@@ -76,6 +85,108 @@ class ModUser extends FRegistry
         $this->mail->setRangeLength(0, 200);
         $this->user_name->setRangeLength(1, 50);
         $this->user_pswd->setRangeLength(1, 200);
+
+        $this->clearChildUserUserRoles();
+        $this->clearChildUserUserAttribs();
+        $this->clearChildUserProcessAreas();
+    }
+
+    public function &getChildUserUserRoles(): array
+    {
+        return $this->childUserUserRoles;
+    }
+
+    public function &getChildUserUserAttribs(): array
+    {
+        return $this->childUserUserAttribs;
+    }
+
+    public function &getChildUserProcessAreas(): array
+    {
+        return $this->childUserProcessAreas;
+    }
+
+    public function clearChildUserUserRoles()
+    {
+        $this->childUserUserRoles = array();
+    }
+
+    public function clearChildUserUserAttribs()
+    {
+        $this->childUserUserAttribs = array();
+    }
+
+    public function clearChildUserProcessAreas()
+    {
+        $this->childUserProcessAreas = array();
+    }
+
+    public function geIdstUserRoles(): array
+    {
+        $ids = array();
+
+        foreach ($this->childUserUserRoles as $child) {
+            $ids[] = $child->getDatum("id_user_role");
+        }
+
+        return $ids;
+    }
+
+    public function getIdsUserAttribs(): array
+    {
+        $ids = array();
+
+        foreach ($this->childUserUserAttribs as $child) {
+            $ids[] = $child->getDatum("id_user_attrib");
+        }
+
+        return $ids;
+    }
+
+    public function getIdsProcessAreas(): array
+    {
+        $ids = array();
+
+        foreach ($this->childUserProcessAreas as $child) {
+            $ids[] = $child->getDatum("id_process_area");
+        }
+
+        return $ids;
+    }
+
+    public function hasChildUserUserRole(int $userRole): bool
+    {
+        $exists = false;
+
+        if ($this->fk_user_type == ModConsts::CC_USER_TYPE_ADMIN || $this->fk_user_type == ModConsts::CC_USER_TYPE_SUPER) {
+            $exists = true;
+        }
+        else {
+            foreach ($this->childUserUserRoles as $child) {
+                if ($child->getDatum("id_user_role") == $userRole) {
+                    $exists = true;
+                    break;
+                }
+            }
+        }
+
+        return $exists;
+    }
+
+    public function addChildUserUserRole(int $userRole): bool
+    {
+        $exists = $this->hasChildUserUserRole($userRole);
+
+        if (!$exists) {
+            $data = array();
+            $data["id_user"] = $this->id;
+            $data["id_user_role"] = $userRole;
+            $child = new ModUserUserRole();
+            $child->setData($data);
+            $this->childUserUserRoles[] = $child;
+        }
+
+        return !$exists;
     }
 
     /** Overriden method.
@@ -89,6 +200,27 @@ class ModUser extends FRegistry
         // validate registry:
 
         parent::validate($userSession);
+
+        foreach ($this->childUserUserRoles as $child) {
+            $data = array();
+            $data["id_user"] = $this->isRegistryNew ? -1 : $this->id;  // bypass validation
+            $child->setData($data);
+            $child->validate($userSession);
+        }
+
+        foreach ($this->childUserUserAttribs as $child) {
+            $data = array();
+            $data["id_user"] = $this->isRegistryNew ? -1 : $this->id;  // bypass validation
+            $child->setData($data);
+            $child->validate($userSession);
+        }
+
+        foreach ($this->childUserProcessAreas as $child) {
+            $data = array();
+            $data["id_user"] = $this->isRegistryNew ? -1 : $this->id;  // bypass validation
+            $child->setData($data);
+            $child->validate($userSession);
+        }
     }
 
     public function read(FUserSession $userSession, int $id, int $mode)
@@ -111,6 +243,7 @@ class ModUser extends FRegistry
             $this->user_pswd->setValue($row["user_pswd"]);
             $this->is_system->setValue($row["is_system"]);
             $this->is_deleted->setValue($row["is_deleted"]);
+            $this->fk_user_type->setValue($row["fk_user_type"]);
             $this->nk_entity->setValue($row["nk_entity"]);
             $this->nk_user_job->setValue($row["nk_user_job"]);
             $this->fk_user_ins->setValue($row["fk_user_ins"]);
@@ -120,6 +253,48 @@ class ModUser extends FRegistry
 
             $this->isRegistryNew = false;
             $this->mode = $mode;
+
+            // create PDO connection for reading children:
+            $pdo = FGuiUtils::createPdo();
+
+            // read child user user roles:
+            $sql = "SELECT id_user, id_user_role FROM cc_user_user_role WHERE id_user = $this->id ORDER BY id_user, id_user_role;";
+            $statement = $pdo->query($sql);
+            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                $ids = array();
+                $ids["id_user"] = intval($row["id_user"]);
+                $ids["id_user_role"] = intval($row["id_user_role"]);
+
+                $child = new ModUserUserRole();
+                $child->retrieve($userSession, $ids, $mode);
+                $this->childUserUserRoles[] = $child;
+            }
+
+            // read child user user attributes:
+            $sql = "SELECT id_user, id_user_attrib FROM cc_user_user_attrib WHERE id_user = $this->id ORDER BY id_user, id_user_attrib;";
+            $statement = $pdo->query($sql);
+            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                $ids = array();
+                $ids["id_user"] = intval($row["id_user"]);
+                $ids["id_user_attrib"] = intval($row["id_user_attrib"]);
+
+                $child = new ModUserUserAttrib();
+                $child->retrieve($userSession, $ids, $mode);
+                $this->childUserUserAttribs[] = $child;
+            }
+
+            // read child user process areas:
+            $sql = "SELECT id_user, id_process_area FROM cc_user_process_area WHERE id_user = $this->id ORDER BY id_user, id_process_area;";
+            $statement = $pdo->query($sql);
+            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                $ids = array();
+                $ids["id_user"] = intval($row["id_user"]);
+                $ids["id_process_area"] = intval($row["id_process_area"]);
+
+                $child = new ModUserProcessArea();
+                $child->retrieve($userSession, $ids, $mode);
+                $this->childUserProcessAreas[] = $child;
+            }
         }
         else {
             throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NOT_FOUND);
@@ -145,6 +320,7 @@ class ModUser extends FRegistry
                 "user_pswd, " .
                 "is_system, " .
                 "is_deleted, " .
+                "fk_user_type, " .
                 "nk_entity, " .
                 "nk_user_job, " .
                 "fk_user_ins, " .
@@ -163,6 +339,7 @@ class ModUser extends FRegistry
                 ":user_pswd, " .
                 ":is_system, " .
                 ":is_deleted, " .
+                ":fk_user_type, " .
                 ":nk_entity, " .
                 ":nk_user_job, " .
                 ":fk_user, " .
@@ -182,6 +359,7 @@ class ModUser extends FRegistry
                 "user_pswd = :user_pswd, " .
                 "is_system = :is_system, " .
                 "is_deleted = :is_deleted, " .
+                "fk_user_type = :fk_user_type, " .
                 "nk_entity = :nk_entity, " .
                 "nk_user_job = :nk_user_job, " .
                 //"fk_user_ins = :fk_user_ins, " .
@@ -202,6 +380,7 @@ class ModUser extends FRegistry
         $user_pswd = $this->user_pswd->getValue();
         $is_system = $this->is_system->getValue();
         $is_deleted = $this->is_deleted->getValue();
+        $fk_user_type = $this->fk_user_type->getValue();
         $nk_entity = $this->nk_entity->getValue();
         $nk_user_job = $this->nk_user_job->getValue();
         $fk_user_ins = $this->fk_user_ins->getValue();
@@ -222,6 +401,7 @@ class ModUser extends FRegistry
         $statement->bindParam(":user_pswd", $user_pswd);
         $statement->bindParam(":is_system", $is_system, \PDO::PARAM_BOOL);
         $statement->bindParam(":is_deleted", $is_deleted, \PDO::PARAM_BOOL);
+        $statement->bindParam(":fk_user_type", $fk_user_type, \PDO::PARAM_INT);
         $statement->bindParam(":nk_entity", $nk_entity, \PDO::PARAM_INT);
         $statement->bindParam(":nk_user_job", $nk_user_job, \PDO::PARAM_INT);
         //$statement->bindParam(":fk_user_ins", $fk_user_ins, \PDO::PARAM_INT);
@@ -243,6 +423,45 @@ class ModUser extends FRegistry
             $this->id_user->setValue($this->id);
             $this->isRegistryNew = false;
         }
+
+        // save child user user roles:
+        $userSession->getPdo()->exec("DELETE FROM cc_user_user_role WHERE id_user = $this->id;");  // raw relations
+        foreach ($this->childUserUserRoles as $child) {
+            // ensure link to parent:
+            $data = array();
+            $data["id_user"] = $this->id;
+
+            // save child:
+            $child->setData($data);
+            $child->forceRegistryNew(); // it is a raw relation
+            $child->save($userSession);
+        }
+
+        // save child user user attributes:
+        $userSession->getPdo()->exec("DELETE FROM cc_user_user_attrib WHERE id_user = $this->id;");  // raw relations
+        foreach ($this->childUserUserAttribs as $child) {
+            // ensure link to parent:
+            $data = array();
+            $data["id_user"] = $this->id;
+
+            // save child:
+            $child->setData($data);
+            $child->forceRegistryNew(); // it is a raw relation
+            $child->save($userSession);
+        }
+
+        // save child user process areas:
+        $userSession->getPdo()->exec("DELETE FROM cc_user_process_area WHERE id_user = $this->id;");  // raw relations
+        foreach ($this->childUserProcessAreas as $child) {
+            // ensure link to parent:
+            $data = array();
+            $data["id_user"] = $this->id;
+
+            // save child:
+            $child->setData($data);
+            $child->forceRegistryNew(); // it is a raw relation
+            $child->save($userSession);
+        }
     }
 
     public function delete(FUserSession $userSession)
@@ -253,5 +472,18 @@ class ModUser extends FRegistry
     public function undelete(FUserSession $userSession)
     {
 
+    }
+
+    public static function getUserId(\PDO $pdo, string $name): int
+    {
+        $id = 0;
+
+        $sql = "SELECT id_user FROM cc_user WHERE user_name = '$name';";
+        $statement = $pdo->query($sql);
+        if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $id = intval($row["id_user"]);
+        }
+
+        return $id;
     }
 }

@@ -51,7 +51,7 @@ switch ($report_st) {
         $stName = "cancelados";
         break;
     default:
-        $stName = "(todos)";
+        $stName = "todos";
 }
 
 $dateFilterGui = "";

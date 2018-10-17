@@ -41,6 +41,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         else {
             $data = array();
             $data["service_type"] = ModRecept::SERVICE_ORDINARY;
+            $data["fk_user_receiver"] = $userSession->getCurUser()->getId();
             $recept->setData($data);
         }
         break;
@@ -52,7 +53,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
         $data = array();
 
-        //$data["recept_num"] = $_POST["recept_num"];
+        $data["recept_num"] = $_POST["recept_num"]; // TODO reactivate automatic generation of reception numbers!
         //$data["recept_datetime"] = $_POST["recept_datetime"];
         //$data["process_days"] = $_POST["process_days"];
         //$data["process_start_date"] = $_POST["process_start_date"];
@@ -121,7 +122,7 @@ echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">Datos de la recepción</div>';
 echo '<div class="panel-body">';
 
-$recept->getItem("recept_num")->setGuiReadOnly(true);
+//$recept->getItem("recept_num")->setGuiReadOnly(true); TODO reactivate automatic generation of reception numbers!
 echo $recept->getItem("recept_num")->composeHtmlInput(FItem::INPUT_TEXT, 4, 4);
 
 $recept->getItem("recept_datetime")->setGuiReadOnly(true);

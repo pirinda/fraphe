@@ -370,13 +370,43 @@ if ($images > 0) {
         $image = '../../images/sample/' . $samplingImage->getDatum("sampling_img");
         $pdf->Image($image, 50, '', 90, 60, 'JPG', '', 'T', false, 600, '', false, false, 0, false, false, false);
         if (--$images > 0) {
-            $pdf->Ln(65);
+            $pdf->Ln(60);
         }
     }
 }
 else if ($sample->getDatum("is_def_sampling_img")) {
     $image = '../../images/entity/' . FFiles::createFileNameForId(ModEntity::PREFIX, 6, $customer->getId(), 1, "jpg");
     $pdf->Image($image, 50, '', 100, '', 'JPG', '', 'T', false, 600, '', false, false, 0, false, false, false);
+    $pdf->Ln(60);
+}
+
+/*
+function Image($file, $x='', $y='', $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
+function MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x='', $y='', $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
+function Write($h, $txt, $link='', $fill=false, $align='', $ln=false, $stretch=0, $firstline=false, $firstblock=false, $maxh=0, $wadj=0, $margin='')
+function writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
+*/
+
+if ($sample->getDatum("is_sampling_company")) {
+    $pdf->SetFont('helvetica', '', 8);
+
+    //$signImage = dirname(__FILE__).'/../images/user/' . FFiles::createFileNameForId("user_", 6, $report->getDatum("fk_user_valid"), 0, "jpg");
+    $signImage = '../../images/user/' . FFiles::createFileNameForId(ModUser::PREFIX, 6, $sample->getDatum("fk_user_sampler"), 0, "jpg");
+    if (!file_exists($signImage)) {
+        //$signImage = dirname(__FILE__).'/../images/user/' . FFiles::createFileNameForId("user_", 6, 0, 0, "jpg"); // default image
+        $signImage = '../../images/user/' . FFiles::createFileNameForId(ModUser::PREFIX, 6, 0, 0, "jpg"); // default image
+    }
+
+    $pdf->Image($signImage, 100, '', 96, '', 'JPG', '', 'T', false, 600, '', false, false, 0, false, false, false);
+    $pdf->Ln(20);
+
+    $sampler = new ModUser();
+    $sampler->read($userSession, $sample->getDatum("fk_user_sampler"), FRegistry::MODE_READ);
+
+    $txt = $sampler->getDatum("name");
+    $pdf->MultiCell(100, 3, $txt, 0, 'C', false, 1, 100, '', true, 0, false, true, 0, 'B', false);
+    $txt = empty($sampler->getDatum("nk_user_job")) ? "ND" : AppUtils::readField($userSession, "name", AppConsts::CC_USER_JOB, $sampler->getDatum("nk_user_job"));
+    $pdf->MultiCell(100, 3, $txt, 0, 'C', false, 1, 100, '', true, 0, false, true, 0, 'B', false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -619,6 +649,12 @@ $txt = "NE = No especificado";
 $pdf->MultiCell(30, $hTxt09, $txt, 0, 'L', false, 1, '', '', true, 0, false, true, 0, 'T', false);
 
 //------------------------------------------------------------------------------
+/*
+function Image($file, $x='', $y='', $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
+function Write($h, $txt, $link='', $fill=false, $align='', $ln=false, $stretch=0, $firstline=false, $firstblock=false, $maxh=0, $wadj=0, $margin='')
+function MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x='', $y='', $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
+function writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true) // uses MultiCell()
+*/
 
 $pdf->SetFont('helvetica', '', 8);
 
@@ -629,21 +665,17 @@ if (!file_exists($signImage)) {
     $signImage = '../../images/user/' . FFiles::createFileNameForId(ModUser::PREFIX, 6, 0, 0, "jpg"); // default image
 }
 
-//public function Image($file, $x='', $y='', $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array()) {
 $pdf->Image($signImage, 100, '', 96, '', 'JPG', '', 'T', false, 600, '', false, false, 0, false, false, false);
-
-//public function MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x='', $y='', $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
-
-$user = new ModUser();
-$user->read($userSession, $report->getDatum("fk_user_valid"), FRegistry::MODE_READ);
-
 $pdf->Ln(20);
 
-$txt = $user->getDatum("name");
+$signatory = new ModUser();
+$signatory->read($userSession, $report->getDatum("fk_user_valid"), FRegistry::MODE_READ);
+
+$txt = $signatory->getDatum("name");
 $pdf->MultiCell(100, 3, $txt, 0, 'C', false, 1, 100, '', true, 0, false, true, 0, 'B', false);
-$txt = empty($user->getDatum("nk_user_job")) ? "ND" : AppUtils::readField($userSession, "name", AppConsts::CC_USER_JOB, $user->getDatum("nk_user_job"));
+$txt = empty($signatory->getDatum("nk_user_job")) ? "ND" : AppUtils::readField($userSession, "name", AppConsts::CC_USER_JOB, $signatory->getDatum("nk_user_job"));
 $pdf->MultiCell(100, 3, $txt, 0, 'C', false, 1, 100, '', true, 0, false, true, 0, 'B', false);
-$txt = empty($user->getDatum("nk_user_job")) ? "" : "SIGNATARIO AUTORIZADO";
+$txt = empty($signatory->getDatum("nk_user_job")) ? "" : "SIGNATARIO AUTORIZADO";
 $pdf->MultiCell(100, 3, $txt, 0, 'C', false, 1, 100, '', true, 0, false, true, 0, 'B', false);
 
 //------------------------------------------------------------------------------

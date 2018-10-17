@@ -13,6 +13,7 @@ abstract class AppConsts
     public const CC_USER = 101121;
     public const CC_USER_USER_ROLE = 101122;
     public const CC_USER_USER_ATTRIB = 101126;
+    public const CC_USER_PROCESS_AREA = 101131;
     public const CC_MARKET_SEGMENT = 101201;
     public const CC_ENTITY_CLASS = 101211;
     public const CC_ENTITY_TYPE = 101212;
@@ -75,6 +76,7 @@ abstract class AppConsts
         self::CC_USER => "cc_user",
         self::CC_USER_USER_ROLE => "cc_user_user_role",
         self::CC_USER_USER_ATTRIB => "cc_user_user_attrib",
+        self::CC_USER_PROCESS_AREA => "cc_user_process_area",
         self::CC_MARKET_SEGMENT => "cc_market_segment",
         self::CC_ENTITY_CLASS => "cc_entity_class",
         self::CC_ENTITY_TYPE => "cc_entity_type",
@@ -136,6 +138,7 @@ abstract class AppConsts
         self::CC_USER_ATTRIB => "id_user_attrib",
         self::CC_USER_JOB => "id_user_job",
         self::CC_USER => "id_user",
+        //
         //
         //
         self::CC_MARKET_SEGMENT => "id_market_segment",

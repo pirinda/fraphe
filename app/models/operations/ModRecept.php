@@ -262,7 +262,7 @@ class ModRecept extends FRegistry
 
         if ($this->isRegistryNew) {
             $this->recept_datetime->setValue(FLibUtils::getLocalDatetime()); // set datetime before than number!
-            $this->recept_num->setValue($this->generateNumber($userSession));
+            //$this->recept_num->setValue($this->generateNumber($userSession)); TODO reactivate automatic generation of reception numbers!
         }
 
         foreach ($this->childSamples as $sample) {

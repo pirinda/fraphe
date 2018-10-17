@@ -139,7 +139,6 @@ abstract class AppUtils
         return $options;
     }
 
-
     public static function getSelectRawOptions(FUserSession $userSession, int $catalog): array
     {
         $sql;

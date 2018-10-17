@@ -9,12 +9,13 @@ abstract class ModConsts
 
     public const CC_COMPANY_BRANCH_HQ = 1;
 
-    public const CC_USER_TYPE_ADMIN = 1;
-    public const CC_USER_TYPE_USER = 2;
+    public const CC_USER_TYPE_USER = 1;
+    public const CC_USER_TYPE_ADMIN = 2;
+    public const CC_USER_TYPE_SUPER = 3;
 
     public const CC_USER_NA = 1;
-    public const CC_USER_SUPER = 2;
-    public const CC_USER_ADMIN = 3;
+    public const CC_USER_ADMIN = 2;
+    public const CC_USER_SUPER = 3;
 
     public const CC_ENTITY_CLASS_COM = 1;
     public const CC_ENTITY_CLASS_CUST = 2;

@@ -22,7 +22,14 @@ abstract class FAppConsts
 
     public const USER_ID = "userId";
     public const USER_NAME = "userName";
+    public const USER_TYPE = "userType";
+    public const USER_ROLES = "userRoles";
     public const USER_LOGIN_TS = "userLoginTs";
+    public const USER_LOGIN_MSG = "userLoginMsg";
+
+    public const USER_TYPE_USER = 1;
+    public const USER_TYPE_ADMIN = 2;
+    public const USER_TYPE_SUPER = 3;
 
     public const TAG_PAGE = "page";
     public const TAG_MOD = "module";

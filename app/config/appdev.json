@@ -1,0 +1,15 @@
+{
+  "appName":"SYS 1.0",
+  "appVendor":"EMPRESA SA DE CV",
+  "appMode":"DEV",
+  "appCatalogs":["catalogs"],
+  "dbHost":"localhost",
+  "dbPort":"3306",
+  "dbName":"test1",
+  "dbUserName":"root",
+  "dbUserPswd":"msroot",
+  "locLang":"es",
+  "locCountry":"MEX",
+  "locCurrency":"MXN",
+  "locTimeZone":"America/Mexico_City"
+}
