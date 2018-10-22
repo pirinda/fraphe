@@ -14,7 +14,8 @@ if (!defined("ROOT_DIR")) {
 
 // set Fraphe autoloader:
 spl_autoload_register(function ($class_name) {
-    if (file_exists($_SESSION[ROOT_DIR] . $class_name . ".php")) {
-        require_once $_SESSION[ROOT_DIR] . $class_name . ".php";
+    $class_name_env = str_replace("\\", DIRECTORY_SEPARATOR, $class_name);
+    if (file_exists($_SESSION[ROOT_DIR] . $class_name_env . ".php")) {
+        require_once $_SESSION[ROOT_DIR] . $class_name_env . ".php";
     }
 });
