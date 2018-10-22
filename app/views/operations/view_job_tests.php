@@ -90,11 +90,13 @@ $sql = <<<SQL
 SELECT jt.job_test, jt.id_job_test, jt.process_days, jt.process_start_date, jt.process_deadline,
 jt.ts_user_ins AS _ts_user_ins, jt.ts_user_upd AS _ts_user_upd,
 t.name AS _t_name,
+tm.name AS _tm_name,
 IF(e.alias <> '', e.alias, e.name) AS _entity,
 js.code AS _js_code,
 ui.name AS _ui_name, uu.name AS _uu_name
 FROM o_job_test AS jt
 INNER JOIN oc_test AS t ON jt.fk_test = t.id_test
+INNER JOIN oc_testing_method AS tm ON t.fk_testing_method = tm.id_testing_method
 INNER JOIN cc_entity AS e ON jt.fk_entity = e.id_entity
 INNER JOIN oc_job_status AS js ON jt.fk_job_test_status = js.id_job_status
 INNER JOIN cc_user AS ui ON jt.fk_user_ins = ui.id_user
@@ -109,6 +111,7 @@ echo '<thead>';
 echo '<tr>';
 echo '<th><abbr title="Número">Núm.</abbr></th>';
 echo '<th>Ensayo</th>';
+echo '<th>Método analítico</th>';
 echo '<th>Entidad</th>';
 echo '<th>Estatus</th>';
 echo '<th><abbr title="Días proceso">DP</abbr></th>';
@@ -128,6 +131,7 @@ foreach ($pdo->query($sql) as $row) {
     echo '<tr>';
     echo '<td>' . $row['job_test'] . '</td>';
     echo '<td>' . $row['_t_name'] . '</td>';
+    echo '<td>' . $row['_tm_name'] . '</td>';
     echo '<td>' . $row['_entity'] . '</td>';
     echo '<td>' . $row['_js_code'] . '</td>';
     echo '<td>' . $row['process_days'] . '</td>';

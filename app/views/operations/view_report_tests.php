@@ -98,10 +98,12 @@ $sql = <<<SQL
 SELECT rt.report_test, rt.id_report_test, rt.result, rt.uncertainty, rt.permiss_limit,
 rt.ts_user_ins AS _ts_user_ins, rt.ts_user_upd AS _ts_user_upd,
 t.name AS _t_name,
+tm.name AS _tm_name,
 ru.code AS _ru_code,
 ui.name AS _ui_name, uu.name AS _uu_name
 FROM o_report_test AS rt
 INNER JOIN oc_test AS t ON rt.fk_test = t.id_test
+INNER JOIN oc_testing_method AS tm ON t.fk_testing_method = tm.id_testing_method
 INNER JOIN cc_user AS ui ON rt.fk_user_ins = ui.id_user
 INNER JOIN cc_user AS uu ON rt.fk_user_upd = uu.id_user
 LEFT OUTER JOIN oc_result_unit AS ru ON rt.nk_result_unit = ru.id_result_unit
@@ -115,6 +117,7 @@ echo '<thead>';
 echo '<tr>';
 echo '<th><abbr title="Número">Núm.</abbr></th>';
 echo '<th>Ensayo</th>';
+echo '<th>Método analítico</th>';
 echo '<th>Resultado</th>';
 echo '<th><abbr title="Unidad resultado">UR</abbr></th>';
 echo '<th><abbr title="Incertidumbre">U</abbr></th>';
@@ -133,6 +136,7 @@ foreach ($pdo->query($sql) as $row) {
     echo '<tr>';
     echo '<td>' . $row['report_test'] . '</td>';
     echo '<td>' . $row['_t_name'] . '</td>';
+    echo '<td>' . $row['_tm_name'] . '</td>';
     echo '<td>' . $row['result'] . '</td>';
     echo '<td>' . $row['_ru_code'] . '</td>';
     echo '<td>' . $row['uncertainty'] . '</td>';
