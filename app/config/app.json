@@ -5,7 +5,7 @@
   "appCatalogs":["catalogs"],
   "dbHost":"localhost",
   "dbPort":"3306",
-  "dbName":"test1",
+  "dbName":"aalims",
   "dbUserName":"root",
   "dbUserPswd":"msroot",
   "locLang":"es",
