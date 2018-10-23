@@ -220,7 +220,13 @@ class ModSamplingImage extends FRegistry
 
     public function delete(FUserSession $userSession)
     {
-
+        if (!$this->canDelete()) {
+            throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NON_DELETABLE);
+        }
+        else {
+            $this->is_deleted->setValue(true);
+            $this->save($userSession);
+        }
     }
 
     public function undelete(FUserSession $userSession)

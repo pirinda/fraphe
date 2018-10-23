@@ -20,9 +20,9 @@ use Fraphe\Model\FRegistry;
 use app\AppConsts;
 use app\AppUtils;
 use app\models\ModConsts;
+use app\models\operations\ModRecept;
 use app\models\operations\ModSample;
 use app\models\operations\ModSamplingImage;
-use app\models\operations\ModTest;
 
 echo '<!DOCTYPE html>';
 echo '<html>';
@@ -33,6 +33,7 @@ echo FAppNavbar::compose("recept");
 $userSession = FGuiUtils::createUserSession();
 $sample = new ModSample();
 $samplingImg = new ModSamplingImage();
+$recept = new ModRecept();
 $errmsg = "";
 
 switch ($_SERVER["REQUEST_METHOD"]) {
@@ -74,7 +75,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
             FFiles::uploadFile($_FILES["sampling_img"], $samplingImg->getTargetFile());
 
-            header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/operations/view_recept_sample_imgs.php?id=" . $sample->getId());
+            header("Location: " . $_SESSION[FAppConsts::ROOT_DIR_WEB] . "app/views/operations/view_recept_sampling_imgs.php?id=" . $sample->getId());
         }
         catch (Exception $e) {
             $errmsg = $e->getMessage();
@@ -171,8 +172,9 @@ echo '</div>';
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-echo '<button type="submit" class="btn btn-sm btn-primary">Guardar</button>&nbsp;';
-echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept_sample_imgs.php?id=' . $sample->getId() . '" class="btn btn-sm btn-danger" role="button">Cancelar</a>';
+$recept->read($userSession, $sample->getDatum("nk_recept"), FRegistry::MODE_READ);
+echo '<button type="submit" class="btn btn-sm btn-primary"' . ($recept->getDatum("fk_recept_status") >= ModConsts::OC_RECEPT_STATUS_PROCESSING ? " disabled" : "") . '>Guardar</button>&nbsp;';
+echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept_sampling_imgs.php?id=' . $sample->getId() . '" class="btn btn-sm btn-danger" role="button">Cancelar</a>';
 
 echo '</form>';
 echo '</div>';  // echo '<div class="container" style="margin-top:50px">';

@@ -13,7 +13,9 @@ abstract class FApp
         $html = '<footer>';
         $html .= '<div class="container-fluid">';
         $html .= '<hr>';
+        $html .= '<img src="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/images/cedimilogo.png" alt="CEDIMI Logo" style="width:100px;">&nbsp;';
         $html .= 'Copyright &copy;' . date("Y") . ' ' . $_SESSION[FAppConsts::APP_VENDOR];
+        $html .= '<hr>';
         $html .= '</div>';
         $html .= '</footer>';
 

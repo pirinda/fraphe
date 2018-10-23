@@ -119,7 +119,7 @@ echo '<th>Cliente</th>';
 echo '<th>Alias</th>';
 echo '<th><abbr title="Número reimpresión">#R</abbr></th>';
 echo '<th><abbr title="Sucursal">Suc.</abbr></th>';
-echo '<th><abbr title="Cantidad ensayos">C/E</abbr></th>';
+echo '<th><abbr title="Cantidad ensayos">Ens.</abbr></th>';
 echo '<th class="small">Creador</th>';
 echo '<th class="small">Creación</th>';
 echo '<th class="small">Modificador</th>';

@@ -1185,7 +1185,47 @@ class ModSample extends FRegistry
 
     public function delete(FUserSession $userSession)
     {
+        if (!$this->canDelete()) {
+            throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NON_DELETABLE);
+        }
+        else {
+            foreach ($this->childSampleTests as $child) {
+                if (!$child->canDelete()) {
+                    throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NON_DELETABLE);
+                }
+            }
 
+            // save child sample status log entries:
+            foreach ($this->childSampleStatusLogs as $child) {
+                if (!$child->canDelete()) {
+                    throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NON_DELETABLE);
+                }
+            }
+
+            // save child sample images:
+            foreach ($this->childSamplingImages as $child) {
+                if (!$child->canDelete()) {
+                    throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NON_DELETABLE);
+                }
+            }
+
+            // save aswell auxiliar child jobs:
+            foreach ($this->auxChildJobs as $auxChild) {
+                if (!$child->canDelete()) {
+                    throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NON_DELETABLE);
+                }
+            }
+
+            // save aswell auxiliar child report:
+            if (isset($this->auxChildReport)) {
+                if (!$child->canDelete()) {
+                    throw new \Exception(__METHOD__ . ": " . FRegistry::ERR_MSG_REGISTRY_NON_DELETABLE);
+                }
+            }
+
+            $this->is_deleted->setValue(true);
+            $this->save($userSession);
+        }
     }
 
     public function undelete(FUserSession $userSession)

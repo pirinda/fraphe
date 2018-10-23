@@ -11,6 +11,7 @@ abstract class FRegistry
     public const ERR_MSG_REGISTRY_NOT_FOUND = "El registro no fue encontrado.";
     public const ERR_MSG_REGISTRY_DEP_NOT_FOUND = "El registro dependiente no fue encontrado.";
     public const ERR_MSG_REGISTRY_NON_UPDATABLE = "El registro no se puede modificar.";
+    public const ERR_MSG_REGISTRY_NON_DELETABLE = "El registro no se puede eliminar.";
 
     protected $registryType;
     protected $tableName;

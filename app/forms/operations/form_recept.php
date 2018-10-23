@@ -138,8 +138,8 @@ echo '<div class="col-sm-4">';
 echo '<label class="control-label small" for="service_type">' . $recept->getItem("service_type")->getName() . ': *</label>';
 echo '</div>';
 echo '<div class="col-sm-8">';
-echo '<label class="radio-inline small"><input type="radio" name="service_type" value="O"' . ($recept->getDatum("service_type") == 'O' ? ' checked' : '') . '>Ordinario</label>';
-echo '<label class="radio-inline small"><input type="radio" name="service_type" value="U"' . ($recept->getDatum("service_type") == 'U' ? ' checked' : '') . '>Urgente</label>';
+echo '<label class="radio-inline small"><input type="radio" name="service_type" value="O"' . ($recept->getDatum("service_type") == ModRecept::SERVICE_ORDINARY ? ' checked' : '') . '>Ordinario</label>';
+echo '<label class="radio-inline small"><input type="radio" name="service_type" value="U"' . ($recept->getDatum("service_type") == ModRecept::SERVICE_URGENT ? ' checked' : '') . '>Urgente</label>';
 echo '</div>';
 echo '</div>';
 
@@ -177,7 +177,7 @@ echo '</div>';  // right panel
 echo '</div>';  // row
 
 //echo '<div class="row">';
-echo '<button type="submit" class="btn btn-sm btn-primary">Guardar</button>&nbsp;';
+echo '<button type="submit" class="btn btn-sm btn-primary"' . ($recept->getDatum("fk_recept_status") >= ModConsts::OC_RECEPT_STATUS_PROCESSING ? " disabled" : "") . '>Guardar</button>&nbsp;';
 echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept.php" class="btn btn-sm btn-danger" role="button">Cancelar</a>';
 //echo '</div>';  // row
 

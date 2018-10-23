@@ -14,6 +14,7 @@ use Fraphe\App\FAppNavbar;
 use Fraphe\App\FGuiUtils;
 use Fraphe\Lib\FLibUtils;
 use Fraphe\Model\FRegistry;
+use app\models\ModConsts;
 use app\models\catalogs\ModEntity;
 use app\models\operations\ModRecept;
 
@@ -50,8 +51,6 @@ echo '<div class="col-sm-2"><b>' . $recept->getItem("fk_customer")->getName() . 
 echo '<div class="col-sm-10">' . $customer->getDatum("name") . '</div>';
 echo '</div>';
 
-echo '<br>';
-
 $address = $customer->getChildEntityAddresses()[0];
 echo '<div class="row">';
 echo '<div class="col-sm-2"><b>Domicilio:</b></div>';
@@ -71,7 +70,7 @@ echo '</div>';
 echo '<h4>Muestras de la recepción de muestras</h4>';
 
 echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?recept=' . $recept->getId() . '" class="btn btn-primary btn-sm" role="button">Crear</a>&nbsp;';
-echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept.php?" class="btn btn-danger btn-sm" role="button">Volver</a>';
+echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept.php?" class="btn btn-info btn-sm" role="button">Volver</a>';
 
 $sql = <<<SQL
 SELECT s.sample_num, s.id_sample AS _id, s.sample_name, round(s.sample_quantity, 3) AS _sample_quantity, s.sample_lot,
@@ -82,8 +81,8 @@ cu.code AS _cu_code,
 us.initials AS _us_initials,
 ur.initials AS _ur_initials,
 ui.name AS _ui_name, uu.name AS _uu_name,
-(SELECT COUNT(*) FROM o_sample_test AS qst WHERE qst.fk_sample = s.id_sample) AS _tests,
-(SELECT COUNT(*) FROM o_sampling_img AS qsi WHERE qsi.fk_sample = s.id_sample) AS _imgs
+(SELECT COUNT(*) FROM o_sample_test AS qst WHERE qst.fk_sample = s.id_sample AND NOT qst.is_deleted) AS _tests,
+(SELECT COUNT(*) FROM o_sampling_img AS qsi WHERE qsi.fk_sample = s.id_sample AND NOT qsi.is_deleted) AS _imgs
 FROM o_sample AS s
 INNER JOIN cc_company_branch AS cb ON s.fk_company_branch = cb.id_company_branch
 INNER JOIN oc_sample_status AS ss ON s.fk_sample_status = ss.id_sample_status
@@ -106,11 +105,11 @@ echo '<th>Cantidad</th>';
 echo '<th><abbr title="Unidad medida">UM</abbr></th>';
 echo '<th>Lote</th>';
 echo '<th>Estatus</th>';
-echo '<th><abbr title="Realizador muestreo">Mtr.</abbr></th>';
+echo '<th><abbr title="Químico muestreo">QM</abbr></th>';
 echo '<th><abbr title="Receptor">Rec.</abbr></th>';
 echo '<th><abbr title="Sucursal">Suc.</abbr></th>';
-echo '<th><abbr title="Cantidad ensayos">C/E</abbr></th>';
-echo '<th><abbr title="Cantidad imágenes muestreo">C/I</abbr></th>';
+echo '<th><abbr title="Cantidad ensayos">Ens.</abbr></th>';
+echo '<th><abbr title="Cantidad imágenes muestreo">Img.</abbr></th>';
 echo '<th class="small">Creador</th>';
 echo '<th class="small">Creación</th>';
 echo '<th class="small">Modificador</th>';
@@ -141,9 +140,12 @@ foreach ($pdo->query($sql) as $row) {
     echo '<td><nobr>';
     echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?id=' . $row['_id'] . '" class="btn btn-success btn-xs" role="button"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;';
     echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept_sample_tests.php?id=' . $row['_id'] . '" class="btn btn-warning btn-xs" role="button"><span class="glyphicon glyphicon-th-list"></span></a>&nbsp;';
-    echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept_sample_imgs.php?id=' . $row['_id'] . '" class="btn btn-warning btn-xs" role="button"><span class="glyphicon glyphicon-picture"></span></a>&nbsp;';
+    echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept_sampling_imgs.php?id=' . $row['_id'] . '" class="btn btn-warning btn-xs" role="button"><span class="glyphicon glyphicon-picture"></span></a>&nbsp;';
     echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample.php?id=' . $row['_id'] . '&copy=1" class="btn btn-primary btn-xs" role="button"><span class="glyphicon glyphicon-duplicate"></span></a>&nbsp;';
-    echo '<a href="#" class="btn btn-danger btn-xs" role="button"><span class="glyphicon glyphicon-ban-circle"></span></a>';
+    echo '<button type="button" class="btn btn-danger btn-xs" ' .
+        'onclick="deleteSample(\'' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/delete_recept_sample.php?id=' . $row['_id'] . '\', \'' . $row['sample_num'] . '\');"' .
+        ($recept->getDatum("fk_recept_status") >= ModConsts::OC_RECEPT_STATUS_PROCESSING ? " disabled" : "") . '>' .
+        '<span class="glyphicon glyphicon-trash"></span></button>';
     echo '</nobr></td>';
     echo '</tr>';
 }
@@ -154,5 +156,14 @@ echo '</table>';
 echo '</div>';
 
 echo FApp::composeFooter();
+echo <<<SCRIPT
+<script>
+function deleteSample(url, num) {
+    if (confirm("¿Eliminar la muestra " + num + "?")) {
+        window.location.assign(url);
+    }
+}
+</script>
+SCRIPT;
 echo '</body>';
 echo '</html>';

@@ -19,6 +19,7 @@ use Fraphe\Model\FRegistry;
 use app\AppConsts;
 use app\AppUtils;
 use app\models\ModConsts;
+use app\models\operations\ModRecept;
 use app\models\operations\ModSample;
 use app\models\operations\ModSampleTest;
 use app\models\operations\ModTest;
@@ -32,6 +33,7 @@ echo FAppNavbar::compose("recept");
 $userSession = FGuiUtils::createUserSession();
 $sample = new ModSample();
 $sampleTest = new ModSampleTest();
+$recept = new ModRecept();
 $errmsg = "";
 
 switch ($_SERVER["REQUEST_METHOD"]) {
@@ -225,7 +227,8 @@ echo '</div>';  // row
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-echo '<button type="submit" class="btn btn-sm btn-primary">Guardar</button>&nbsp;';
+$recept->read($userSession, $sample->getDatum("nk_recept"), FRegistry::MODE_READ);
+echo '<button type="submit" class="btn btn-sm btn-primary"' . ($recept->getDatum("fk_recept_status") >= ModConsts::OC_RECEPT_STATUS_PROCESSING ? " disabled" : "") . '>Guardar</button>&nbsp;';
 echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept_sample_tests.php?id=' . $sample->getId() . '" class="btn btn-sm btn-danger" role="button">Cancelar</a>';
 
 echo '</form>';

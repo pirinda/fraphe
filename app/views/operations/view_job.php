@@ -136,8 +136,8 @@ echo '<th><abbr title="Días proceso">DP</abbr></th>';
 echo '<th>Inicio proceso</th>';
 echo '<th>Límite proceso</th>';
 echo '<th><abbr title="Sucursal">Suc.</abbr></th>';
-echo '<th><abbr title="Cantidad ensayos">C/E</abbr></th>';
-echo '<th><abbr title="Muestra compartida">M/C</abbr></th>';
+echo '<th><abbr title="Cantidad ensayos">Ens.</abbr></th>';
+echo '<th><abbr title="Muestra compartida">MC</abbr></th>';
 echo '<th class="small">Creador</th>';
 echo '<th class="small">Creación</th>';
 echo '<th class="small">Modificador</th>';
@@ -178,7 +178,7 @@ foreach ($pdo->query($sql) as $row) {
     echo '<td class="small">' . $row['c_ts_user_upd'] . '</td>';
     echo '<td><nobr>';
     echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_job_tests.php?id=' . $row['id_job'] . '" class="btn btn-warning btn-xs" role="button"><span class="glyphicon glyphicon-inbox"></span></a>&nbsp;';
-    echo '<a href="#" class="btn btn-danger btn-xs" role="button"><span class="glyphicon glyphicon-ban-circle"></span></a>';
+    //echo '<a href="#" class="btn btn-danger btn-xs" role="button"><span class="glyphicon glyphicon-ban-circle"></span></a>';
     echo '</nobr></td>';
     echo '</tr>';
 }

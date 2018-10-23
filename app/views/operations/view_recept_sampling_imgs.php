@@ -16,7 +16,9 @@ use Fraphe\Lib\FLibUtils;
 use Fraphe\Model\FRegistry;
 use app\AppConsts;
 use app\AppUtils;
+use app\models\ModConsts;
 use app\models\operations\ModSample;
+use app\models\operations\ModRecept;
 use app\models\operations\ModSamplingImage;
 
 echo '<!DOCTYPE html>';
@@ -28,6 +30,8 @@ echo FAppNavbar::compose("recept");
 $userSession = FGuiUtils::createUserSession();
 $sample = new ModSample();
 $sample->read($userSession, intval($_GET[FRegistry::ID]), FRegistry::MODE_READ);
+$recept = new ModRecept();
+$recept->read($userSession, $sample->getDatum("nk_recept"), FRegistry::MODE_READ);
 
 //------------------------------------------------------------------------------
 echo '<div class="container" style="margin-top:50px">';
@@ -60,8 +64,8 @@ echo '</div>';
 
 echo '<h4>Imágenes de muestreo de la muestra</h4>';
 
-echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample_img.php?sample=' . $sample->getId() . '" class="btn btn-primary btn-sm" role="button">Crear</a>&nbsp;';
-echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept_samples.php?id=' . $sample->getDatum("nk_recept") . '" class="btn btn-danger btn-sm" role="button">Volver</a>';
+echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sampling_img.php?sample=' . $sample->getId() . '" class="btn btn-primary btn-sm" role="button">Crear</a>&nbsp;';
+echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept_samples.php?id=' . $sample->getDatum("nk_recept") . '" class="btn btn-info btn-sm" role="button">Volver</a>';
 
 $sql = <<<SQL
 SELECT si.sampling_img, si.id_sampling_img,
@@ -93,15 +97,18 @@ $pdo = FGuiUtils::createPdo();
 foreach ($pdo->query($sql) as $row) {
     echo '<tr>';
     echo '<td>' . $row['sampling_img'] . '</td>';
-    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample_img.php?id=' . $row['id_sampling_img'] . '">';
+    echo '<td><a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sampling_img.php?id=' . $row['id_sampling_img'] . '">';
     echo '<img src="' . ModSamplingImage::PATH_IMG . $row['sampling_img'] . '" alt="' . $row['sampling_img'] . '" width="150" height="100"></a></td>';
     echo '<td class="small">' . $row['_ui_name'] . '</td>';
     echo '<td class="small">' . $row['_ts_user_ins'] . '</td>';
     echo '<td class="small">' . $row['_uu_name'] . '</td>';
     echo '<td class="small">' . $row['_ts_user_upd'] . '</td>';
     echo '<td><nobr>';
-    echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sample_img.php?id=' . $row['id_sampling_img'] . '" class="btn btn-success btn-xs" role="button"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;';
-    echo '<a href="#" class="btn btn-danger btn-xs" role="button"><span class="glyphicon glyphicon-ban-circle"></span></a>';
+    echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept_sampling_img.php?id=' . $row['id_sampling_img'] . '" class="btn btn-success btn-xs" role="button"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;';
+    echo '<button type="button" class="btn btn-danger btn-xs" ' .
+        'onclick="deleteImage(\'' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/delete_recept_sampling_img.php?id=' . $row['id_sampling_img'] . '\', \'' . $row['sampling_img'] . '\');"' .
+        ($recept->getDatum("fk_recept_status") >= ModConsts::OC_RECEPT_STATUS_PROCESSING ? " disabled" : "") . '>' .
+        '<span class="glyphicon glyphicon-trash"></span></button>';
     echo '</nobr></td>';
     echo '</tr>';
 }
@@ -112,5 +119,14 @@ echo '</table>';
 echo '</div>';
 
 echo FApp::composeFooter();
+echo <<<SCRIPT
+<script>
+function deleteImage(url, image) {
+    if (confirm("¿Eliminar la imagen " + image + "?")) {
+        window.location.assign(url);
+    }
+}
+</script>
+SCRIPT;
 echo '</body>';
 echo '</html>';

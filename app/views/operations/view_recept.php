@@ -67,7 +67,7 @@ cus.alias AS _cus_alias,
 rs.code AS _rs_code,
 ur.initials AS _ur_initials,
 ui.name AS ui_name, uu.name AS uu_name,
-(SELECT COUNT(*) FROM o_sample AS qs WHERE qs.nk_recept = r.id_recept) AS _samples
+(SELECT COUNT(*) FROM o_sample AS qs WHERE qs.nk_recept = r.id_recept AND NOT qs.is_deleted) AS _samples
 FROM o_recept AS r
 INNER JOIN cc_company_branch AS cb ON r.fk_company_branch = cb.id_company_branch
 INNER JOIN cc_entity AS cus ON r.fk_customer = cus.id_entity
@@ -101,7 +101,7 @@ echo '<th>Cliente</th>';
 echo '<th>Alias</th>';
 echo '<th><abbr title="Receptor">Rec.</abbr></th>';
 echo '<th><abbr title="Sucursal">Suc.</abbr></th>';
-echo '<th><abbr title="Cantidad muestras">C/M</abbr></th>';
+echo '<th><abbr title="Cantidad muestras">Mtr.</abbr></th>';
 echo '<th class="small">Creador</th>';
 echo '<th class="small">Creación</th>';
 echo '<th class="small">Modificador</th>';
@@ -141,7 +141,10 @@ foreach ($pdo->query($sql) as $row) {
     echo '<td><nobr>';
     echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/forms/operations/form_recept.php?id=' . $row['id_recept'] . '" class="btn btn-success btn-xs" role="button"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;';
     echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_recept_samples.php?id=' . $row['id_recept'] . '" class="btn btn-warning btn-xs" role="button"><span class="glyphicon glyphicon-list-alt"></span></a>&nbsp;';
-    echo '<a href="#" class="btn btn-danger btn-xs" role="button"><span class="glyphicon glyphicon-ban-circle"></span></a>';
+    echo '<button type="button" class="btn btn-danger btn-xs" ' .
+        'onclick="deleteRecept(\'' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/delete_recept.php?id=' . $row['id_recept'] . '\', \'' . $row['recept_num'] . '\');"' .
+        ($recept_st >= ModConsts::OC_RECEPT_STATUS_PROCESSING || $recept_st == 0 ? " disabled" : "") . '>' .
+        '<span class="glyphicon glyphicon-trash"></span></button>';
     echo '</nobr></td>';
     echo '</tr>';
 }
@@ -159,8 +162,10 @@ function procRecept(url, move) {
         window.location.assign(url);
     }
 }
-function validateForm() {
-    return checkBeforeSubmit(); // prevent multiple form submitions
+function deleteRecept(url, num) {
+    if (confirm("¿Eliminar la recepción de muestras " + num + "?")) {
+        window.location.assign(url);
+    }
 }
 </script>
 SCRIPT;

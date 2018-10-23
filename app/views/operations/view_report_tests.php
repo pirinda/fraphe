@@ -18,6 +18,7 @@ use app\AppConsts;
 use app\AppUtils;
 use app\models\catalogs\ModEntity;
 use app\models\operations\ModReport;
+use app\models\operations\ModRecept;
 use app\models\operations\ModSample;
 
 echo '<!DOCTYPE html>';
@@ -72,16 +73,35 @@ echo '<div class="row">';
 echo '<div class="col-sm-2"><b>' . $sample->getItem("sample_num")->getName() . ':</b></div>';
 echo '<div class="col-sm-3"><span class="bg-info">' . $sample->getDatum("sample_num") . '</span></div>';
 echo '<div class="col-sm-2"><b>' . $sample->getItem("recept_datetime_n")->getName() . ':</b></div>';
-echo '<div class="col-sm-3"><span class="bg-info">' . FLibUtils::formatStdDatetime($sample->getDatum("recept_datetime_n")) . '</span></div>';
+echo '<div class="col-sm-5"><span class="bg-info">' . FLibUtils::formatStdDatetime($sample->getDatum("recept_datetime_n")) . '</span></div>';
 echo '</div>';
 
 echo '<div class="row">';
 echo '<div class="col-sm-2"><b>' . $sample->getItem("sample_name")->getName() . ':</b></div>';
 echo '<div class="col-sm-3"><mark>' . $sample->getDatum("sample_name") . '</mark></div>';
+echo '<div class="col-sm-2"><b>' . $sample->getItem("recept_notes")->getName() . ':</b></div>';
+echo '<div class="col-sm-5">' . $sample->getDatum("recept_notes") . '</div>';
+echo '</div>';
+
+echo '<div class="row">';
 echo '<div class="col-sm-2"><b>' . $sample->getItem("sample_quantity")->getName() . ':</b></div>';
-echo '<div class="col-sm-2">' . $sample->getDatum("sample_quantity") . ' ' . AppUtils::readField($userSession, "code", AppConsts::OC_CONTAINER_UNIT, $sample->getDatum("fk_container_unit")) . '</div>';
+echo '<div class="col-sm-3">' . $sample->getDatum("sample_quantity") . ' ' . AppUtils::readField($userSession, "code", AppConsts::OC_CONTAINER_UNIT, $sample->getDatum("fk_container_unit")) . '</div>';
+echo '<div class="col-sm-2"><b>' . $sample->getItem("recept_deviations")->getName() . ':</b></div>';
+echo '<div class="col-sm-5">' . $sample->getDatum("recept_deviations") . '</div>';
+echo '</div>';
+
+echo '<div class="row">';
 echo '<div class="col-sm-2"><b>' . $sample->getItem("sample_lot")->getName() . ':</b></div>';
-echo '<div class="col-sm-1">' . $sample->getDatum("sample_lot") . '</div>';
+echo '<div class="col-sm-3">' . $sample->getDatum("sample_lot") . '</div>';
+echo '<div class="col-sm-2"><b>' . $sample->getItem("sampling_notes")->getName() . ':</b></div>';
+echo '<div class="col-sm-5">' . $sample->getDatum("sampling_notes") . '</div>';
+echo '</div>';
+
+echo '<div class="row">';
+echo '<div class="col-sm-2"><b>' . $sample->getItem("service_type")->getName() . ':</b></div>';
+echo '<div class="col-sm-3">' . ($sample->getDatum("service_type") == ModRecept::SERVICE_URGENT ? "Urgente" : "Ordinario") . '</div>';
+echo '<div class="col-sm-2"><b>' . $sample->getItem("sampling_deviations")->getName() . ':</b></div>';
+echo '<div class="col-sm-5">' . $sample->getDatum("sampling_deviations") . '</div>';
 echo '</div>';
 
 echo '</div>';
@@ -92,7 +112,7 @@ echo '</div>';
 
 echo '<h4>Ensayos del informe de resultados</h4>';
 
-echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_report.php" class="btn btn-danger btn-sm" role="button">Volver</a>';
+echo '<a href="' . $_SESSION[FAppConsts::ROOT_DIR_WEB] . 'app/views/operations/view_report.php" class="btn btn-info btn-sm" role="button">Volver</a>';
 
 $sql = <<<SQL
 SELECT rt.report_test, rt.id_report_test, rt.result, rt.uncertainty, rt.permiss_limit,
