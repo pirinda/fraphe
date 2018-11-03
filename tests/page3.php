@@ -13,7 +13,7 @@ session_start();
         echo "__DIR__: " . __DIR__ . "<br>";
         echo "__FILE__: " . __FILE__ . "<br>";
 
-        $_SESSION['RootDirServer'] = __DIR__ . DIRECTORY_SEPARATOR;
+        $_SESSION['RootDirServer'] = __DIR__ . "/";
         $_SESSION['RootDirClient'] = dirname($_SERVER['PHP_SELF']) . "/";
 
         echo "RootDirServer: " . $_SESSION['RootDirServer'] . "<br>";

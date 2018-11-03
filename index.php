@@ -9,11 +9,11 @@ if (!isset($_SESSION)) {
 }
 
 // define root directories, local (back-end) and web (front-end):
-$_SESSION["rootDir"] = __DIR__ . DIRECTORY_SEPARATOR;
+$_SESSION["rootDir"] = __DIR__ . "/";
 $_SESSION["rootDirWeb"] = dirname($_SERVER['PHP_SELF']) . "/";
 
 // bootstrap Fraphe:
-require $_SESSION["rootDir"] . "Fraphe" . DIRECTORY_SEPARATOR . "fraphe.php";
+require $_SESSION["rootDir"] . "Fraphe/fraphe.php";
 
 // start application:
 Fraphe\App\FApp::start();

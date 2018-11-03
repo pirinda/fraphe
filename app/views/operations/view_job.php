@@ -5,7 +5,7 @@ if (!isset($_SESSION)) {
     session_start();
 }
 // bootstrap Fraphe:
-require $_SESSION["rootDir"] . "Fraphe" . DIRECTORY_SEPARATOR . "fraphe.php";
+require $_SESSION["rootDir"] . "Fraphe/fraphe.php";
 //------------------------------------------------------------------------------
 
 use app\AppConsts;
