@@ -164,5 +164,21 @@
                 }
             }
         }
+    },
+    "queries":{
+        "module":"<span class='glyphicon glyphicon-stats'></span> Consultas",
+        "href":"app/modules.php?module=queries",
+        "menus":{
+            "queries":{
+                "menu":"Consultas",
+                "href":"menu=queries",
+                "submenus":{
+                    "queries":{
+                        "submenu":"Consultas",
+                        "href":"app/views/operations/view_queries.php"
+                    }
+                }
+            }
+        }
     }
 }

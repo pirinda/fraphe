@@ -104,9 +104,16 @@ abstract class FAppBodyHome
 
                 $html .= '  <div class="row">';
 
+                $roles = array();
+                $roles[] = ModConsts::CC_USER_ROLE_MARKETING;
+                $roles[] = ModConsts::CC_USER_ROLE_DIRECTION;
+                $hasRole = FApp::hasUserSessionUserRoles($roles);
+                $module = FGuiUtils::getModule("queries");
                 $html .= '    <div class="col-sm-4">';
+                $html .= !$hasRole ? '' : '      <a href="' . $module->getHref() . '">';
                 $html .= '      <h1><span class="glyphicon glyphicon-stats"></span></h1>';
                 $html .= '      <h4>CONSULTAS</h4>';
+                $html .= !$hasRole ? '' : '      </a>';
                 $html .= '      <p>Generación de consultas, reportes y estadísticas.</p>';
                 $html .= '    </div>';
 
