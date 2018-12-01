@@ -255,7 +255,7 @@ class ModEntity extends FRegistry
     {
         $this->initialize();
 
-        $sql = "SELECT * FROM $this->tableName WHERE id_entity = $id;";
+        $sql = "SELECT * FROM $this->tableName WHERE $this->idName = $id;";
         $statement = $userSession->getPdo()->query($sql);
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->id = intval($row["id_entity"]);
